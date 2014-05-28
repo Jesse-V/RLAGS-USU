@@ -1,0 +1,7 @@
+#!/bin/bash
+for i in {1..1}
+do
+sudo cp /home/rlags1/Rlags_Project/crons/time{,.`date +"%H.%M.%S"`}
+sleep 1
+done
+exit

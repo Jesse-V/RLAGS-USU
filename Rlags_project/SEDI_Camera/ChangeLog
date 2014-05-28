@@ -1,0 +1,354 @@
+2013 November: GoQat version 1.0.2
+
+The following features are added/modified:
+
+* The main application toolbar is now hideable via an option on the Windows
+  menu.  This shrinks the vertical height of the main window which is
+  useful for small displays.
+
+* The 'Wait for guide correction' option on the Autoguider tab was redundant
+  and has been removed.
+
+The following bugs have been fixed:
+
+* Autoguiding using the integrated guide port on Starlight Xpress cameras now
+  works properly (tested with Lodestar).  Thanks to Mike Collins for enthusiastic 
+  assistance with debugging and testing.
+
+* The number of north/south guide corrections was being reported incorrectly at 
+  the end of a guiding session.  The values were much too large.
+
+* GoQat was unable to find an instance of DS9 that had been opened by a previous
+  invocation of GoQat.
+
+* The controls for choosing a destination folder for saving files (on the Files
+  tab and the Live View window) were not initialised with any default location on
+  some systems.  The user's home folder is now set explicitly when GoQat starts.
+
+* The following changes have been made to FITS header records:
+	- EPOCH was deprecated and is now EQUINOX
+	- Records whose value contains a decimal point now appear correctly with 
+      a decimal point irrespective of the user's locale.  Thanks to Guenter Gebhard
+      for reporting this bug.
+	- The values of the CTYPE1 and CTYPE2 keywords have been changed to ' '.  
+      The existing value caused DS9 to crash on some systems.  Thanks to Fredrik
+      Florgård for reporting this problem.
+
+2013 May: GoQat version 1.0.0
+
+The following features are added/modified:
+
+* Support for Starlight Xpress cameras using the USB 2.0 interface has been
+  added.  This has been tested with a Lodestar as an autoguider camera or
+  as a main CCD camera.  It is possible to send guide signals via the
+  Lodestar in either of these configurations.  It is expected that GoQat
+  will support all USB 2.0 cameras, including those with temperature
+  regulation and colour chips.  However, these options have not yet been
+  tested.  Using a Starlight Xpress camera as both the main and autoguider
+  cameras simultaneously has also not been tested yet, but this is expected
+  to work.
+
+* There is a new option for controlling GoQat remotely.  GoQat can be instructed
+  to watch a file for incoming commands and any instructions available via the
+  task list can be sent to this file.  GoQat executes commands as they are
+  received.
+
+* USB/serial ports now appear and disappear dynamically on the Communications 
+  menu as USB-serial converters are plugged in or unplugged.
+
+* There are now four fixed options for video-for-linux devices on the Cameras
+  menu (i.e. /dev/video0 to /dev/video3 inclusive).
+
+* The user may now specify whether guide signals in north/south and east/west
+  directions can be processed simultaneously or not.  Some hardware may not
+  support this option.
+
+* The user can now specify whether GoQat is to correct only for long-term guide 
+  star drift in the north/south direction (e.g. to correct for polar misalignment)
+  rather than responding immediately to any 'spikes' in the star position arising
+  from seeing variations.
+
+* The sign of star positions in the star_pos.csv file and the guide corrections
+  file that can be produced by the autoguider camera has been reversed.  A 
+  negative sign now means that the star has moved east and a positive sign means 
+  it has moved west, relative to its initial position.  Columns in the star_pos.csv
+  file are now separated by tabs rather than commas.
+
+* A number of internal improvements have been made to the autoguiding code.
+
+* GoQat's auxiliary files are now installed in /usr/local/share/GoQat by default,
+  rather than /usr/local/GoQat.  Thank you to Vincent Hourdin for pointing out
+  this configuration error in previous versions.
+
+The following bugs have been fixed:
+
+* A previous version of GoQat was reported to crash on Debian 6.0.6.  The
+  underlying cause for this has probably (!) been fixed in this release.
+
+2012 July: GoQat version 0.9.8
+
+The following features are added/modified:
+
+* The dependency on gnome-specific libraries has been removed.  In particular,
+  GnomeCanvas has been replaced with GooCanvas, plus one or two other minor
+  changes.
+  
+* The mechanism for storing configuration data has been changed from GConf to
+  a text-based configuration file containing key-value pairs.  Users will need
+  to use the gconf-editor utility to retrieve their existing settings from the
+  GConf database and enter them into the new configuration file.
+  
+* The interface has been completely re-built using gtk's internal GtkBuilder
+  mechanism, rather than using the external libglade library.
+  
+* GoQat's simple video-for-linux capability is now provided by the libv4l 
+  library.  The previous method was not compatible with version 3 of the Linux
+  kernel.  As a result of this change, long exposure Philips webcams are no
+  longer supported.
+  
+* Support for frame-grabbing via the Imperx card has been removed.
+
+* The video playback window has been improved with new zoom in and zoom out
+  features.  It now behaves in the same way as the autoguider image display
+  window.
+  
+* Photometry of video data has been improved.  Photometry data is now written to
+  successively-numbered output files, rather than overwriting the same files 
+  each time a photometric measurement is made.
+  
+* GoQat's CCD camera filter names are now read from the text-based configuration
+  file, rather than being hard-wired in the code.  Users may edit the list of
+  of filter names as required.
+
+2012 July: GoQat version 0.9.7-1
+
+The following features are added/modified:
+
+* The documentation has been modified to reflect some minor changes relating to 
+  DS9 version 7.
+
+The following bugs have been fixed:
+
+* A change in the Linux kernel at some point after version 2.6 meant that GoQat 
+  hung when attempting to open a serial/USB port.  This has been fixed.
+
+* The documentation incorrectly referred to the 'Settings' menu rather than the 
+  'Communications' and 'Cameras' menus.  This has been modified.  
+
+2011 December: GoQat version 0.9.7
+
+The following features are added/modified:
+
+* Full support of RoboFocus for electronic focusing, including 'V-curve'
+  calibration (using published method by Larry Weber and Steve Brady), 
+  autofocus, temperature compensated focusing and the ability to adjust focus 
+  according to defined offsets for each filter change.
+  
+* 'FocusTo' and 'FocusMove' tasks added to task list commands for moving the 
+  focuser to a given position or moving it in or out by a given amount.
+  
+* Scripts executed via the task list 'Exec' or 'ExecAsync' commands now receive
+  the current focuser position, the maximum travel range and the focuser
+  temperature, so you can write your own focusing routines e.g. for focusing a
+  spectrograph.
+  
+* The CCD camera configuration window now contains sufficient data entry fields
+  for wheels with 8 filters, and fields for specifying filter focus offsets.
+  Data entered in these fields must be saved with the 'Save settings' button
+  before they can be applied.
+  
+* Support for the fast readout option for QSI 600-series cameras has been added.
+  Fast readout can be selected automatically for focusing operations.
+  
+* The video-for-linux autoguider camera option has a mono mode to support V4L
+  devices with mono output (e.g. modified webcams with no Bayer filter).  Thanks
+  to Armando Beneduce for suggesting and testing this option.
+  
+* A 'Notify' checkbox has been added to the CCD camera tab.  Check this to give
+  a 'beep' at the end of each exposure.  Thanks to Michel Borde for this 
+  suggestion.
+  
+* The menu items have been rearranged.
+
+* The beta 'b' post-fix is dropped from the version number with this release.
+
+The following bugs have been fixed:
+
+* Various small bug fixes and tweaks have been made.
+
+2011 May: GoQat version 0.9.6b
+
+The following features are added/modified:
+
+* GoQat now supports the execution of arbitrary scripts either synchronously or
+  asynchronously via the new Exec and ExecAsync tasks, with communication of 
+  script results to GoQat.
+* The following new tasks have also been added: IfTrue, IfFalse, Endif, While,
+  EndWhile, Exit and SetParam.  The execution of 'If' and 'While' statements
+  can be controlled by external scripts.
+* Video photometry and astrometry can be performed automatically on GoQat's 
+  video files via Emmanuel Bertin's SExtractor code, for analysis of asteroid
+  occultations and other transient events.
+* A long form of file name is now optionally available when saving CCD images;
+  this appends the CCD temperature and exposure length to the file name.
+  
+The following bugs have been fixed:
+
+* GoQat did not run properly on systems using a comma decimal separator.  Thanks
+  to Guenter Gebhard for reporting this bug and testing the fix.
+* When saving a file, the filter name was used instead of the exposure type in 
+  the file name.
+* The Move task was not recognised when loading a task list from a file.
+* Error messages when failing to open V4L devices were incorrect.
+
+2011 March: GoQat version 0.9.5b
+
+The following features are added/modified:
+
+* GoQat now supports long exposure webcams (the SC1 modification).  Thanks to
+  Armando Beneduce for suggesting this modification and assisting with testing
+  and debugging.   
+* GoQat now supports sending TTL guide signals via a parallel port (either 
+  native port or add-on card).  Thanks to Armando Beneduce for suggesting this 
+  modification and assisting with testing and debugging.
+* One-click autoguider calibration for the autoguider camera at any angle.  
+  Please read the manual carefully for details of this and other changes to
+  autoguiding.
+* The task list now includes a Move command for offsetting the telescope from
+  its current position by the specified number of arc minutes.
+* Task lists written 'by hand' can now be free-format, including blank lines,
+  indentation and comment lines beginning with a hash.  This is not backwards
+  compatible with the previous fixed format.
+* Task list checking now takes place immediately prior to execution and displays
+  intelligent warnings - for example the task list will not execute if it
+  contains a GoTo task but the link to the telescope controller is closed.
+* The Losmandy Gemini commands have been separated out and the user may select
+  whether to use them or not (the default is elements from the Autostar/LX200 
+  command set).
+* Menu items have been modified and re-arranged.
+* Automatic restoration of the pan setting in DS9 has been removed - do this by 
+  setting DS9 preferences instead - see the GoQat manual.  
+
+The following bugs have been fixed:
+
+* A QSI CCD camera without a filter wheel was closed immediately after opening, 
+  due to an unexpected return value in an underlying library.
+* Buffer overruns when communicating with telescope controllers caused GoQat
+  to crash on some Linux systems.
+* DS9 closed with "xpa_display_image: Can't find DS9 to display image!" message
+  if an attempt was made to display an image that was a different size from the 
+  currently displayed one.
+* There was an error in the format of declination strings when sending GoTo 
+  commands to non-Gemini controllers.
+* The GoTo command now works correctly for Gemini and non-Gemini controllers
+  and GoQat successfully detects the end of the telescope motion.
+* Video frame time-stamps could not be modified correctly if the local time was 
+  other than UTC.
+* The documentation has been completely reviewed and some cut-and-paste errors
+  have been corrected.
+
+2010 July: GoQat version 0.9.4b	
+
+The following features are added/modified:
+
+* The previous pan state is restored when an image is displayed in DS9 (so a
+  zoomed and panned part of an image will be displayed consistently from one
+  exposure to the next).
+* The task list now supports nested loops up to ten deep.
+* Error checking has been improved when loading a task list from a file.
+* Video frame time-stamps can be automatically set to match the on-screen
+  display from a GPS time inserter for a user-selectable range of frames.
+* A user-selectable sub-set of a video recording can be saved as a new video
+  file (in GoQat VID format).
+* Video frames saved as FITS files are now numbered with six significant figures
+  instead of four.
+* Many video operations can now be halted via the Esc key.
+
+The following bugs have been fixed:
+
+* A recently introduced bug caused GoQat to crash after a CCD exposure when
+  retrieving the RA and Dec coordinates from the telescope controller.
+* It is now possible to play back a video file larger than a 4Gb limit.
+* Streams of FITS images from a video file are now not saved unless the user 
+  sets valid values for the frame range (previously GoQat would attempt to save 
+  every frame as a FITS file if the specified range was invalid).
+* Selecting a subset of a video frame to save as FITS didn't work correctly if
+  the video frame was not the same size as the display window.
+
+2010 February: GoQat version 0.9.3b
+
+The following features are added/modified:
+
+* When playing back video recorded via the Live View window, a subset of each 
+  video frame can be exported as a FITS file, rather than exporting the entire 
+  frame as previously.
+* When playing back video, every n-th frame in the selected range can be
+  exported as a FITS file, rather than having to export every frame as
+  previously.
+* When playing back video, any frame can be jumped to directly by entering 
+  the desired frame number.
+* Right-clicking on the task-list pane opens the list in an external editor.  
+  Saving any changes and closing the editor automatically re-loads the 
+  (modified) task list.
+
+The following bugs have been fixed:
+
+* It was not possible to play back a video file beyond a 2Gb limit.
+* Single autoguider images that were saved, or displayed via DS9, were garbled
+  in some circumstances.
+* Compilation failed on more recent Linux distributions because of a change in 
+  the C++ string header file.
+
+2009 November: GoQat version 0.9.2b
+
+The following features are added/modified:
+
+* When recording video, all frames are now time stamped with the time that the
+  frame was captured from the video device.  The time stamp is written to the
+  FITS header of any individual frames that are saved from the video stream.
+* When recording video, the user can specify whether to save every frame or
+  only every n-th frame.
+* All video frames are now saved at the end of a recording session; previously,
+  the frames that were still in memory were discarded.
+* If a CCD camera is connected, the full-frame coordinates of the chip are
+  automatically entered in the relevant fields of the 'Expose' task when the
+  'Edit tasks' window is opened.
+* If a CCD camera is connected, selecting the exposure type as 'BIAS'
+  automatically fills the relevant exposure time field with the minimum exposure
+  time supported by the camera.  This applies to the 'Edit tasks' window and the
+  'CCD camera' tab of the main window.
+* A checkbox has been added to the Autoguider tab to specify whether to save the
+  RA worm position with each guide star position; previously the worm position
+  was always saved whenever the serial link to the telescope was open.
+* The exposure time field in the FITS header for saved files now has 3 decimal
+  places rather than 2.
+* The y-axis scale for the plot of CCD temperatures via Glade now has 5C more at
+  the top and 5C less at the bottom.
+  
+The following bugs have been fixed:
+
+* Compilation failed if one or both of the libftdi and libqsiapi libraries were
+  not installed.
+* Compilation failed if the libvce library _was_ installed.
+* GoQat crashed on starting if XPA support was unavailable, due to an unrelated
+  bug.
+* The following message appeared in the message log if an 'Object' task was
+  executed: "set_entry_string: Not a valid text field: txtAUGFile", due to a
+  mis-named text field in the Glade definition file.
+* The task list elapsed time counter wasn't automatically reset to zero when the
+  tasks 'Start' button was pressed.
+* The default chip temperature on the 'CCD camera' tab of the main window was
+  not automatically set to the value defined in the 'CCD Camera Configuration'
+  window when a camera was connected.
+
+2009 September: GoQat version 0.9.1b
+
+The following features are added/modified:
+
+* Added support for sending guide commands via the port on the QSI camera head.
+* Fixed multi-threading so requesting CCD camera status, issuing guide commands 
+  and downloading image data now take place in a separate thread.
+* Tidied up greying-out/un-greying some menu items and buttons on the Autoguider
+  tab.
+
+2009 September: GoQat first public release, version 0.9.0b

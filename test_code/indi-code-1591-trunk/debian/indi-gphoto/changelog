@@ -1,0 +1,23 @@
+indi-gphoto (1.1) Precise; urgency=low
+
+  * Precise release.
+
+ -- Jasem Mutlaq <mutlaqja@ikarustech.com>  Wed, 22 Aug 2012 02:20:12 +0300
+
+indi-gphoto (1.0-ubuntu2) Oneiric; urgency=low
+
+  * Oneiric release.
+
+ -- Jasem Mutlaq <mutlaqja@ikarustech.com>  Sun, 15 Jan 2012 14:20:12 +0300
+
+indi-gphoto (1.0ubuntu1) maverick; urgency=low
+
+  * New upstream release.
+
+ -- Jasem Mutlaq <mutlaqja@ikarustech.com>  Tue, 23 Nov 2010 14:20:12 +0300
+
+indi-gphoto (1.0) jaunty; urgency=low
+
+  * Initial release
+
+ -- Geoffrey Hausheer <astro@phracturedblue.com>  Tue, 25 Aug 2009 06:13:28 -0700

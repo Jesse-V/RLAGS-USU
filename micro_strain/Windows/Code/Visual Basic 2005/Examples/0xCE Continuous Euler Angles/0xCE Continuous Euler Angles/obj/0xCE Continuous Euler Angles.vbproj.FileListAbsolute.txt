@@ -1,0 +1,13 @@
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\0xCE Continuous Euler Angles.exe
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\0xCE Continuous Euler Angles.xml
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\0xCE Continuous Euler Angles.pdb
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\ResolveAssemblyReference.cache
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\_0xCE_Continuous_Euler_Angles.Main.resources
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\_0xCE_Continuous_Euler_Angles.Resources.resources
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\0xCE Continuous Euler Angles.vbproj.GenerateResource.Cache
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\bin\Debug\0xCE Continuous Euler Angles.exe
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\bin\Debug\0xCE Continuous Euler Angles.pdb
+C:\Documents and Settings\b_trutor\Desktop\Visual Studio Projects\GX3 SDK\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\bin\Debug\0xCE Continuous Euler Angles.xml
+C:\Documents and Settings\b_trutor\Desktop\GX3 SDK\SDK_Master\Windows\Code\Visual Basic 2005\Examples\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\0xCE Continuous Euler Angles.exe
+C:\Documents and Settings\b_trutor\Desktop\GX3 SDK\SDK_Master\Windows\Code\Visual Basic 2005\Examples\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\0xCE Continuous Euler Angles.xml
+C:\Documents and Settings\b_trutor\Desktop\GX3 SDK\SDK_Master\Windows\Code\Visual Basic 2005\Examples\0xCE Continuous Euler Angles\0xCE Continuous Euler Angles\obj\Debug\0xCE Continuous Euler Angles.pdb

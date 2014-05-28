@@ -1,0 +1,191 @@
+#! @PERL@ -w
+
+#/******************************************************************************/
+#/*           PERL ROUTINE FOR CALCULATING SLOPES OF HFD GRAPH                 */
+#/*                                                                            */
+#/* Copyright (C) 2011  Edward Simonson                                        */
+#/*                                                                            */
+#/* This file is part of GoQat.                                                */
+#/*                                                                            */
+#/* GoQat is free software; you can redistribute it and/or modify              */
+#/* it under the terms of the GNU General Public License as published by       */
+#/* the Free Software Foundation; either version 2 of the License, or          */
+#/* (at your option) any later version.                                        */
+#/*                                                                            */
+#/* This program is distributed in the hope that it will be useful,            */
+#/* but WITHOUT ANY WARRANTY; without even the implied warranty of             */
+#/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              */
+#/* GNU General Public License for more details.                               */
+#/*                                                                            */
+#/* You should have received a copy of the GNU General Public License          */
+#/* along with this program; if not, see <http://www.gnu.org/licenses/> .      */
+#/*                                                                            */
+#/******************************************************************************/
+
+
+use warnings;
+use strict;
+
+sub get_data_in_range;
+sub calc_best_fit;
+
+my $TRUE = 1;
+my $FALSE = 0;
+my $error_code = 0;
+
+# Get the passed parameters
+
+my $graph_file;
+my $HFD_lower;
+my $HFD_upper;
+my $results_file;
+for (my $i = 0; $i <= $#ARGV; $i++) {
+  if ($ARGV[$i] eq "--graph_file") {$graph_file = $ARGV[$i + 1]}
+  elsif ($ARGV[$i] eq "--HFD_lower") {$HFD_lower = $ARGV[$i + 1]}
+  elsif ($ARGV[$i] eq "--HFD_upper") {$HFD_upper = $ARGV[$i + 1]}
+  elsif ($ARGV[$i] eq "--results_file") {$results_file = $ARGV[$i + 1]}
+}
+open (RESULTS, ">", $results_file) or die ("Cannot open results file for writing!\n");
+
+# Read Grace graph file
+
+if (!open (GRAPH, $graph_file)) {
+  $error_code = -999;
+  print (RESULTS $error_code);
+  close (RESULTS);
+  exit;
+}
+  
+my @vals;
+my $capture_vals = $FALSE;
+while (!eof (GRAPH)) {
+  if (!$capture_vals) {
+    if (<GRAPH> =~ "^\@target G1.S0") {
+      $capture_vals = $TRUE;
+      <GRAPH>;  # Skip the line after "@target G1.S0"
+    }
+  } else {
+    $_ = <GRAPH>;
+    if (/&/) {last;}                      # "&" marks the end of the data block
+    if (!/^-1000 0/) {push (@vals, $_);}  # Skip lines containing "-1000 0".  These points are there just so
+  }                                       #  that the graph (set) properties can be defined in the template file 
+}
+close (GRAPH);
+if ($#vals < 0) {  # Return error if array is empty
+  print (RESULTS "-1\n");
+  close (RESULTS);
+  exit;
+}
+
+# Sort the input array numerically by focus position (which is just the
+# first number in each row) and average all the HFD measurements at each
+# position
+
+my @sorted_vals = sort {(split / +/, $a)[0] <=> (split / +/, $b)[0]} (@vals);
+$_ = $sorted_vals[0];
+my @fields = split (/ +/);
+my $focus_pos = $fields[0];
+my $ave_hfd = 0;
+my $num_vals = 0;
+my @ave_pos;
+my @ave_hfd;
+foreach (@sorted_vals) {
+  @fields = split (/ +/);
+  if ($fields[0] == $focus_pos) {
+    $ave_hfd += $fields[1];
+    $num_vals += 1;
+  } else {
+    push (@ave_pos, $focus_pos);
+    push (@ave_hfd, $ave_hfd / $num_vals);
+    $focus_pos = $fields[0];
+    $ave_hfd = $fields[1];
+    $num_vals = 1;
+  }
+}
+push (@ave_pos, $focus_pos);
+push (@ave_hfd, $ave_hfd / $num_vals);
+
+# Extract the required points for the left-hand and right-hand parts
+# of the V-curve from the averaged data
+
+my ($LH_pos, $LH_hfd) = get_data_in_range (\@ave_pos, \@ave_hfd);
+my @r_ave_pos = reverse (@ave_pos);
+my @r_ave_hfd = reverse (@ave_hfd);
+my ($RH_pos, $RH_hfd) = get_data_in_range (\@r_ave_pos, \@r_ave_hfd);
+
+# Check for errors
+
+$error_code = -2 if ($#{$LH_pos} < 1 || $#{$RH_pos} < 1);  # Bounds too narrow: LH or RH line contains fewer than 2 points
+$error_code = -3 if ($#{$LH_pos} == $#ave_pos && $#{$RH_pos} == $#ave_pos);  # Bounds too wide: LH and RH lines contain all points
+if ($error_code) {
+  print (RESULTS $error_code);
+  close (RESULTS);
+  exit;
+}
+
+# Calculate least-squares best fits to LH and RH lines
+
+my ($LH_n, $LH_m, $LH_b, $LH_i) = calc_best_fit ($LH_pos, $LH_hfd);
+my ($RH_n, $RH_m, $RH_b, $RH_i) = calc_best_fit ($RH_pos, $RH_hfd);
+
+# Write results to file
+
+print (RESULTS "0\n");
+print (RESULTS $LH_n . " " . $LH_m . " " . $LH_b . " " . $LH_i, "\n");
+print (RESULTS $RH_n . " " . $RH_m . " " . $RH_b . " " . $RH_i, "\n");
+
+exit 0;
+
+
+sub get_data_in_range {
+
+  # Return all data in the given range (i.e. between HFD_lower and
+  # HFD_upper), starting with the first point that lies within the
+  # range and stopping as soon as any point lies outside the range.
+
+  my ($pos, $hfd) = @_;
+  
+  my (@range_pos, @range_hfd);
+  my $capture_vals = $FALSE;
+  for (my $i = 0; $i <= $#{$pos}; $i++) {
+    if (!$capture_vals) {
+      if ($hfd->[$i] <= $HFD_upper && $hfd->[$i] >= $HFD_lower) {
+        $capture_vals = $TRUE;
+        push (@range_pos, $pos->[$i]);
+        push (@range_hfd, $hfd->[$i]);
+      }
+    } else {
+      if ($hfd->[$i] <= $HFD_upper && $hfd->[$i] >= $HFD_lower) {
+        push (@range_pos, $pos->[$i]);
+        push (@range_hfd, $hfd->[$i]);
+      } else {
+        last;
+      }
+    }
+  }
+  return (\@range_pos, \@range_hfd);
+}
+
+sub calc_best_fit {
+
+  # Calculate least squares best fit to the given data.
+
+  my ($pos, $hfd) = @_;
+
+  my $n = $#{$pos} + 1;
+  my $Sx = 0;
+  my $Sx2 = 0;
+  my $Sy = 0; 
+  my $Sxy = 0;
+  for (my $i = 0; $i <= $n - 1; $i++) {
+    $Sx += $pos->[$i];
+    $Sx2 += $pos->[$i] **2;
+    $Sy += $hfd->[$i];
+    $Sxy += $pos->[$i] * $hfd->[$i];
+  }
+  
+  my $m = ($n * $Sxy - $Sx * $Sy) / ($n * $Sx2 - $Sx **2);
+  my $b = ($Sy - $m * $Sx) / $n;
+  
+  return ($n, $m, $b, -$b / $m);
+}

@@ -1,0 +1,11 @@
+#!/bin/bash
+DRIVES=$(grep -c '' /home/linaro/Rlags_project/scripts/drives/partition_list)
+COUNTER=0
+while [ $COUNTER -lt $DRIVES ];
+do
+NUMBER=NR==$COUNTER+1
+PARTITION=$(awk $NUMBER /home/linaro/Rlags_project/scripts/drives/partition_list)
+sudo umount $PARTITION
+let COUNTER=COUNTER+1
+done
+exit

@@ -1,0 +1,4 @@
+#!/bin/bash
+/home/linaro/Rlags_project/Sun_Camera/test_code/get_sun_image
+###sleep 1
+/home/linaro/Rlags_Project/crons/moving_script.camera

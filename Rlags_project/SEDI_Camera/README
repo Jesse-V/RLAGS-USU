@@ -1,0 +1,575 @@
+
+                 ***** Welcome to GoQat! *****
+
+Please read ALL of this file carefully BEFORE proceeding, including the parts 
+that you may not think apply to your situation.  This file is organised into
+sections as follows:
+
+1. INTRODUCTION
+2. GENERAL SOFTWARE INSTALLATION NOTES
+3. SOFTWARE LIBRARIES           (Please read this for QSI and SX camera support)
+4. ACCESSING DEVICE FILES
+5. CCD CAMERA FILTER NAMES IN GOQAT
+6. SOME COMMON PROBLEMS
+7. INSTALLED FILES
+8. OK, SO WHY IS IT CALLED GOQAT AND HOW DO I PRONOUNCE IT?
+
+
+1. INTRODUCTION
+===============
+
+GoQat is presently developed on Fedora Core 16 (kernel 3.3.7-1 and gtk 2.24.7). 
+It is expected that GoQat should work with any recent Linux distributions.
+
+This release of GoQat builds against the gtk version 2 libraries, because some 
+of the libraries on which GoQat depends for a full installation are not yet 
+compatible with gtk version 3.  However, you should have gtk version 2 bundled 
+with your distribution.  The configuration process fails unless gtk version 2.24
+or greater is available.  GoQat does not require any Gnome-specific libraries so
+it shouild work whether you are running Gnome 2 or Gnome 3, or even if you are 
+not running the Gnome desktop at all.
+
+GoQat must be compiled from source code and for full functionality it does 
+require additional software libraries to be installed before you compile it.  
+You do not have to install all the libraries that GoQat uses; you only require 
+the libraries that provide the functionality that you need.  Many of the 
+libraries that GoQat uses may be available for your distribution as pre-compiled
+packages that can be installed with your package manager.  Your system 
+documentation should tell you how to do this.
+
+The following section discusses software installation in general terms.  Section
+3 discusses the specific libraries that GoQat uses and why you might want to
+install them.
+
+
+2. GENERAL SOFTWARE INSTALLATION NOTES
+======================================
+
+You must install all the libraries that you need before you compile GoQat.
+
+If you are using a package manager to install your libraries, you will not need
+to do any additional compilation or installation steps because the package 
+manager will install pre-compiled and appropriately configured libraries for 
+you.
+
+If you are compiling libraries from source code, you will typically need to so 
+something like this:
+
+1) Download the source tarball e.g. 'lib-source.tgz'
+2) Un-tar the source in any convenient location:
+
+	# tar -xzvf lib-source.tgz
+	
+3) Change into the 'lib-source' directory:
+
+	# cd lib-source
+	
+4) Then configure, make and install (you will need root user (super-user)
+   permission for the installation step):
+
+	# ./configure
+	# make
+	# make install
+	
+It is always a good idea to re-run ldconfig as root user after installing new 
+libraries:
+
+	# ldconfig
+
+When you have installed all the required libraries, you should then compile
+and install GoQat using the configure, make and make install steps given above
+in step 4.
+
+Software libraries typically use the pkg-config mechanism to enable other 
+software to be compiled correctly using those libraries.  A particular library
+might have a file called 'mylib.pc' installed under /usr/lib/pkgconfig.  This
+file contains the correct commands for compiling and linking against 'mylib'.  
+However, you may find that some of the libraries that you build from source code
+have their '*.pc' files installed under /usr/local/lib/pkgconfig.  For GoQat to 
+find the relevant libraries when compiling, you would need to use:
+
+	# ./configure PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig
+
+at the configuration stage.
+
+When you first run GoQat, always run it from the command line initially.  If it
+fails to run you may see some messages that will help you (me!) to understand 
+the problem.
+
+
+3. SOFTWARE LIBRARIES
+=====================
+
+Some of these libraries may already be present on your system, depending on the 
+Linux distribution that you are using. If not, you can either download and 
+compile the required libraries from source code, or your distribution may have a
+package manager that will install pre-packaged versions of the libraries for 
+you.  Always use the package manager if possible.
+
+Please note that GoQat requires the header files for these libraries, otherwise
+it will not compile.  The header files are usually not installed by default, so 
+you should expect to have to install them, even if the library apparently 
+already exists on your system.  The header files are generally contained in 
+'devel' packages, so a library named 'mylib' might have a corresponding package 
+called 'mylib-devel'.  If you are installing packages via a package manager,
+you can usually elect to install e.g. 'mylib*' and that should install 'mylib'
+and all the other associated 'devel' packages for you.  You can also do this 
+even if the library is already installed; your package manager should then just 
+fetch and install the 'devel' packages.
+
+If you compile the libraries from source code, the source packages will include 
+all the header files that you need, so these should be installed automatically 
+when you install the compiled library.
+
+GoQat requires the gtk library (version 2.24 or higher) and the gthread library,
+version 2.0 or higher.  Both of these are likely to be part of the base 
+installation on your system or can readily be installed with your package 
+manager.
+
+
+GooCanvas
+---------
+
+GoQat requires the GooCanvas widget for displaying autoguider images.  You need
+to install this library even if you don't want to use GoQat for autoguiding.
+There should be a package for GooCanvas for your Linux distribution.  If not,
+you can find the code here:
+
+	https://live.gnome.org/GooCanvas
+	
+You need version 1.x (not version 2.x) for compatibility with gtk version 2.x.
+(GooCanvas version 2.x is compatible with gtk version 3.x - it's very 
+confusing!).
+
+
+QSI Camera support
+------------------
+
+Follow the instructions in the QSI API documention that forms part of the QSI
+download package for the Linux API from QSI's website.
+
+To access the camera as a normal user, you will need to do the following:
+
+1) Create a file in /etc/udev/rules.d called '99-qsi.rules' and add the 
+   following for 500-series cameras (all on one line):
+
+	ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="eb48", MODE="0666"
+	
+   For 600-series cameras, add the following (all on one line):
+   
+	ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="eb49", MODE="0666"
+
+   Save the file (you need root permissions for this).
+
+2) QSI provide a demonstration program that is built when you compile the 
+   library.  This may be called qsiapitest or qsidemo in a folder called 
+   demo_src that is created when you unpack the QSI library download package.  
+   Make sure that you can run this successfully before attempting to access the
+   camera with GoQat.
+   
+
+SX Camera support
+-----------------
+
+The code to drive SX cameras is built in to GoQat; you do not need to install
+any additional libraries specifically for that.  But you do need the libusb-1.0
+library and you must set the relevant device file permissions as described 
+below.
+
+1) Make sure that libusb-1.0 is installed on your system.  There should be a 
+   package for it.  If not, you can get the code from here:
+
+	http://sourceforge.net/projects/libusb/files/libusb-1.0/
+	
+   If you download the code, you will need to compile and install it in the 
+   usual way.
+
+2) Create a file in /etc/udev/rules.d called '99-sx.rules' and add the following
+   (all on one line):
+
+	ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1278", ATTR{idProduct}=="XXXX", MODE="0666"
+	
+	where XXXX depends on the model of camera(s) that you have.  You can get the
+	relevant number from the list on the Starlight-Xpress website or maybe from
+	your camera documentation.  Otherwise if /proc/bus/usb/devices exists on 
+	your system, find the group of entries for the Starlight Xpress device and 
+	look for the line beginning "P:  Vendor=1278".  The "ProdID" field gives you
+	the product ID that you require.  Alternatively, run lsusb (available in the
+	usbutils package) and find the entry containing ID 1278.  The product ID is
+	the four numbers following the colon in that entry.
+
+   Save the file (you need root permissions for this).
+
+3) Now plug in the SX camera.  You should be able to open it successfully and
+   obtain an image in GoQat.
+   
+
+Support for video-for-linux devices
+-----------------------------------
+
+GoQat provides simple support for video-for-linux (V4L) devices (e.g. webcams)
+using the v4l library:
+
+	# yum install libv4l*
+	
+You can find the code here:
+
+	http://freecode.com/projects/libv4l
+	
+If the unicap library supports your V4L device, that will be better than the
+minimal support implemented in GoQat via libv4l.  See below.
+
+
+Support for Unicap-compatible devices
+-------------------------------------
+
+Unicap-compatible devices include webcams, USB or firewire cameras and the 
+video-to-firewire converter from The Imaging Source that you may wish to use for
+autoguiding.  You need to install the libunicapgtk library to support these:
+
+	# yum install libunicapgtk*
+	
+This will install the libunicap, libunicap-devel, libunicapgtk, 
+libunicapgtk-devel, libucil and libucil-devel packages.
+
+Also install the unicap viewer (useful for testing purposes):
+
+	# yum install ucview
+
+Alternatively, download the code from:
+
+	http://unicap-imaging.org/download.htm
+	
+and follow the instructions.
+
+
+Support for firewire devices
+----------------------------
+
+To support firewire devices, e.g. firewire versions of Imaging Source cameras or
+the video-to-firewire converter from The Imaging Source, install the libraw1394 
+library:
+
+	# yum install libraw1394*
+	
+Or, download it from:
+
+	http://sourceforge.net/projects/libraw1394/
+
+and follow the instructions for installation.
+
+To access firewire devices, you may need to load the raw1394 module:
+
+# modprobe raw1394
+
+This creates the /dev/raw1394 device file when loaded.  If your Linux 
+distribution has a file called /etc/rc.local (or similar) that is executed at 
+boot time, you may find it convenient to add this instruction to that file.
+
+Alternatively, your Linux distribution may have firewire support integral to the
+kernel and you may already have existing firewire device files called /dev/fw0 
+and /dev/fw1.
+
+
+Support for parallel port autoguiding
+-------------------------------------
+
+GoQat requires the parapin library for communicating via a parallel port
+(either a native port or an add-on card).  This is necessary for sending 
+TTL-level guide signals via a parallel port.  You may download the parapin 
+library from:
+
+	http://parapin.sourceforge.net/	
+	
+Compile and install in the usual way.  Note that you will require to run GoQat
+with root privileges to access the port.  Please note that this has not been
+tested on version 3 of the Linux kernel.
+
+
+Support for video photometry and astrometry
+-------------------------------------------
+
+The SExtractor program is required to analyse GoQat's video recordings.  (Note
+that this is a standalone program rather than a library):
+
+	# yum install sextractor
+	
+You can also obtain it from:
+
+	http://www.astromatic.net/software/sextractor
+
+
+Support for the SAOImage DS9 image viewer
+-----------------------------------------
+
+GoQat displays CCD images via the SAOImage DS9 image viewer.  You may install a 
+binary version of the viewer from:
+
+    http://hea-www.harvard.edu/RD/ds9/
+	
+Move the executable file to /usr/local/bin.
+
+GoQat communicates with DS9 via the XPA mechanism.  Install using the source 
+code from:
+
+    http://hea-www.harvard.edu/RD/xpa/
+    
+Configure and install as follows:
+
+	# ./configure --with-threads --with-gtk=/usr/include/gtk-2.0/gtk/gtk.h
+	# make
+	# make install
+
+
+Support for Grace
+-----------------
+
+GoQat can display graphical data via the Grace plotting program:
+
+	# yum install grace*
+	
+Alternatively, you can get it from: 
+
+	http://plasma-gate.weizmann.ac.il/Grace/
+
+Please note that you also need the header files.
+
+If you are running a 32-bit version of a recent release of Fedore Core, Grace
+may crash when it starts with several lines of incomprehensible error message.
+If this happens, download and expand the latest source tarball (e.g. from 
+ftp://plasma-gate.weizmann.ac.il/pub/grace/src/grace-latest.tar.gz).  Remove the
+link to type 1 fonts in /usr/share/grace/fonts and create a directory in that 
+location called 'type1'.  Then copy the fonts from the latest source tarball 
+(e.g. in grace-5.1.22/fonts/type1) to the /usr/share/grace/fonts/type1 
+directory.  Also remove the FontDataBase link in /usr/share/grace/fonts and copy
+FontDataBase from the source tarball (e.g. in grace-5.1.22/fonts) to 
+/usr/share/grace/fonts.
+
+
+4. ACCESSING DEVICE FILES
+=========================
+
+GoQat communicates with the hardware connected to your computer in the usual
+Linux fashion, i.e. via device files.  A non-privileged (non-root) user will not
+necessarily have access to these files by default.
+
+Serial/USB
+----------
+
+To connect to the telescope and the autoguider via the 'serial' ports (whether
+they are actual serial ports or USB ports with USB-to-serial converters), you
+need to make the non-root user a member of the appropriate group.  Suppose you
+have a USB-to-serial converter connected to your computer.  Execute the
+following command:
+
+	# ls -l /dev/ttyUSB*
+	
+The /dev/ttyUSB0 file (for example) will be listed with attributes such as:
+
+	crw-rw---- 1 root uucp
+	
+This shows that 'root' is the owner of the device file but it can also be 
+accessed by members of the 'uucp' group.  Therefore you need to add any 
+non-root users who require access to the serial/USB ports to the 'uucp' group.  
+(On Fedora Core 16, the appropriate group is the 'dialout' group).  Your system 
+documentation will tell you how to assign group membership.
+
+Firewire
+--------
+
+If you are using a firewire device and your distribution has /dev/fw0 and
+/dev/fw1 device files, then the non-root users need access to these.  This may
+be set automatically when you connect a firewire device.  If not, create a file
+called '99-firewire.rules' in /etc/udev/rules.d and add the line:
+
+	KERNEL=="fw*", MODE="0666"
+
+This gives read/write access to firewire device files for all users.
+
+CCD cameras
+-----------
+
+Accessing CCD cameras is described under 'QSI Camera support' and 'SX Camera
+support' in section 3 above.
+
+
+5. FILTER NAMES IN GOQAT
+========================
+
+GoQat permits you to select the filter that you would like to use for each CCD 
+camera exposure.  The filter name forms part of the FITS file name when you save
+the image.  GoQat comes with a pre-installed list of filter names but you can
+add or remove filter names if you wish.
+
+When GoQat has been run for the first time, there will be a folder called 
+'GoQat' in your home directory.  Edit the file called 'GoQat.conf' in that 
+folder.  Find the section called '[ListCCDFilterTypes]'.  You can add or remove
+filter names from this list, but do not remove the first two items, or GoQat may
+not function properly.
+
+
+6. SOME COMMON PROBLEMS
+=======================
+
+Q) After configuring GoQat, I see messages like:
+
+	******** No XYZ library - compiling without XYZ support!
+	
+A) If you want support for XYZ, you must install the XYZ library.  You need the 
+   header files for the library, so even if XYZ is already installed on your 
+   system, you may need to install the header files as well.  These may be in
+   the "devel" package for that library.
+   
+   
+Q) I installed the header files, but the configuration process still can't find 
+   the library.
+
+A) Try this:
+
+	# ./configure PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig
+	
+	
+Q) I tried to compile GoQat but it failed with messages like:
+
+	image.c:40:17: error: xpa.h: No such file or directory
+	image.c:42: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘xpa’
+	image.c: In function ‘xpa_open’:
+	image.c:96: error: ‘xpa’ undeclared (first use in this function)
+	
+A) The compiler can't find the xpa header files if they have been installed in a
+   non-standard location.  Try adding:
+
+	CPPFLAGS="-I/usr/include/xpa"
+	
+   to your './configure' command.
+
+   
+Q) I tried to compile GoQat, but it failed for some other reason than given 
+   above.
+
+A) Hmmm... Please contact me with details, using the website e-mail address.
+
+
+Q) I compiled GoQat successfully, but I got messages like:
+
+	image.c:393: warning: 'xpa_messages' defined but not used
+	
+A) If you have compiled GoQat without some of the libraries, you may see such
+   messages because GoQat defines some variables or routines that are then not
+   used.  (For example, you may see the above message if you compile without
+   the XPA library).  You don't need to be concerned by these messages - GoQat
+   will still run correctly.
+   
+   
+Q) I compiled GoQat successfully, but I got a screenful of messages like:
+
+	qsi.c:XYZ warning: implicit declaration of function 'QSICamera_FUNCTION_NAME'
+	
+A) This arises because GoQat combines C code and C++ code in one program, and
+   some of the variables required for function definitions are not defined
+   consistently across C and C++.  So function definitions for the QSI camera
+   functions are not used.  A screenful of warnings looks unnerving, but don't
+   worry - it all works correctly!
+
+
+Q) I tried to run GoQat but it didn't start and I got this message:
+
+	GoQat: error while loading shared libraries: libqsiapi.so.0: cannot open 
+	shared object file: No such file or directory
+	
+A) Create a file called local_libs.conf in /etc/ld.so.conf.d (or similarly-named
+   location on your system) and add a line indicating the local library path:
+   
+		/usr/local/lib
+		
+   Then re-run ldconfig.  You will need root permissions to do this.
+
+
+Q) I can't access my CCD camera as a normal user, but it works if I run GoQat as
+   root user.
+   
+A) The file permissions on the device file are not set properly.  You need to
+   experiment with the udev rules given above under 'QSI Camera support'.
+   Remember to unplug the camera USB connection and then plug it in again each
+   time you change the rule.
+   
+
+7. INSTALLED FILES
+==================
+
+When you install GoQat, the following files are installed in the given locations
+by default:
+
+GoQat binary file:
+
+/usr/local/bin/GoQat
+
+
+Glade interface files:
+
+/usr/local/share/GoQat/glade/GoQat-gtkbuilder.glade
+/usr/local/share/GoQat/glade/north.png
+/usr/local/share/GoQat/glade/south.png
+/usr/local/share/GoQat/glade/east.png
+/usr/local/share/GoQat/glade/west.png
+
+
+Grace template files, sample Losmandy Gemini Defaults.dat file, demonstration
+task list and scripts, files for interacting with SExtractor and default GoQat
+configuration file:
+
+/usr/local/share/GoQat/data/trace.agr
+/usr/local/share/GoQat/data/temps.agr
+/usr/local/share/GoQat/data/hfd.agr
+/usr/local/share/GoQat/data/Defaults.dat
+/usr/local/share/GoQat/data/DemoTasks.txt
+/usr/local/share/GoQat/data/DemoScript.pl
+/usr/local/share/GoQat/data/DemoScript.sh
+/usr/local/share/GoQat/data/Analyse_HFD.pl
+/usr/local/share/GoQat/data/GoQat_SExtractor.pl
+/usr/local/share/GoQat/data/goqat_vid_photom_sextractor.conf
+/usr/local/share/GoQat/data/goqat_vid_photom_sextractor.param
+/usr/local/share/GoQat/data/goqat_vid_photom_sextractor_filter.conv
+/usr/local/share/GoQat/data/GoQat.conf
+
+
+GoQat icon:
+
+/usr/local/share/GoQat/pixmaps/GoQat.png
+
+
+Documentation:
+
+/usr/local/share/doc/goqat/README
+/usr/local/share/doc/goqat/COPYING
+/usr/local/share/doc/goqat/AUTHORS
+/usr/local/share/doc/goqat/ChangeLog
+/usr/local/share/doc/goqat/INSTALL
+/usr/local/share/doc/goqat/NEWS
+/usr/local/share/doc/goqat/TODO
+/usr/local/share/doc/goqat/GoQat.pdf
+
+
+8. OK, SO WHY IS IT CALLED GOQAT AND HOW DO I PRONOUNCE IT?
+===========================================================
+
+GoQat originally stood for:
+
+"Gnome software for operating QSI camera, autoguider and telescope"
+ =                  =         =           =              =
+ 
+But now it doesn't need the Gnome libraries and works with Starlight Xpress 
+cameras too, so it stands for:
+
+"Gtk software for operating Qamera, autoguider and telescope"
+ =                =         =       =              =
+ 
+It's a hard 'Q', so GoQat is pronounced 'GoCat'.  Except I couldn't really call
+it that, because the name was already taken by a well-known brand of cat food.
+And I didn't want people to think that GoQat was a dog's breakfast
+(http://en.wiktionary.org/wiki/dog's_breakfast).
+
+Besides, GoQat is one of those words that seems to lead a lonely existence on
+the internet.  It doesn't really clash with anything else, and doesn't mean
+something offensive in someone else's language, as far as I can tell.
+

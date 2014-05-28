@@ -1,0 +1,13 @@
+#!/bin/bash
+DRIVES=$(grep -c '' partition_list)
+COUNTER=0
+while [ $COUNTER -lt $DRIVES ];
+do
+sudo mkdir /media/ssd_$COUNTER 2> /dev/null
+NUMBER=NR==$COUNTER+1
+PARTITION=$(awk $NUMBER partition_list)
+sudo umount $PARTITION
+sudo mount $PARTITION /media/ssd_$COUNTER
+let COUNTER=COUNTER+1
+done
+exit

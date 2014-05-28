@@ -1,0 +1,29 @@
+
+/***********************************************
+*                                              *
+* Based on Microchip PIC18F45K50 by Hardkernel *
+*                                              *
+/***********************************************
+
+This document very simply explain what function in folder included.
+
+Microchip Solutions v2012-10-15/Microchip/
+: All needs files to build and update like to connect HOST PC
+
+Microchip Solutions v2012-10-15/USB/Device - Bootloaders/
+: Only modified to update(Self-programmability) by Hardkernel
+  It becomes possible to create an application that can update
+  it self in the field.
+  
+Microchip Solutions v2012-10-15/USB/Device - HID - Custom Demos/
+: You can enjoy to make application inside your idea in this folder.
+
+usbio/
+: This example host software for linux platform like ubuntu. and
+  It comunicate with 
+  "Microchip Solutions v2012-10-15/USB/Device - HID - Custom Demos"
+  application.
+
+For more detail infomation,
+: http://dev.odroid.com/projects/pic18f45k50
+

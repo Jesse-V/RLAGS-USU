@@ -1,0 +1,3 @@
+#!/bin/bash
+sudo mv /home/rlags1/Rlags_Project/Sun_Camera/test_code/consule.tif /home/rlags1/Rlags_Project/Sun_Camera/test_code/sun_picture.`date +"%H.%M.%S"`.tif
+exit

@@ -1,0 +1,4 @@
+#!/bin/bash
+/home/rlags1/Rlags_Project/Sun_Camera/test_code/test_console
+###sleep 1
+/home/rlags1/Rlags_Project/crons/moving_script.camera

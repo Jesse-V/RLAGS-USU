@@ -1,0 +1,1 @@
+cl main_AA.c i3dmgx3_Cmd.c i3dmgx3_Utils.c i3dmgx3_SerialWin.c  -o Read_Acc_AngRate

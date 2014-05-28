@@ -1,0 +1,202 @@
+<devGroup group="Telescopes">
+	<device label="LX200 Basic" focal_length="" aperture="">
+		<driver name="LX200 Basic">indi_lx200basic</driver>
+		<version>1.0</version>
+	</device>
+	<device label="LX200 Autostar" focal_length="" aperture="">
+		<driver name="LX200 Autostar">indi_lx200autostar</driver>
+		<version>2.0</version>
+	</device>
+	<device label="LX200 Classic" focal_length="" aperture="">
+		<driver name="LX200 Classic">indi_lx200classic</driver>
+                <version>2.0</version>
+	</device>
+	<device label="LX200 GPS" focal_length="" aperture="">
+		<driver name="LX200 GPS">indi_lx200gps</driver>
+		<version>2.0</version>
+	</device>
+	<device label="LX200 16" focal_length="4064" aperture="406.4">
+		<driver name="LX200 16">indi_lx200_16</driver>
+		<version>2.0</version>
+	</device>
+	<device label="LX90" focal_length="2000" aperture="203.2">
+		<driver name="LX200 Autostar">indi_lx200autostar</driver>
+		<version>2.0</version>
+	</device>
+	<device label="ETX125" focal_length="1900" aperture="127">
+		<driver name="LX200 Autostar">indi_lx200autostar</driver>
+		<version>2.0</version>
+	</device>
+	<device label="ETX105" focal_length="1470" aperture="105">
+		<driver name="LX200 Autostar">indi_lx200autostar</driver>
+		<version>2.0</version>
+	</device>
+	<device label="ETX90"  focal_length="1250" aperture="88.9">
+		<driver name="LX200 Autostar">indi_lx200autostar</driver>
+		<version>2.0</version>
+	</device>
+	<device label="LX200 Astro-Physics">
+		<driver name="LX200 Astro-Physics">indi_lx200ap</driver>
+		<version>1.0</version>
+	</device>
+	<device label="Celestron GPS" focal_length="" aperture="">
+		<driver name="Celestron GPS">indi_celestron_gps</driver>
+                <version>2.0</version>
+	</device>
+	<device label="Celestron NexStar" focal_length="" aperture="">
+		<driver name="Celestron GPS">indi_celestron_gps</driver>
+                <version>2.0</version>
+	</device>
+	<device label="Astro-Electronic FS-2" focal_length="" aperture="">
+		<driver name="LX200 Basic">indi_lx200basic</driver>
+		<version>1.0</version>
+	</device>
+	<device label="Orion Atlas" focal_length="" aperture="">
+                <driver name="SynScan">indi_synscan</driver>
+                <version>1.0</version>
+	</device>
+	<device label="Sky Scan" focal_length="" aperture="">
+                <driver name="SynScan">indi_synscan</driver>
+		<version>0.1</version>
+	</device>
+	<device label="Losmandy Gemini" focal_length="" aperture="">
+		<driver name="LX200 Basic">indi_lx200basic</driver>
+		<version>1.0</version>
+	</device>
+	<device label="Mel Bartels" focal_length="" aperture="">
+		<driver name="LX200 Basic">indi_lx200basic</driver>
+		<version>1.0</version>
+	</device>
+	<device label="Temma Takahashi" focal_length="" aperture="">
+		<driver name="Temma">indi_temma</driver>
+	  	<version>0.1</version>
+	</device>
+	<device label="Sky Commander" focal_length="" aperture="">
+		<driver name="Sky Commander">indi_skycommander</driver>
+		<version>0.1</version>
+	</device>
+	<device label="Argo Navis" focal_length="" aperture="">
+		<driver name="LX200 Basic">indi_lx200basic</driver>
+		<version>1.0</version>
+	</device>
+	<device label="Intelliscope" focal_length="" aperture="">
+		<driver name="Intelliscope">indi_intelliscope</driver>
+		<version>0.2</version>
+	</device>
+	<device label="SkyWizard" focal_length="" aperture="">
+		<driver name="Intelliscope">indi_intelliscope</driver>
+		<version>0.2</version>
+	</device>
+        <device label="SynScan" focal_length="" aperture="">
+                <driver name="SynScan">indi_synscan</driver>
+                <version>1.0</version>
+        </device>
+        <device label="EQ6" focal_length="" aperture="">
+                <driver name="SynScan">indi_synscan</driver>
+                <version>1.0</version>
+        </device>
+        <device label="HEQ5" focal_length="" aperture="">
+                <driver name="SynScan">indi_synscan</driver>
+                <version>1.0</version>
+        </device>
+        <device label="NEQ3" focal_length="" aperture="">
+                <driver name="SynScan">indi_synscan</driver>
+                <version>1.0</version>
+        </device>
+        <device label="Magellan I" focal_length="" aperture="">
+                <driver name="Magellan I">indi_magellan1</driver>
+                <version>1.0</version>
+        </device>
+        <device label="iEQ45_8406" focal_length="" aperture="">
+                <driver name="IEQ45">indi_ieq45_8406</driver>
+                <version>0.1</version>
+        </device>
+        <device label="iEQ45_8407" focal_length="" aperture="">
+                <driver name="IEQ45">indi_ieq45_8407</driver>
+                <version>0.1</version>
+        </device>
+        <device label="Telescope Simulator" focal_length="" aperture="">
+                <driver name="Telescope Simulator">indi_simulator_telescope</driver>
+                <version>1.0</version>
+        </device>
+        <device label="Skywatcher API Mount" focal_length="" aperture="">
+                <driver name="Skywatcher API Mount">indi_skywatcherAPIMount</driver>
+                <version>1.0</version>
+        </device>
+</devGroup>
+<devGroup group="Focusers">
+        <device label="Focuser Simulator">
+            <driver name="Focuser Simulator">indi_simulator_focus</driver>
+            <version>1.0</version>
+        </device>
+	<device label="RoboFocus">
+                <driver name="RoboFocus">indi_robo_focus</driver>
+		<version>1.0</version>
+	</device>
+	<device label="Rigelsys NFocus">
+                <driver name="Rigelsys NFocus">indi_nfocus</driver>
+		<version>1.0</version>
+	</device>
+        <device label="MoonLite">
+                <driver name="MoonLite">indi_moonlite_focus</driver>
+                <version>1.0</version>
+        </device>
+        <device label="Optec TCF-S">
+                <driver name="Optec TCF-S">indi_tcfs_focus</driver>
+                <version>0.1</version>
+        </device>
+        <device label="Optec TCF-S3">
+                <driver name="Optec TCF-S">indi_tcfs3_focus</driver>
+                <version>0.1</version>
+        </device>
+</devGroup>
+<devGroup group="CCDs">
+        <device label="CCD Simulator">
+                <driver name="CCD Simulator">indi_simulator_ccd</driver>
+                <version>1.0</version>
+        </device>
+        <device label="DMK CCD">
+                <driver name="V4L2 CCD">indi_v4l2_ccd</driver>
+                <version>0.1</version>
+        </device>
+        <device label="V4L2 CCD">
+                <driver name="V4L2 CCD">indi_v4l2_ccd</driver>
+                <version>0.1</version>
+        </device>
+</devGroup>
+<devGroup group="Filter Wheels">
+	<device label="TruTech Wheel">
+		<driver name="TruTech Wheel">indi_trutech_wheel</driver>
+		<version>0.1</version>
+    	</device>
+        <device label="Filter Simulator">
+                <driver name="Filter Simulator">indi_simulator_wheel</driver>
+                <version>1.0</version>
+        </device>
+</devGroup>
+<devGroup group="Video">
+	<device label="Meade LPI">
+		<driver name="Meade LPI">indi_meade_lpi</driver>
+		<version>0.1</version>
+	</device>
+        <device label="STV Guider">
+		<driver name="STV Guider">indi_sbig_stv</driver>
+		<version>0.1</version>
+	</device>
+</devGroup>
+<devGroup group="Auxiliary">
+        <device label="GPUSB">
+                <driver name="GPUSB">indi_gpusb</driver>
+                <version>0.1</version>
+        </device>
+        <device label="Joystick">
+                <driver name="Joystick">indi_joystick</driver>
+                <version>0.1</version>
+        </device>
+</devGroup>
+<devGroup group="Agent">
+    <device label="Imager Agent">
+        <driver name="Imager Agent">indi_imager_agent</driver>
+        <version>1.0</version>
+        </device>
+</devGroup>

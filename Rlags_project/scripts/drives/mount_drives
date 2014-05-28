@@ -1,0 +1,18 @@
+#!/bin/bash
+sudo /home/linaro/Rlags_project/scripts/drives/populate_ssd_lists
+DRIVES=$(grep -c '' /home/linaro/Rlags_project/scripts/drives/partition_list)
+COUNTER=0
+while [ $COUNTER -lt $DRIVES ];
+do
+sudo mkdir /media/ssd_$COUNTER 2> /dev/null
+NUMBER=NR==$COUNTER+1
+PARTITION=$(awk $NUMBER /home/linaro/Rlags_project/scripts/drives/partition_list)
+sudo umount $PARTITION
+sudo mount $PARTITION /media/ssd_$COUNTER
+sudo mkdir /media/ssd_$COUNTER/sun_cameras
+sudo mkdir /media/ssd_$COUNTER/sedi_camera
+sudo mkdir /media/ssd_$COUNTER/thermal_data
+sudo mkdir /media/ssd_$COUNTER/imu
+let COUNTER=COUNTER+1
+done
+exit

@@ -1,0 +1,5 @@
+#!/bin/bash
+hwinfo --block --short 2> /dev/null > device_list
+grep Apricorn device_list | awk '{print $1}'> drive_list
+grep -f drive_list device_list | grep Partition | awk '{print $1}' > partition_list
+exit

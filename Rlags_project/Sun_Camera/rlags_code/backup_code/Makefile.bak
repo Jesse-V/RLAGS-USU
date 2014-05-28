@@ -1,0 +1,43 @@
+ver = debug
+platform = x86
+
+CC = g++
+INCLIB = /usr/local/include
+LDLIB = /usr/local/lib
+OPENCV = -I/usr/include/opencv2    -lopencv_highgui -lopencv_core
+USB =  -I../libusb/include  -L../libusb/$(platform) -lusb-1.0  
+
+
+LIBS = -lASICamera 
+LIBSPATH = -L../lib/$(platform) -I../include
+
+
+
+ifeq ($(ver), debug)
+DEFS = -D_LIN -D_DEBUG 
+CFLAGS = -g  -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH) $(LIBS) -lpthread  $(USB) -DGLIBC_20
+else
+DEFS = -D_LIN 
+CFLAGS =  -O3 -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH) $(LIBS) -lpthread  $(USB) -DGLIBC_20
+endif
+
+ifeq ($(platform), x64)
+CFLAGS += -m64
+endif
+
+ifeq ($(platform), arm)
+CC = arm-linux-gnueabi-g++
+AR= arm-linux-gnueabi-ar
+USB = -I/usr/local/arm/libusb/include/libusb-1.0  -L/usr/local/arm/libusb/lib -lusb-1.0  
+endif
+
+all:
+	$(CC) main_console.cpp -o test_console $(CFLAGS) $(OPENCV)
+#	$(CC)  main.cpp -o test_gui $(CFLAGS) $(OPENCV)
+
+
+clean:
+	rm  test_gui test_console
+#pkg-config libusb-1.0 --cflags --libs
+#pkg-config opencv --cflags --libs
+

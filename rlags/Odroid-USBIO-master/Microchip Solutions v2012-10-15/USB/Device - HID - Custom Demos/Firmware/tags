@@ -1,0 +1,406 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ALLCONFS	.\MPLAB.X\nbproject\Makefile-impl.mk	/^ALLCONFS=PICDEM_FSUSB_K50 $/;"	m
+ALLCONFS	MPLAB.X\nbproject\Makefile-impl.mk	/^ALLCONFS=PICDEM_FSUSB_K50 $/;"	m
+ASFLAGS	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^ASFLAGS=$/;"	m
+ASFLAGS	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^ASFLAGS=$/;"	m
+BLANK_INTERVAL	.\main.c	1112;"	d	file:
+BLANK_INTERVAL	main.c	1112;"	d	file:
+BLINK_INTERVAL	.\main.c	1111;"	d	file:
+BLINK_INTERVAL	main.c	1111;"	d	file:
+BUILD_SUBPROJECTS	.\MPLAB.X\nbproject\Makefile-impl.mk	/^BUILD_SUBPROJECTS=${BUILD_SUBPROJECTS_${SUBPROJECTS}}$/;"	m
+BUILD_SUBPROJECTS	MPLAB.X\nbproject\Makefile-impl.mk	/^BUILD_SUBPROJECTS=${BUILD_SUBPROJECTS_${SUBPROJECTS}}$/;"	m
+BUILD_SUBPROJECTS_	.\MPLAB.X\nbproject\Makefile-impl.mk	/^BUILD_SUBPROJECTS_=.build-subprojects$/;"	m
+BUILD_SUBPROJECTS_	MPLAB.X\nbproject\Makefile-impl.mk	/^BUILD_SUBPROJECTS_=.build-subprojects$/;"	m
+BUILD_SUBPROJECTS_NO	.\MPLAB.X\nbproject\Makefile-impl.mk	/^BUILD_SUBPROJECTS_NO=$/;"	m
+BUILD_SUBPROJECTS_NO	MPLAB.X\nbproject\Makefile-impl.mk	/^BUILD_SUBPROJECTS_NO=$/;"	m
+BlinkUSBStatus	.\main.c	/^void BlinkUSBStatus(void)$/;"	f
+BlinkUSBStatus	main.c	/^void BlinkUSBStatus(void)$/;"	f
+CFLAGS	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^CFLAGS=$/;"	m
+CFLAGS	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^CFLAGS=$/;"	m
+CLEAN_SUBPROJECTS	.\MPLAB.X\nbproject\Makefile-impl.mk	/^CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}$/;"	m
+CLEAN_SUBPROJECTS	MPLAB.X\nbproject\Makefile-impl.mk	/^CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}$/;"	m
+CLEAN_SUBPROJECTS_	.\MPLAB.X\nbproject\Makefile-impl.mk	/^CLEAN_SUBPROJECTS_=.clean-subprojects$/;"	m
+CLEAN_SUBPROJECTS_	MPLAB.X\nbproject\Makefile-impl.mk	/^CLEAN_SUBPROJECTS_=.clean-subprojects$/;"	m
+CLEAN_SUBPROJECTS_NO	.\MPLAB.X\nbproject\Makefile-impl.mk	/^CLEAN_SUBPROJECTS_NO=$/;"	m
+CLEAN_SUBPROJECTS_NO	MPLAB.X\nbproject\Makefile-impl.mk	/^CLEAN_SUBPROJECTS_NO=$/;"	m
+CLOCK_FREQ	.\HardwareProfile - PICDEM FSUSB K50.h	98;"	d
+CLOCK_FREQ	HardwareProfile - PICDEM FSUSB K50.h	98;"	d
+CND_ARTIFACT_DIR_PICDEM_FSUSB_K50	.\MPLAB.X\nbproject\Makefile-variables.mk	/^CND_ARTIFACT_DIR_PICDEM_FSUSB_K50=dist\/PICDEM_FSUSB_K50\/production$/;"	m
+CND_ARTIFACT_DIR_PICDEM_FSUSB_K50	MPLAB.X\nbproject\Makefile-variables.mk	/^CND_ARTIFACT_DIR_PICDEM_FSUSB_K50=dist\/PICDEM_FSUSB_K50\/production$/;"	m
+CND_ARTIFACT_NAME_PICDEM_FSUSB_K50	.\MPLAB.X\nbproject\Makefile-variables.mk	/^CND_ARTIFACT_NAME_PICDEM_FSUSB_K50=MPLAB.X.production.hex$/;"	m
+CND_ARTIFACT_NAME_PICDEM_FSUSB_K50	MPLAB.X\nbproject\Makefile-variables.mk	/^CND_ARTIFACT_NAME_PICDEM_FSUSB_K50=MPLAB.X.production.hex$/;"	m
+CND_ARTIFACT_PATH_PICDEM_FSUSB_K50	.\MPLAB.X\nbproject\Makefile-variables.mk	/^CND_ARTIFACT_PATH_PICDEM_FSUSB_K50=dist\/PICDEM_FSUSB_K50\/production\/MPLAB.X.production.hex$/;"	m
+CND_ARTIFACT_PATH_PICDEM_FSUSB_K50	MPLAB.X\nbproject\Makefile-variables.mk	/^CND_ARTIFACT_PATH_PICDEM_FSUSB_K50=dist\/PICDEM_FSUSB_K50\/production\/MPLAB.X.production.hex$/;"	m
+CND_BASEDIR	.\MPLAB.X\nbproject\Makefile-variables.mk	/^CND_BASEDIR=`pwd`$/;"	m
+CND_BASEDIR	MPLAB.X\nbproject\Makefile-variables.mk	/^CND_BASEDIR=`pwd`$/;"	m
+CND_CONF	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^CND_CONF=PICDEM_FSUSB_K50$/;"	m
+CND_CONF	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^CND_CONF=PICDEM_FSUSB_K50$/;"	m
+CND_PACKAGE_DIR_PICDEM_FSUSB_K50	.\MPLAB.X\nbproject\Makefile-variables.mk	/^CND_PACKAGE_DIR_PICDEM_FSUSB_K50=${CND_DISTDIR}\/PICDEM_FSUSB_K50\/package$/;"	m
+CND_PACKAGE_DIR_PICDEM_FSUSB_K50	MPLAB.X\nbproject\Makefile-variables.mk	/^CND_PACKAGE_DIR_PICDEM_FSUSB_K50=${CND_DISTDIR}\/PICDEM_FSUSB_K50\/package$/;"	m
+CND_PACKAGE_NAME_PICDEM_FSUSB_K50	.\MPLAB.X\nbproject\Makefile-variables.mk	/^CND_PACKAGE_NAME_PICDEM_FSUSB_K50=mplab.x.tar$/;"	m
+CND_PACKAGE_NAME_PICDEM_FSUSB_K50	MPLAB.X\nbproject\Makefile-variables.mk	/^CND_PACKAGE_NAME_PICDEM_FSUSB_K50=mplab.x.tar$/;"	m
+CND_PACKAGE_PATH_PICDEM_FSUSB_K50	.\MPLAB.X\nbproject\Makefile-variables.mk	/^CND_PACKAGE_PATH_PICDEM_FSUSB_K50=${CND_DISTDIR}\/PICDEM_FSUSB_K50\/package\/mplab.x.tar$/;"	m
+CND_PACKAGE_PATH_PICDEM_FSUSB_K50	MPLAB.X\nbproject\Makefile-variables.mk	/^CND_PACKAGE_PATH_PICDEM_FSUSB_K50=${CND_DISTDIR}\/PICDEM_FSUSB_K50\/package\/mplab.x.tar$/;"	m
+CONF	.\MPLAB.X\nbproject\Makefile-impl.mk	/^CONF=${DEFAULTCONF}$/;"	m
+CONF	MPLAB.X\nbproject\Makefile-impl.mk	/^CONF=${DEFAULTCONF}$/;"	m
+CP	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^CP=cp $/;"	m
+CP	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^CP=cp $/;"	m
+DEBUGGABLE_SUFFIX	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^DEBUGGABLE_SUFFIX=cof$/;"	m
+DEBUGGABLE_SUFFIX	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^DEBUGGABLE_SUFFIX=cof$/;"	m
+DEFAULTCONF	.\MPLAB.X\nbproject\Makefile-impl.mk	/^DEFAULTCONF=PICDEM_FSUSB_K50$/;"	m
+DEFAULTCONF	MPLAB.X\nbproject\Makefile-impl.mk	/^DEFAULTCONF=PICDEM_FSUSB_K50$/;"	m
+DEMO_BOARD	.\HardwareProfile - PICDEM FSUSB K50.h	95;"	d
+DEMO_BOARD	HardwareProfile - PICDEM FSUSB K50.h	95;"	d
+DEPFILES	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^DEPFILES=$(shell mplabwildcard ${POSSIBLE_DEPFILES})$/;"	m
+DEPFILES	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^DEPFILES=$(shell mplabwildcard ${POSSIBLE_DEPFILES})$/;"	m
+DEP_GEN	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^DEP_GEN=${MP_JAVA_PATH}java -jar "C:\/Program Files (x86)\/Microchip\/MPLABX\/mplab_ide\/mplab_ide\/modules\/..\/..\/bin\/extractobjectdependencies.jar" $/;"	m
+DEP_GEN	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^DEP_GEN=${MP_JAVA_PATH}java -jar "C:\/Program Files (x86)\/Microchip\/MPLABX\/mplab_ide\/mplab_ide\/modules\/..\/..\/bin\/extractobjectdependencies.jar" $/;"	m
+DISTDIR	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^DISTDIR=dist\/${CND_CONF}\/${IMAGE_TYPE}$/;"	m
+DISTDIR	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^DISTDIR=dist\/${CND_CONF}\/${IMAGE_TYPE}$/;"	m
+FCMEN_OFF	.\main.c	/^        __CONFIG(FOSC_HS & WDTE_OFF & PWRTE_OFF & MCLRE_OFF & CP_OFF & BOREN_OFF & CLKOUTEN_ON & IESO_OFF & FCMEN_OFF);$/;"	v
+FCMEN_OFF	.\main.c	/^        __CONFIG(FOSC_INTOSC & WDTE_OFF & PWRTE_OFF & MCLRE_OFF & CP_OFF & BOREN_OFF & CLKOUTEN_ON & IESO_OFF & FCMEN_OFF);$/;"	v
+FCMEN_OFF	main.c	/^        __CONFIG(FOSC_HS & WDTE_OFF & PWRTE_OFF & MCLRE_OFF & CP_OFF & BOREN_OFF & CLKOUTEN_ON & IESO_OFF & FCMEN_OFF);$/;"	v
+FCMEN_OFF	main.c	/^        __CONFIG(FOSC_INTOSC & WDTE_OFF & PWRTE_OFF & MCLRE_OFF & CP_OFF & BOREN_OFF & CLKOUTEN_ON & IESO_OFF & FCMEN_OFF);$/;"	v
+FINAL_IMAGE	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^FINAL_IMAGE=dist\/${CND_CONF}\/${IMAGE_TYPE}\/MPLAB.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}$/;"	m
+FINAL_IMAGE	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^FINAL_IMAGE=dist\/${CND_CONF}\/${IMAGE_TYPE}\/MPLAB.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}$/;"	m
+FIXDEPS	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^FIXDEPS=fixDeps$/;"	m
+FIXDEPS	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^FIXDEPS=fixDeps$/;"	m
+HARDWARE_PROFILE_H	.\HardwareProfile.h	37;"	d
+HARDWARE_PROFILE_H	HardwareProfile.h	37;"	d
+HARDWARE_PROFILE_PICDEM_FSUSB_K50_H	.\HardwareProfile - PICDEM FSUSB K50.h	38;"	d
+HARDWARE_PROFILE_PICDEM_FSUSB_K50_H	HardwareProfile - PICDEM FSUSB K50.h	38;"	d
+HID_EP	.\usb_config.h	186;"	d
+HID_EP	usb_config.h	186;"	d
+HID_INTF_ID	.\usb_config.h	185;"	d
+HID_INTF_ID	usb_config.h	185;"	d
+HID_INT_IN_EP_SIZE	.\usb_config.h	188;"	d
+HID_INT_IN_EP_SIZE	usb_config.h	188;"	d
+HID_INT_OUT_EP_SIZE	.\usb_config.h	187;"	d
+HID_INT_OUT_EP_SIZE	usb_config.h	187;"	d
+HID_NUM_OF_DSC	.\usb_config.h	189;"	d
+HID_NUM_OF_DSC	usb_config.h	189;"	d
+HID_RPT01_SIZE	.\usb_config.h	190;"	d
+HID_RPT01_SIZE	usb_config.h	190;"	d
+High_ISR	.\main.c	/^	void High_ISR (void)$/;"	f
+High_ISR	main.c	/^	void High_ISR (void)$/;"	f
+IMAGE_TYPE	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^IMAGE_TYPE=debug$/;"	m
+IMAGE_TYPE	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^IMAGE_TYPE=production$/;"	m
+IMAGE_TYPE	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^IMAGE_TYPE=debug$/;"	m
+IMAGE_TYPE	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^IMAGE_TYPE=production$/;"	m
+INPUT_PIN	.\HardwareProfile - PICDEM FSUSB K50.h	166;"	d
+INPUT_PIN	HardwareProfile - PICDEM FSUSB K50.h	166;"	d
+ISRCode	.\main.c	/^	void interrupt ISRCode()$/;"	f
+ISRCode	main.c	/^	void interrupt ISRCode()$/;"	f
+InitializeSystem	.\main.c	/^static void InitializeSystem(void)$/;"	f	file:
+InitializeSystem	main.c	/^static void InitializeSystem(void)$/;"	f	file:
+LDLIBSOPTIONS	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^LDLIBSOPTIONS=$/;"	m
+LDLIBSOPTIONS	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^LDLIBSOPTIONS=$/;"	m
+LVP_OFF	.\main.c	/^        __CONFIG(WRT_OFF & CPUDIV_NOCLKDIV & USBLSCLK_48MHz & PLLMULT_3x & PLLEN_ENABLED & STVREN_ON &  BORV_LO & LPBOR_OFF & LVP_OFF);$/;"	v
+LVP_OFF	.\main.c	/^        __CONFIG(WRT_OFF & CPUDIV_NOCLKDIV & USBLSCLK_48MHz & PLLMULT_4x & PLLEN_ENABLED & STVREN_ON &  BORV_LO & LPBOR_OFF & LVP_OFF);$/;"	v
+LVP_OFF	main.c	/^        __CONFIG(WRT_OFF & CPUDIV_NOCLKDIV & USBLSCLK_48MHz & PLLMULT_3x & PLLEN_ENABLED & STVREN_ON &  BORV_LO & LPBOR_OFF & LVP_OFF);$/;"	v
+LVP_OFF	main.c	/^        __CONFIG(WRT_OFF & CPUDIV_NOCLKDIV & USBLSCLK_48MHz & PLLMULT_4x & PLLEN_ENABLED & STVREN_ON &  BORV_LO & LPBOR_OFF & LVP_OFF);$/;"	v
+Low_ISR	.\main.c	/^	void Low_ISR (void)$/;"	f
+Low_ISR	main.c	/^	void Low_ISR (void)$/;"	f
+MAIN_C	.\main.c	46;"	d	file:
+MAIN_C	main.c	46;"	d	file:
+MKDIR	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MKDIR=gnumkdir -p$/;"	m
+MKDIR	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MKDIR=gnumkdir -p$/;"	m
+MP_AR	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\mplib.exe"$/;"	m
+MP_AR	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\mplib.exe"$/;"	m
+MP_AR_DIR	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AR_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin"$/;"	m
+MP_AR_DIR	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AR_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin"$/;"	m
+MP_AS	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AS="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\..\\mpasm\\MPASMWIN.exe"$/;"	m
+MP_AS	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AS="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\..\\mpasm\\MPASMWIN.exe"$/;"	m
+MP_AS_DIR	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AS_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\..\\mpasm"$/;"	m
+MP_AS_DIR	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_AS_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\..\\mpasm"$/;"	m
+MP_CC	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_CC="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\mcc18.exe"$/;"	m
+MP_CC	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_CC="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\mcc18.exe"$/;"	m
+MP_CC_DIR	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_CC_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin"$/;"	m
+MP_CC_DIR	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_CC_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin"$/;"	m
+MP_JAVA_PATH	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_JAVA_PATH="C:\\Program Files (x86)\\Microchip\\MPLABX\\sys\\java\\jre1.6.0_32-windows-x64\\java-windows\/bin\/"$/;"	m
+MP_JAVA_PATH	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_JAVA_PATH="C:\\Program Files (x86)\\Microchip\\MPLABX\\sys\\java\\jre1.6.0_32-windows-x64\\java-windows\/bin\/"$/;"	m
+MP_LD	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_LD="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\mplink.exe"$/;"	m
+MP_LD	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_LD="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin\\mplink.exe"$/;"	m
+MP_LD_DIR	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_LD_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin"$/;"	m
+MP_LD_DIR	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^MP_LD_DIR="C:\\Program Files (x86)\\Microchip\\mplabc18\\v3.44\\bin"$/;"	m
+MP_LINKER_DEBUG_OPTION	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MP_LINKER_DEBUG_OPTION=$/;"	m
+MP_LINKER_DEBUG_OPTION	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MP_LINKER_DEBUG_OPTION=$/;"	m
+MP_PROCESSOR_OPTION	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MP_PROCESSOR_OPTION=18F45K50$/;"	m
+MP_PROCESSOR_OPTION	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MP_PROCESSOR_OPTION=18F45K50$/;"	m
+MP_PROCESSOR_OPTION_LD	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MP_PROCESSOR_OPTION_LD=18f45k50$/;"	m
+MP_PROCESSOR_OPTION_LD	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MP_PROCESSOR_OPTION_LD=18f45k50$/;"	m
+MV	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MV=mv $/;"	m
+MV	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^MV=mv $/;"	m
+OBJECTDIR	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OBJECTDIR=build\/${CND_CONF}\/${IMAGE_TYPE}$/;"	m
+OBJECTDIR	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OBJECTDIR=build\/${CND_CONF}\/${IMAGE_TYPE}$/;"	m
+OBJECTFILES	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OBJECTFILES=${OBJECTDIR}\/_ext\/926206843\/usb_device.o ${OBJECTDIR}\/_ext\/1785203669\/usb_function_hid.o ${OBJECTDIR}\/_ext\/1472\/main.o ${OBJECTDIR}\/_ext\/1472\/usb_descriptors.o$/;"	m
+OBJECTFILES	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OBJECTFILES=${OBJECTDIR}\/_ext\/926206843\/usb_device.o ${OBJECTDIR}\/_ext\/1785203669\/usb_function_hid.o ${OBJECTDIR}\/_ext\/1472\/main.o ${OBJECTDIR}\/_ext\/1472\/usb_descriptors.o$/;"	m
+OBJECTFILES_QUOTED_IF_SPACED	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}\/_ext\/926206843\/usb_device.o ${OBJECTDIR}\/_ext\/1785203669\/usb_function_hid.o ${OBJECTDIR}\/_ext\/1472\/main.o ${OBJECTDIR}\/_ext\/1472\/usb_descriptors.o$/;"	m
+OBJECTFILES_QUOTED_IF_SPACED	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}\/_ext\/926206843\/usb_device.o ${OBJECTDIR}\/_ext\/1785203669\/usb_function_hid.o ${OBJECTDIR}\/_ext\/1472\/main.o ${OBJECTDIR}\/_ext\/1472\/usb_descriptors.o$/;"	m
+OS_CURRENT	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^OS_CURRENT="$(shell uname -s)"$/;"	m
+OS_CURRENT	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^OS_CURRENT="$(shell uname -s)"$/;"	m
+OUTPUT_PIN	.\HardwareProfile - PICDEM FSUSB K50.h	167;"	d
+OUTPUT_PIN	HardwareProfile - PICDEM FSUSB K50.h	167;"	d
+OUTPUT_SUFFIX	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OUTPUT_SUFFIX=cof$/;"	m
+OUTPUT_SUFFIX	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OUTPUT_SUFFIX=hex$/;"	m
+OUTPUT_SUFFIX	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OUTPUT_SUFFIX=cof$/;"	m
+OUTPUT_SUFFIX	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^OUTPUT_SUFFIX=hex$/;"	m
+PATH	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^PATH:=C:\/Program Files (x86)\/Microchip\/MPLABX\/mplab_ide\/mplab_ide\/modules\/..\/..\/bin\/:$(PATH)$/;"	m
+PATH	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^PATH:=C:\/Program Files (x86)\/Microchip\/MPLABX\/mplab_ide\/mplab_ide\/modules\/..\/..\/bin\/:$(PATH)$/;"	m
+PATH_TO_IDE_BIN	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^PATH_TO_IDE_BIN=C:\/Program Files (x86)\/Microchip\/MPLABX\/mplab_ide\/mplab_ide\/modules\/..\/..\/bin\/$/;"	m
+PATH_TO_IDE_BIN	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^PATH_TO_IDE_BIN=C:\/Program Files (x86)\/Microchip\/MPLABX\/mplab_ide\/mplab_ide\/modules\/..\/..\/bin\/$/;"	m
+PIC18F45K50_FAMILY	.\HardwareProfile - PICDEM FSUSB K50.h	97;"	d
+PIC18F45K50_FAMILY	HardwareProfile - PICDEM FSUSB K50.h	97;"	d
+PICDEM_FS_USB_K50	.\HardwareProfile - PICDEM FSUSB K50.h	96;"	d
+PICDEM_FS_USB_K50	HardwareProfile - PICDEM FSUSB K50.h	96;"	d
+POSSIBLE_DEPFILES	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^POSSIBLE_DEPFILES=${OBJECTDIR}\/_ext\/926206843\/usb_device.o.d ${OBJECTDIR}\/_ext\/1785203669\/usb_function_hid.o.d ${OBJECTDIR}\/_ext\/1472\/main.o.d ${OBJECTDIR}\/_ext\/1472\/usb_descriptors.o.d$/;"	m
+POSSIBLE_DEPFILES	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^POSSIBLE_DEPFILES=${OBJECTDIR}\/_ext\/926206843\/usb_device.o.d ${OBJECTDIR}\/_ext\/1785203669\/usb_function_hid.o.d ${OBJECTDIR}\/_ext\/1472\/main.o.d ${OBJECTDIR}\/_ext\/1472\/usb_descriptors.o.d$/;"	m
+PROGRAMMABLE_WITH_USB_HID_BOOTLOADER	.\HardwareProfile - PICDEM FSUSB K50.h	78;"	d
+PROGRAMMABLE_WITH_USB_HID_BOOTLOADER	HardwareProfile - PICDEM FSUSB K50.h	78;"	d
+PROJECTNAME	.\MPLAB.X\nbproject\Makefile-impl.mk	/^PROJECTNAME=MPLAB.X$/;"	m
+PROJECTNAME	MPLAB.X\nbproject\Makefile-impl.mk	/^PROJECTNAME=MPLAB.X$/;"	m
+ProcessIO	.\main.c	/^void ProcessIO(void)$/;"	f
+ProcessIO	main.c	/^void ProcessIO(void)$/;"	f
+REMAPPED_HIGH_INTERRUPT_VECTOR_ADDRESS	.\main.c	394;"	d	file:
+REMAPPED_HIGH_INTERRUPT_VECTOR_ADDRESS	.\main.c	398;"	d	file:
+REMAPPED_HIGH_INTERRUPT_VECTOR_ADDRESS	.\main.c	402;"	d	file:
+REMAPPED_HIGH_INTERRUPT_VECTOR_ADDRESS	main.c	394;"	d	file:
+REMAPPED_HIGH_INTERRUPT_VECTOR_ADDRESS	main.c	398;"	d	file:
+REMAPPED_HIGH_INTERRUPT_VECTOR_ADDRESS	main.c	402;"	d	file:
+REMAPPED_LOW_INTERRUPT_VECTOR_ADDRESS	.\main.c	395;"	d	file:
+REMAPPED_LOW_INTERRUPT_VECTOR_ADDRESS	.\main.c	399;"	d	file:
+REMAPPED_LOW_INTERRUPT_VECTOR_ADDRESS	.\main.c	403;"	d	file:
+REMAPPED_LOW_INTERRUPT_VECTOR_ADDRESS	main.c	395;"	d	file:
+REMAPPED_LOW_INTERRUPT_VECTOR_ADDRESS	main.c	399;"	d	file:
+REMAPPED_LOW_INTERRUPT_VECTOR_ADDRESS	main.c	403;"	d	file:
+REMAPPED_RESET_VECTOR_ADDRESS	.\main.c	393;"	d	file:
+REMAPPED_RESET_VECTOR_ADDRESS	.\main.c	397;"	d	file:
+REMAPPED_RESET_VECTOR_ADDRESS	.\main.c	401;"	d	file:
+REMAPPED_RESET_VECTOR_ADDRESS	main.c	393;"	d	file:
+REMAPPED_RESET_VECTOR_ADDRESS	main.c	397;"	d	file:
+REMAPPED_RESET_VECTOR_ADDRESS	main.c	401;"	d	file:
+RM	.\MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^RM=rm -f $/;"	m
+RM	MPLAB.X\nbproject\Makefile-PICDEM_FSUSB_K50.mk	/^RM=rm -f $/;"	m
+RX_DATA_BUFFER_ADDRESS	.\main.c	/^unsigned char ReceivedDataBuffer[64] RX_DATA_BUFFER_ADDRESS;$/;"	v
+RX_DATA_BUFFER_ADDRESS	.\main.c	330;"	d	file:
+RX_DATA_BUFFER_ADDRESS	main.c	/^unsigned char ReceivedDataBuffer[64] RX_DATA_BUFFER_ADDRESS;$/;"	v
+RX_DATA_BUFFER_ADDRESS	main.c	330;"	d	file:
+ReadPOT	.\main.c	/^WORD_VAL ReadPOT(void)$/;"	f
+ReadPOT	main.c	/^WORD_VAL ReadPOT(void)$/;"	f
+Remapped_High_ISR	.\main.c	/^	void Remapped_High_ISR (void)$/;"	f
+Remapped_High_ISR	main.c	/^	void Remapped_High_ISR (void)$/;"	f
+Remapped_Low_ISR	.\main.c	/^	void Remapped_Low_ISR (void)$/;"	f
+Remapped_Low_ISR	main.c	/^	void Remapped_Low_ISR (void)$/;"	f
+SHELL	.\MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^SHELL=cmd.exe$/;"	m
+SHELL	MPLAB.X\nbproject\Makefile-local-PICDEM_FSUSB_K50.mk	/^SHELL=cmd.exe$/;"	m
+SUBPROJECTS	.\MPLAB.X\nbproject\Makefile-impl.mk	/^SUBPROJECTS=${SUB_${SUB}}$/;"	m
+SUBPROJECTS	MPLAB.X\nbproject\Makefile-impl.mk	/^SUBPROJECTS=${SUB_${SUB}}$/;"	m
+SUB_no	.\MPLAB.X\nbproject\Makefile-impl.mk	/^SUB_no=NO$/;"	m
+SUB_no	MPLAB.X\nbproject\Makefile-impl.mk	/^SUB_no=NO$/;"	m
+TX_DATA_BUFFER_ADDRESS	.\main.c	/^unsigned char ToSendDataBuffer[64] TX_DATA_BUFFER_ADDRESS;$/;"	v
+TX_DATA_BUFFER_ADDRESS	.\main.c	331;"	d	file:
+TX_DATA_BUFFER_ADDRESS	main.c	/^unsigned char ToSendDataBuffer[64] TX_DATA_BUFFER_ADDRESS;$/;"	v
+TX_DATA_BUFFER_ADDRESS	main.c	331;"	d	file:
+USBCBCheckOtherReq	.\main.c	/^void USBCBCheckOtherReq(void)$/;"	f
+USBCBCheckOtherReq	main.c	/^void USBCBCheckOtherReq(void)$/;"	f
+USBCBErrorHandler	.\main.c	/^void USBCBErrorHandler(void)$/;"	f
+USBCBErrorHandler	main.c	/^void USBCBErrorHandler(void)$/;"	f
+USBCBInitEP	.\main.c	/^void USBCBInitEP(void)$/;"	f
+USBCBInitEP	main.c	/^void USBCBInitEP(void)$/;"	f
+USBCBSendResume	.\main.c	/^void USBCBSendResume(void)$/;"	f
+USBCBSendResume	main.c	/^void USBCBSendResume(void)$/;"	f
+USBCBStdSetDscHandler	.\main.c	/^void USBCBStdSetDscHandler(void)$/;"	f
+USBCBStdSetDscHandler	main.c	/^void USBCBStdSetDscHandler(void)$/;"	f
+USBCBSuspend	.\main.c	/^void USBCBSuspend(void)$/;"	f
+USBCBSuspend	main.c	/^void USBCBSuspend(void)$/;"	f
+USBCBWakeFromSuspend	.\main.c	/^void USBCBWakeFromSuspend(void)$/;"	f
+USBCBWakeFromSuspend	main.c	/^void USBCBWakeFromSuspend(void)$/;"	f
+USBCB_SOF_Handler	.\main.c	/^void USBCB_SOF_Handler(void)$/;"	f
+USBCB_SOF_Handler	main.c	/^void USBCB_SOF_Handler(void)$/;"	f
+USBCFG_H	.\usb_config.h	50;"	d
+USBCFG_H	usb_config.h	50;"	d
+USBInHandle	.\main.c	/^USB_HANDLE USBInHandle = 0;     \/\/USB handle.  Must be initialized to 0 at startup.$/;"	v
+USBInHandle	main.c	/^USB_HANDLE USBInHandle = 0;     \/\/USB handle.  Must be initialized to 0 at startup.$/;"	v
+USBOutHandle	.\main.c	/^USB_HANDLE USBOutHandle = 0;    \/\/USB handle.  Must be initialized to 0 at startup.$/;"	v
+USBOutHandle	main.c	/^USB_HANDLE USBOutHandle = 0;    \/\/USB handle.  Must be initialized to 0 at startup.$/;"	v
+USB_BUS_SENSE	.\HardwareProfile - PICDEM FSUSB K50.h	66;"	d
+USB_BUS_SENSE	.\HardwareProfile - PICDEM FSUSB K50.h	68;"	d
+USB_BUS_SENSE	HardwareProfile - PICDEM FSUSB K50.h	66;"	d
+USB_BUS_SENSE	HardwareProfile - PICDEM FSUSB K50.h	68;"	d
+USB_CD_Ptr	.\usb_descriptors.c	/^ROM BYTE *ROM USB_CD_Ptr[]=$/;"	v
+USB_CD_Ptr	usb_descriptors.c	/^ROM BYTE *ROM USB_CD_Ptr[]=$/;"	v
+USB_ENABLE_ALL_HANDLERS	.\usb_config.h	168;"	d
+USB_ENABLE_ALL_HANDLERS	usb_config.h	168;"	d
+USB_ENABLE_STATUS_STAGE_TIMEOUTS	.\usb_config.h	141;"	d
+USB_ENABLE_STATUS_STAGE_TIMEOUTS	usb_config.h	141;"	d
+USB_EP0_BUFF_SIZE	.\usb_config.h	53;"	d
+USB_EP0_BUFF_SIZE	usb_config.h	53;"	d
+USB_INTERRUPT	.\usb_config.h	104;"	d
+USB_INTERRUPT	usb_config.h	104;"	d
+USB_MAX_EP_NUMBER	.\usb_config.h	61;"	d
+USB_MAX_EP_NUMBER	usb_config.h	61;"	d
+USB_MAX_NUM_INT	.\usb_config.h	60;"	d
+USB_MAX_NUM_INT	usb_config.h	60;"	d
+USB_NUM_STRING_DESCRIPTORS	.\usb_config.h	165;"	d
+USB_NUM_STRING_DESCRIPTORS	usb_config.h	165;"	d
+USB_PING_PONG_MODE	.\usb_config.h	87;"	d
+USB_PING_PONG_MODE	usb_config.h	87;"	d
+USB_PULLUP_OPTION	.\usb_config.h	108;"	d
+USB_PULLUP_OPTION	usb_config.h	108;"	d
+USB_SD_Ptr	.\usb_descriptors.c	/^ROM BYTE *ROM USB_SD_Ptr[]=$/;"	v
+USB_SD_Ptr	usb_descriptors.c	/^ROM BYTE *ROM USB_SD_Ptr[]=$/;"	v
+USB_SPEED_OPTION	.\usb_config.h	117;"	d
+USB_SPEED_OPTION	usb_config.h	117;"	d
+USB_STATUS_STAGE_TIMEOUT	.\usb_config.h	157;"	d
+USB_STATUS_STAGE_TIMEOUT	usb_config.h	157;"	d
+USB_SUPPORT_DEVICE	.\usb_config.h	163;"	d
+USB_SUPPORT_DEVICE	usb_config.h	163;"	d
+USB_TRANSCEIVER_OPTION	.\usb_config.h	111;"	d
+USB_TRANSCEIVER_OPTION	usb_config.h	111;"	d
+USB_USER_CONFIG_DESCRIPTOR	.\usb_config.h	71;"	d
+USB_USER_CONFIG_DESCRIPTOR	usb_config.h	71;"	d
+USB_USER_CONFIG_DESCRIPTOR_INCLUDE	.\usb_config.h	72;"	d
+USB_USER_CONFIG_DESCRIPTOR_INCLUDE	usb_config.h	72;"	d
+USB_USER_DEVICE_DESCRIPTOR	.\usb_config.h	66;"	d
+USB_USER_DEVICE_DESCRIPTOR	usb_config.h	66;"	d
+USB_USER_DEVICE_DESCRIPTOR_INCLUDE	.\usb_config.h	67;"	d
+USB_USER_DEVICE_DESCRIPTOR_INCLUDE	usb_config.h	67;"	d
+USB_USE_HID	.\usb_config.h	180;"	d
+USB_USE_HID	usb_config.h	180;"	d
+USER_USB_CALLBACK_EVENT_HANDLER	.\main.c	/^BOOL USER_USB_CALLBACK_EVENT_HANDLER(int event, void *pdata, WORD size)$/;"	f
+USER_USB_CALLBACK_EVENT_HANDLER	main.c	/^BOOL USER_USB_CALLBACK_EVENT_HANDLER(int event, void *pdata, WORD size)$/;"	f
+USE_INTERNAL_OSC	.\main.c	47;"	d	file:
+USE_INTERNAL_OSC	main.c	47;"	d	file:
+UserInit	.\main.c	/^void UserInit(void)$/;"	f
+UserInit	main.c	/^void UserInit(void)$/;"	f
+YourHighPriorityISRCode	.\main.c	/^	void YourHighPriorityISRCode()$/;"	f
+YourHighPriorityISRCode	main.c	/^	void YourHighPriorityISRCode()$/;"	f
+YourLowPriorityISRCode	.\main.c	/^	void YourLowPriorityISRCode()$/;"	f
+YourLowPriorityISRCode	main.c	/^	void YourLowPriorityISRCode()$/;"	f
+__USB_DESCRIPTORS_C	.\usb_descriptors.c	154;"	d	file:
+__USB_DESCRIPTORS_C	usb_descriptors.c	154;"	d	file:
+_reset	.\main.c	/^	void _reset (void)$/;"	f
+_reset	main.c	/^	void _reset (void)$/;"	f
+bDscType	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	m	struct:__anon1	file:
+bDscType	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	m	struct:__anon3	file:
+bDscType	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	m	struct:__anon2	file:
+bDscType	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	m	struct:__anon5	file:
+bDscType	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	m	struct:__anon7	file:
+bDscType	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	m	struct:__anon6	file:
+bLength	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	m	struct:__anon1	file:
+bLength	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	m	struct:__anon3	file:
+bLength	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	m	struct:__anon2	file:
+bLength	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	m	struct:__anon5	file:
+bLength	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	m	struct:__anon7	file:
+bLength	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	m	struct:__anon6	file:
+blinkStatusValid	.\main.c	/^BOOL blinkStatusValid = TRUE;$/;"	v
+blinkStatusValid	main.c	/^BOOL blinkStatusValid = TRUE;$/;"	v
+checkReturnCode	.\MPLAB.X\nbproject\Package-PICDEM_FSUSB_K50.bash	/^function checkReturnCode$/;"	f
+checkReturnCode	MPLAB.X\nbproject\Package-PICDEM_FSUSB_K50.bash	/^function checkReturnCode$/;"	f
+configDescriptor1	.\usb_descriptors.c	/^ROM BYTE configDescriptor1[]={$/;"	v
+configDescriptor1	usb_descriptors.c	/^ROM BYTE configDescriptor1[]={$/;"	v
+copyFileToTmpDir	.\MPLAB.X\nbproject\Package-PICDEM_FSUSB_K50.bash	/^function copyFileToTmpDir$/;"	f
+copyFileToTmpDir	MPLAB.X\nbproject\Package-PICDEM_FSUSB_K50.bash	/^function copyFileToTmpDir$/;"	f
+device_dsc	.\usb_descriptors.c	/^ROM USB_DEVICE_DESCRIPTOR device_dsc=$/;"	v
+device_dsc	usb_descriptors.c	/^ROM USB_DEVICE_DESCRIPTOR device_dsc=$/;"	v
+hid_rpt01	.\usb_descriptors.c	/^ROM struct{BYTE report[HID_RPT01_SIZE];}hid_rpt01={$/;"	v	typeref:struct:__anon4
+hid_rpt01	usb_descriptors.c	/^ROM struct{BYTE report[HID_RPT01_SIZE];}hid_rpt01={$/;"	v	typeref:struct:__anon8
+ie_btnLed	.\main.c	/^void ie_btnLed(void) {$/;"	f
+ie_btnLed	main.c	/^void ie_btnLed(void) {$/;"	f
+ie_pwm	.\main.c	/^void ie_pwm(void) {$/;"	f
+ie_pwm	main.c	/^void ie_pwm(void) {$/;"	f
+mGetLED_1	.\HardwareProfile - PICDEM FSUSB K50.h	118;"	d
+mGetLED_1	HardwareProfile - PICDEM FSUSB K50.h	118;"	d
+mGetLED_2	.\HardwareProfile - PICDEM FSUSB K50.h	119;"	d
+mGetLED_2	HardwareProfile - PICDEM FSUSB K50.h	119;"	d
+mGetLED_3	.\HardwareProfile - PICDEM FSUSB K50.h	120;"	d
+mGetLED_3	HardwareProfile - PICDEM FSUSB K50.h	120;"	d
+mGetLED_4	.\HardwareProfile - PICDEM FSUSB K50.h	121;"	d
+mGetLED_4	HardwareProfile - PICDEM FSUSB K50.h	121;"	d
+mInitAllLEDs	.\HardwareProfile - PICDEM FSUSB K50.h	103;"	d
+mInitAllLEDs	.\HardwareProfile - PICDEM FSUSB K50.h	105;"	d
+mInitAllLEDs	HardwareProfile - PICDEM FSUSB K50.h	103;"	d
+mInitAllLEDs	HardwareProfile - PICDEM FSUSB K50.h	105;"	d
+mInitAllSwitches	.\HardwareProfile - PICDEM FSUSB K50.h	140;"	d
+mInitAllSwitches	.\HardwareProfile - PICDEM FSUSB K50.h	142;"	d
+mInitAllSwitches	HardwareProfile - PICDEM FSUSB K50.h	140;"	d
+mInitAllSwitches	HardwareProfile - PICDEM FSUSB K50.h	142;"	d
+mInitPOT	.\HardwareProfile - PICDEM FSUSB K50.h	162;"	d
+mInitPOT	HardwareProfile - PICDEM FSUSB K50.h	162;"	d
+mInitSwitch2	.\HardwareProfile - PICDEM FSUSB K50.h	146;"	d
+mInitSwitch2	.\HardwareProfile - PICDEM FSUSB K50.h	148;"	d
+mInitSwitch2	HardwareProfile - PICDEM FSUSB K50.h	146;"	d
+mInitSwitch2	HardwareProfile - PICDEM FSUSB K50.h	148;"	d
+mInitSwitch3	.\HardwareProfile - PICDEM FSUSB K50.h	151;"	d
+mInitSwitch3	HardwareProfile - PICDEM FSUSB K50.h	151;"	d
+mLED_1	.\HardwareProfile - PICDEM FSUSB K50.h	109;"	d
+mLED_1	.\HardwareProfile - PICDEM FSUSB K50.h	111;"	d
+mLED_1	HardwareProfile - PICDEM FSUSB K50.h	109;"	d
+mLED_1	HardwareProfile - PICDEM FSUSB K50.h	111;"	d
+mLED_1_Off	.\HardwareProfile - PICDEM FSUSB K50.h	128;"	d
+mLED_1_Off	HardwareProfile - PICDEM FSUSB K50.h	128;"	d
+mLED_1_On	.\HardwareProfile - PICDEM FSUSB K50.h	123;"	d
+mLED_1_On	HardwareProfile - PICDEM FSUSB K50.h	123;"	d
+mLED_1_Toggle	.\HardwareProfile - PICDEM FSUSB K50.h	133;"	d
+mLED_1_Toggle	HardwareProfile - PICDEM FSUSB K50.h	133;"	d
+mLED_2	.\HardwareProfile - PICDEM FSUSB K50.h	114;"	d
+mLED_2	HardwareProfile - PICDEM FSUSB K50.h	114;"	d
+mLED_2_Off	.\HardwareProfile - PICDEM FSUSB K50.h	129;"	d
+mLED_2_Off	HardwareProfile - PICDEM FSUSB K50.h	129;"	d
+mLED_2_On	.\HardwareProfile - PICDEM FSUSB K50.h	124;"	d
+mLED_2_On	HardwareProfile - PICDEM FSUSB K50.h	124;"	d
+mLED_2_Toggle	.\HardwareProfile - PICDEM FSUSB K50.h	134;"	d
+mLED_2_Toggle	HardwareProfile - PICDEM FSUSB K50.h	134;"	d
+mLED_3	.\HardwareProfile - PICDEM FSUSB K50.h	115;"	d
+mLED_3	HardwareProfile - PICDEM FSUSB K50.h	115;"	d
+mLED_3_Off	.\HardwareProfile - PICDEM FSUSB K50.h	130;"	d
+mLED_3_Off	HardwareProfile - PICDEM FSUSB K50.h	130;"	d
+mLED_3_On	.\HardwareProfile - PICDEM FSUSB K50.h	125;"	d
+mLED_3_On	HardwareProfile - PICDEM FSUSB K50.h	125;"	d
+mLED_3_Toggle	.\HardwareProfile - PICDEM FSUSB K50.h	135;"	d
+mLED_3_Toggle	HardwareProfile - PICDEM FSUSB K50.h	135;"	d
+mLED_4	.\HardwareProfile - PICDEM FSUSB K50.h	116;"	d
+mLED_4	HardwareProfile - PICDEM FSUSB K50.h	116;"	d
+mLED_4_Off	.\HardwareProfile - PICDEM FSUSB K50.h	131;"	d
+mLED_4_Off	HardwareProfile - PICDEM FSUSB K50.h	131;"	d
+mLED_4_On	.\HardwareProfile - PICDEM FSUSB K50.h	126;"	d
+mLED_4_On	HardwareProfile - PICDEM FSUSB K50.h	126;"	d
+mLED_4_Toggle	.\HardwareProfile - PICDEM FSUSB K50.h	136;"	d
+mLED_4_Toggle	HardwareProfile - PICDEM FSUSB K50.h	136;"	d
+main	.\main.c	/^void main(void)$/;"	f
+main	main.c	/^void main(void)$/;"	f
+makeDirectory	.\MPLAB.X\nbproject\Package-PICDEM_FSUSB_K50.bash	/^function makeDirectory$/;"	f
+makeDirectory	MPLAB.X\nbproject\Package-PICDEM_FSUSB_K50.bash	/^function makeDirectory$/;"	f
+report	.\usb_descriptors.c	/^ROM struct{BYTE report[HID_RPT01_SIZE];}hid_rpt01={$/;"	m	struct:__anon4	file:
+report	usb_descriptors.c	/^ROM struct{BYTE report[HID_RPT01_SIZE];}hid_rpt01={$/;"	m	struct:__anon8	file:
+sd000	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	v	typeref:struct:__anon1
+sd000	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	v	typeref:struct:__anon5
+sd001	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	v	typeref:struct:__anon2
+sd001	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	v	typeref:struct:__anon6
+sd002	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	v	typeref:struct:__anon3
+sd002	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	v	typeref:struct:__anon7
+self_power	.\HardwareProfile - PICDEM FSUSB K50.h	58;"	d
+self_power	.\HardwareProfile - PICDEM FSUSB K50.h	60;"	d
+self_power	HardwareProfile - PICDEM FSUSB K50.h	58;"	d
+self_power	HardwareProfile - PICDEM FSUSB K50.h	60;"	d
+string	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	m	struct:__anon1	file:
+string	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	m	struct:__anon3	file:
+string	.\usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	m	struct:__anon2	file:
+string	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[1];}sd000={$/;"	m	struct:__anon5	file:
+string	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[22];}sd002={$/;"	m	struct:__anon7	file:
+string	usb_descriptors.c	/^ROM struct{BYTE bLength;BYTE bDscType;WORD string[25];}sd001={$/;"	m	struct:__anon6	file:
+sw2	.\HardwareProfile - PICDEM FSUSB K50.h	153;"	d
+sw2	HardwareProfile - PICDEM FSUSB K50.h	153;"	d
+sw3	.\HardwareProfile - PICDEM FSUSB K50.h	156;"	d
+sw3	.\HardwareProfile - PICDEM FSUSB K50.h	158;"	d
+sw3	HardwareProfile - PICDEM FSUSB K50.h	156;"	d
+sw3	HardwareProfile - PICDEM FSUSB K50.h	158;"	d
+tris_self_power	.\HardwareProfile - PICDEM FSUSB K50.h	56;"	d
+tris_self_power	HardwareProfile - PICDEM FSUSB K50.h	56;"	d
+tris_usb_bus_sense	.\HardwareProfile - PICDEM FSUSB K50.h	64;"	d
+tris_usb_bus_sense	HardwareProfile - PICDEM FSUSB K50.h	64;"	d

@@ -1,0 +1,11 @@
+disk:
+  /dev/mmcblk0         Disk
+  /dev/mmcblk0boot1    Disk
+  /dev/mmcblk0boot0    Disk
+  /dev/sda             Apricorn SATAWire
+  /dev/sdb             Apricorn SATAWire
+partition:
+  /dev/mmcblk0p1       Partition
+  /dev/mmcblk0p2       Partition
+  /dev/sda1            Partition
+  /dev/sdb1            Partition

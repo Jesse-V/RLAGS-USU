@@ -1,0 +1,30 @@
+# ====== GEMINI DEFAULTS FILE ======= #
+# Each line must be padded with       #
+# blanks to 40 characters followed by #
+# a line feed.                        #
+#                                     #
+# LX200 command-set commands must     #
+# begin with a colon in column 1 and  #
+# end with a hash.                    #
+#                                     #
+# Gemini native commands must have    #
+# the command id right-justified to   #
+# column 5 followed by a semi-colon.  #
+# The value to be set must follow     #
+# immediately after the semi-colon.   #
+#                                     #
+# Lines beginning with a hash are     #
+# ignored.                            #
+# Lines beginning with a forward-slash#
+# are echoed to the log window.       #
+#                                     #
+/Set display brightness (dim)          
+:SB6#                                  
+/Set latitude                          
+:St-27*09#                             
+/Set longitude                         
+:Sg+109*26#                            
+/Set mount type to G11                 
+    2;                                 
+/Set TVC value for dec. backlash       
+  200;22                               

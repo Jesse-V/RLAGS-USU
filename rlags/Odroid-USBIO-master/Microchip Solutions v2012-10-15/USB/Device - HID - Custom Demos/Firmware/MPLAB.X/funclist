@@ -1,0 +1,20 @@
+_configDescriptor1: SMALLCONST, 2154 0 41
+_USB_CD_Ptr: SMALLCONST, 2054 0 2
+_sd001: SMALLCONST, 2056 0 52
+_BlinkUSBStatus: CODE, 3196 0 294
+_USBTransferOnePacket: CODE, 3490 0 212
+_USBDeviceAttach: CODE, 3788 0 60
+_UserInit: CODE, 3848 0 58
+_sd002: SMALLCONST, 2108 0 46
+_memset: CODE, 3958 0 52
+_main: CODE, 4048 0 22
+__initialization: CODE, 3906 0 42
+_device_dsc: SMALLCONST, 2223 0 18
+_InitializeSystem: CODE, 3702 0 86
+_ReadPOT: CODE, 4010 0 38
+_ProcessIO: CODE, 2246 0 580
+_USBDeviceInit: CODE, 2826 0 370
+_USB_SD_Ptr: SMALLCONST, 2048 0 6
+_hid_rpt01: SMALLCONST, 2195 0 28
+_sd000: SMALLCONST, 2241 0 4
+Total: 2011

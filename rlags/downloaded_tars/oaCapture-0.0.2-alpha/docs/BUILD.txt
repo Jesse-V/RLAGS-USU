@@ -1,0 +1,7 @@
+Need:
+  yasm for ffmpeg
+  qt4-qmake
+  qt4-default
+  libusb-1.0-0-dev
+  libv4l-dev
+  g++

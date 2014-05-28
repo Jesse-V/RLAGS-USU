@@ -1,0 +1,37 @@
+########################################################################
+#                                                                      #
+# This is an example task list that executes the DemoScript.pl         #
+# script.  Load this task list into GoQat and start the execution      #
+# of the task list.                                                    #
+#                                                                      #
+########################################################################
+
+
+# Set some initial parameters...
+# Parameter 0 is the amount by which the CCD chip temperature will be
+# reduced after each exposure.
+# Parameter 9 is the initial chip temperature.
+# Parameter 1 is a control variable for the 'While' loop.  Set it to 1
+# initially to make sure the loop is executed.
+
+SetParam  0 5
+SetParam  9 15
+SetParam  1 1
+
+# Execute the 'While' loop as long as parameter 1 is non-zero.
+
+While  %1
+
+# Make an exposure one hundred pixels square, at a chip temperature set
+# by parameter 9.
+
+  Expose  TARGET - 1 1 1 100 100 1 1 %9
+  
+  # Execute the external script.  This sets a new value for the chip
+  # temperature in parameter 9 by subtracting the value in parameter 0,
+  # and returns parameter 1 as zero if the new temperature is less than 
+  # -5C.
+
+  Exec  @DATAROOTDIR@/GoQat/data/DemoScript.pl
+  
+EndWhile 

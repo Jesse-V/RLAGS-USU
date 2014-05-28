@@ -1,0 +1,12 @@
+disk:
+  /dev/sda             ST3160815AS
+  /dev/sdb             WDC WD2500AAJS-7
+  /dev/sdc             Apricorn SATAWire
+partition:
+  /dev/sda1            Partition
+  /dev/sda2            Partition
+  /dev/sda5            Partition
+  /dev/sdb1            Partition
+  /dev/sdc1            Partition
+cdrom:
+  /dev/sr0             Optiarc DVD+-RW AD-7200S

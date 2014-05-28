@@ -1,0 +1,93 @@
+Toolbar menus:
+
+File:
+  Only the Quit option is implemented
+
+Device:
+  Should show all the available cameras
+  The Rescan option rescans for cameras that have been added or removed
+  since the application was started
+
+Options:
+  Histogram shows a histogram for the captured image
+  Reticle displays a circular reticle over the preview image
+  Flip X flips the image (preview and recorded) horizontally
+  Flip Y flips the image (preview and recorded) vertically
+
+Settings:
+  All the options here pop up the same config dialog, but start in a
+  different place.  Hopefully the options should be obvious.  The "Save"
+  button changes the settings, "Cancel" closes the window and forgets any
+  changes.  I should probably chance "Cancel" to "Close" after a save and
+  before any other changes have been made.
+
+Help:
+  You're beyond help :)
+
+
+Settings boxes:
+
+Camera:
+  Preview turns the preview on and off
+  Night mode makes the display a nasty red colour
+  16-bit enables 16-bit mode for cameras that support it (ASI120MM so far?)
+  2x2 binning does what it says on the tin for mono cameras only
+
+Image:
+  Use ROI does nothing.  The ASI120 cameras have a fixed-ish set of image
+  sizes displayed in the drop-down
+  Max size reverts the image to the largest size
+
+Zoom:
+  The buttons instantly rescale the preview image by the displayed factor
+  (which can be changed in the drop-down associated with each one
+
+  The slider resizes the preview on a continuous scale between 25% and 300%
+
+Control:
+  The obvious available controls for the camera.  Not all are displayed here.
+  Others will eventually be available via a pop-up panel.  The FPS slider
+  is available for those cameras that support setting FPS.
+
+Capture:
+  Profile allows a settings profile to be selected (these can be saved in
+  the Settings pop-up).  The "redo" button resets the settings to those of
+  the currently selected profile.
+  Filter does nothing yet other than change the string used to replace
+  "%FILTER%" in the filename template.
+  File allows the capture filename to be set.  See below
+  The three buttons after the filename allow selection of the capture
+  directory, deletion of the last capture and a directory view.
+  File type only supports AVI for the moment
+  Limit sets a limit on autorun capture times.  When selected an input box
+  opens to allow the time to be set (in seconds).
+  The record (triangle) and stop (square) buttons do as expected
+  The "autorun" button resets the autorun settings to the saved values.
+  If you have set, say, ten capture runs in sequence in the settings dialog
+  and run them, this button allows you to configure another ten without
+  having to reopen the settings dialog.
+
+The status line at the bottom of the screen displays:
+
+  Camera temperature, if available
+  Theoretical maximum frame rate
+  Actual frame rate
+  Captured frames (during recording)
+
+Filenames
+
+The captured filename may contain the following strings which are
+substituted when the file is opened:
+
+%D %DATE	date, YYYYMMDD
+%T %TIME        time of day, HHMMSS
+%P %PROFILE     profile name
+%F %FILTER      filter name
+%Y %YEAR        year, YYYY
+%M %MONTH       month, MM
+%d %DAY         day, DD
+%h %HOUR        hour, HH
+%m %MINUTE      minutes, MM
+%s %SECOND      second, SS
+%E %EPOCH       seconds since the epoch (1/1/1970 00:00:00)
+

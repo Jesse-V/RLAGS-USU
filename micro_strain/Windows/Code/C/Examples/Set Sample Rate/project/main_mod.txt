@@ -1,0 +1,300 @@
+while(!bQuit){
+		int chOption = 0;
+
+		if(bPrintHeader)
+		{
+			printf("\n");
+			printf("Enter an Option: (S)ampling Settings (C)ontinuous (L)og_Continuous (Q)uit\n");
+			printf("'S Sampling  Settings   - Modify or review the current Sampling Settings \n");
+			printf("C Continuous              - Put the node in continuous mode and print each record\n");
+			printf("L Log Continuous       - Put the node in continuous mode log and print each record\n");
+			printf("Q Quit                        - Quit the application\n");
+
+			bPrintHeader = FALSE;
+		}
+
+		//read option from the keyboard
+		while(!ReadCharNoReturn(&chOption))
+		{
+			Sleep(50);
+		}
+
+		//
+		switch(chOption)
+		{
+			case 'S':
+			case 's': SamplingData(portNum); bPrintHeader = TRUE; break;
+
+			case 'C':
+			case 'c': ReadContinuousData(portNum); bPrintHeader = TRUE; break;
+
+			case 'L':
+			case 'l': 
+				      ReadContinuousLogData(portNum); 
+				      bPrintHeader = TRUE; 
+				      break;
+
+			case 'q':
+			case 'Q': bQuit = TRUE; break;
+
+			case 'h':
+			case 'H': bPrintHeader = TRUE; break;
+
+			default: printf("Invalid Option\n\n"); bPrintHeader = TRUE;
+		}
+	}
+				
+	return 0;
+}
+
+SamplingData(portNum){
+
+int Value;
+unsigned char ByteOne;
+unsigned char ByteTwo;
+Boolean bPrintHeader;
+BYTE Record[20];
+
+while(Value == 0)
+	{
+		
+		if(bPrintHeader)
+		{
+			printf("\n");
+			printf("Enter an Option From the Following Menu \n");
+			printf("0 Data Rate                      - Modify or review the current DataRate\n");
+			printf("1 Calculate Orientation      - Set Calculate Orientation \(Default is On\) \n");
+			printf("2 Coning & Sculling         - Enable Coning & Sculling \(Default is On\)\n");
+			printf("3 Little Endian                  - Change IMU Big Endian format to Little \(Default is Big\)\n");
+                                                printf("4 NaN's suppression        - Suppress NaN Data \(Default is On\) \n");
+			printf("5 Finite size corrction       - Enable Finite Size Correction \(Default is Off\)\n");
+			printf("6 Disable Magnetometer   - Disable the Magnetometer \(Default is On\)\n");
+                                                printf("7 Enable Magnetometer    - Enable the Magnetometer Low Power\(Default is Off\)\n");
+			printf("8 Disable Magnetic North - Disable the Magnetic North Compenstation \(Default is On\)\n");
+                                                printf("9 Disable Gravity Comp   - Disable the Gravity Compenstation \(Default is On\)\n");
+                                                printf("Q Enable Quaternion        - Enable the Quaternion calculation \(Default is Off\)\n");
+			printf("E Exit Sampling               - Exit the Sampling Menu and return to the Main Menu\n");
+
+			bPrintHeader = FALSE;
+		}
+     
+		switch (chOption){
+			case '0': 
+                                                             SetDataRate(portNum); bPrintHeader = TRUE; break;
+
+			case '1': ByteOne=0x01;
+                                                             ByteTwo=0;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]); 
+                                                             if(ByteOne == Record[3])
+                                                                printf("Sample Setting Calculate orientation now enabled\n");
+                                                             else
+                                                                 printf("Error: Failure to set Sample Setting Calculate orientation\n");
+                                                             bPrintHeader = TRUE; break;
+
+			case '2': ByteOne=0x02;
+                                                             ByteTwo=0;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]); 
+                                                             if(ByteOne == Record[3])
+                                                                printf("Sample Setting Coning&Sculling now enabled\n");
+                                                             else
+                                                                 printf("Error: Failure to set Sample Setting Coning&Sculling\n");
+                                                             bPrintHeader = TRUE; break;
+                                               
+                                                case '3': ByteOne=0x10;   //16;
+                                                             ByteTwo=0;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]); 
+                                                             if(ByteOne == Record[3])
+                                                                printf("Sample Setting Floating Point data is sent in Little Endian\n");
+                                                             else
+                                                                 printf("Error: Failure to set Sample Setting Floating Point data in Little Endian\n");
+                                                             bPrintHeader = TRUE; break;
+
+			case '4': ByteOne=0x20;   //32;
+                                                            ByteTwo=0;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]);
+                                                             if(ByteOne == Record[3])
+                                                                printf("Sample Setting NaN data is suppressed.\n");
+                                                             else
+                                                                 printf("Error: Failure to set Sample Setting NaN data to suppressed.n"); 
+                                                             bPrintHeader = TRUE; break;
+
+                                                case '5': ByteOne=0x40;  //64;
+                                                             ByteTwo=0;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]);
+                                                             if(ByteOne == Record[3])
+                                                                printf("Sample Setting enable finite size correction\n");
+                                                             else
+                                                                 printf("Error: Failure to enable Sample Setting  finite size correction\n");
+                                                             bPrintHeader = TRUE; break;
+
+			case '6': ByteOne=0x80; //128;
+                                                             ByteTwo=0x00;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]);
+                                                             if(ByteOne == Record[3])
+                                                                printf("Sample Setting disabled Magnetometer \n");
+                                                             else
+                                                                 printf("Error: Failure to disable Sample Setting Magnetometer\n"); 
+                                                             bPrintHeader = TRUE; break;
+                                               
+                                                case '7': ByteOne=0;
+                                                               ByteTwo=0x01;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]); 
+                                                             if(ByteTwo == Record[4])
+                                                                printf("Sample Setting Magnetometer now enabled\n");
+                                                             else
+                                                                 printf("Error: Failure to enable Sample Setting Magnetometer\n");
+                                                             bPrintHeader = TRUE; break;
+
+			case '8': ByteOne=0;
+                                                             ByteTwo=0x02;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]); 
+                                                             if(ByteTwo == Record[4])
+                                                                printf("Sample Setting Magnetic North Compensationn disabled");
+                                                             else
+                                                                 printf("Error: Failure to disable Sample Setting Magnetic North Compensation\n");
+                                                             bPrintHeader = TRUE; break;
+
+                                                case '9': ByteOne=0;
+                                                             ByteTwo=0x04;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]); 
+                                                             if(ByteTwo == Record[4])
+                                                                printf("Sample Setting Gravity Compensationn disabled");
+                                                             else
+                                                                 printf("Error: Failure to disable Sample Setting Gravity Compensation\n");
+                                                             bPrintHeader = TRUE; break;
+
+			case 'q':
+			case 'Q':ByteOne=0x03;  //needs bit 0 bit 1 and bit 11 set on
+                                                             ByteTwo=0x08;
+                                                             SetSampleSetting(portNum,ByteOne,ByteTwo, &Record[0]);
+                                                             if((ByteOne == Record[3]) && (ByteTwo == Record[4])){
+                                                                printf("Sample Setting Quaternion Calculation now enabled\n");
+                                                                Get_Quaternion(portNum);
+                                                             }
+                                                             else
+                                                                 printf("Error: Failure to set Sample Setting Quaternion Calculation\n");
+                                                             bPrintHeader = TRUE; break;
+
+                                                case 'e':
+			case 'E': bQuit = TRUE; break;
+
+			case 'h':
+			case 'H': bPrintHeader = TRUE; break;
+
+			default: printf("Invalid Option\n\n"); bPrintHeader = TRUE;
+						
+			
+           }
+		   //return;
+		   }			
+		
+		} Schwontkowski Norbert
+
+
+}
+
+
+//===========================================================================
+// SetSampleSetting
+//---------------------------------------------------------------------------
+// Description: Allows user to set one of the optional Sample Settings
+//
+// Return: Confirmation that selection was set.
+//===========================================================================
+void  SetSampleSetting(int portNum, BYTE ByteOne, BYTE ByteTwo, unsigned char *Bresponse)
+{
+    int status = 0;
+    unsigned char DR3_write_buff[21];
+    int responseLength = 19;
+    unsigned short wChecksum = 0;
+    unsigned short wCalculatedCheckSum = 0;
+    unsigned short Decimation = (1000/m_DRvalue);
+    unsigned short DigFilter = 20;
+    int ytrewq=0;   
+
+    purge_port(portNum);
+
+    DR3_write_buff[0] = 0xDB;                                          //Command identifier for Write to Data-Rate
+    DR3_write_buff[1] = 0xA8;		                         //Required identifier for Data-Rate Write  was C1
+    DR3_write_buff[2] = 0xB9;                                           //Required identifier for Data-Rate Write  was 29
+    DR3_write_buff[3] = 0x01;                                            //Identifies an update to data rate, 0 == no update
+                                                                                         // 1 == change the parameters to new values
+                                                                                         // 2 == change and write to non-volatile memory
+                                                                                         // 3 == same as 2 but does not send a reply
+
+    DR3_write_buff[4]   = (Decimation & MSB_MASK) >> 8;  //1st byte of Decimation value to write
+    DR3_write_buff[5]   = Decimation & LSB_MASK;             //2ond byte of Decimation value to write
+    DR3_write_buff[6]   = ByteOne;                                         //First Byte of Data Conditioning Function Selector      //0xC0;
+    DR3_write_buff[7]   = ByteTwo;                                        //Second Byte of Data Conditioning Function Selector //0x00;
+    DR3_write_buff[8]   = 0x02;                                               //Gyro and Accel digital filter window size default is 15
+    DR3_write_buff[9]   = 0x02;                                               //Mag digital filter window size default is 17
+    DR3_write_buff[10] = 0x0A;                                              //First Byte of Up Compensation in Sec
+    DR3_write_buff[11] = 0x00;                                               //Second Byte of Up Compensation default is 10
+    DR3_write_buff[12] = 0x0A;                                              //First Byte of North Compensation in Sec
+    DR3_write_buff[13] = 0x00;                                               //Second Byte of North Compensation default is 10
+
+    for(ytrewq=14; ytrewq<20; ytrewq++)
+	  DR3_write_buff[ytrewq] = 0x00;        // Bytes 15-20 are reserved set to zero(s) 0
+		
+    status = sendBuffData(portNum, &DR3_write_buff[0], 20);	          
+      
+    if (status != I3DMGX3_COMM_OK) 
+		    return  status; 
+
+    status = receiveData(portNum, &Bresponse[0], responseLength);
+
+    if (status == I3DMGX3_COMM_OK) {
+        wChecksum = convert2ushort(&Bresponse[responseLength-2]);
+        wCalculatedCheckSum = i3dmgx3_Checksum(&Bresponse[0], responseLength-2); 
+        if(wChecksum == wCalculatedCheckSum){
+             return status;
+       }
+      else if(wChecksum != wCalculatedCheckSum){
+             return status = I3DMGX3_CHECKSUM_ERROR;
+      }
+   }	   
+    return status;	                                               
+				   
+}
+
+void Get_Quaternion(int portNum){
+BYTE Qresponse[23];
+int Qstatus=0;
+int i = 0;
+float setQ[4];
+
+
+Qstatus = i3dmgx3_Quaternion(portNum, &Qresponse[0]);
+
+if (Qstatus == 0){
+    printf("Quaternion Data ---------------------------------------------------------------------------------------\n");
+     for (i=0; i<4; i++) {
+           setQ[i] = FloatFromBytes(&Qresponse[1 + i*4]);                         // Quaternion 0, 1, 2, and 3
+    }
+    printf("DF____________________________Quaternion(s)______________________________\n");
+    printf("            q0                       q1                      q2		q3            \n");
+    printf("\t%2.6f\t\t%2.6f\t\t%2.6f\t\t%2.6f\n", setQ[0], setQ[1], setQ[2], setQ[3]);      
+}else
+  printf("Error: Quaternion Failed with status %i\n",Qstatus);
+  
+return;
+    
+
+
+}
+
+//#include <cstring>
+//using std::memcpy;
+
+float Little_Endian_Float(char unsigned *const p)
+{
+float val;
+
+memcpy(&val,p,sizeof val);
+
+return val;
+
+//to use char unsigned arr[4] = {};
+
+// Little_Endian_Float(arr);
+}
