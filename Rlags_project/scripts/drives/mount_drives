@@ -9,10 +9,10 @@ NUMBER=NR==$COUNTER+1
 PARTITION=$(awk $NUMBER /home/linaro/Rlags_project/scripts/drives/partition_list)
 sudo umount $PARTITION
 sudo mount $PARTITION /media/ssd_$COUNTER
-sudo mkdir /media/ssd_$COUNTER/sun_cameras
-sudo mkdir /media/ssd_$COUNTER/sedi_camera
-sudo mkdir /media/ssd_$COUNTER/thermal_data
-sudo mkdir /media/ssd_$COUNTER/imu
+#sudo mkdir /media/ssd_$COUNTER/sun_cameras
+#sudo mkdir /media/ssd_$COUNTER/sedi_camera
+#sudo mkdir /media/ssd_$COUNTER/thermal_data
+#sudo mkdir /media/ssd_$COUNTER/imu
 let COUNTER=COUNTER+1
 done
 exit

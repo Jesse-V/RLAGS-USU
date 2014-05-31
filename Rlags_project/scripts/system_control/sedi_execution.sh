@@ -1,4 +1,4 @@
-cali#!/bin/bash
+#!/bin/bash
 while true; do
 #echo starting calibration
 sudo /home/linaro/Rlags_project/scripts/sedi_camera/calibrate_sedi.sh

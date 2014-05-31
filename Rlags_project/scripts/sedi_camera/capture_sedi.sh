@@ -4,8 +4,8 @@ sudo cp /home/linaro/Rlags_project/scripts/sedi_camera/exposure_watchfile /home/
 start=$(date +"%d.%H.%M.%S")
 while [ ! -f /root/GoQat/ccd_display.fit ];
 do
-#       echo "Doesn't exist yet"
-        sleep 0.001
+	echo "Doesn't exist yet"
+	sleep 0.1
 done
 
 sudo mv /root/GoQat/ccd_display.fit /home/linaro/Rlags_project/scripts/sedi_camera/
