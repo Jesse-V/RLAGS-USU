@@ -10,6 +10,11 @@ done
 
 sudo mv /root/GoQat/ccd_display.fit /home/linaro/Rlags_project/scripts/sedi_camera/
 sudo mv /home/linaro/Rlags_project/scripts/sedi_camera/ccd_display.fit /home/linaro/Rlags_project/scripts/sedi_camera/sedi.$start.fit
-sudo cp /home/linaro/Rlags_project/scripts/sedi_camera/sedi.* /media/ssd_0/sedi_camera/
-sudo mv /home/linaro/Rlags_project/scripts/sedi_camera/sedi.* /media/ssd_1/sedi_camera/
 
+#archive and advertise latest SEDI data
+sudo cp /home/linaro/Rlags_project/scripts/sedi_camera/sedi.* /media/ssd_0/sedi_camera/
+sudo cp /home/linaro/Rlags_project/scripts/sedi_camera/sedi.* /media/ssd_1/sedi_camera/
+sudo cp /home/linaro/Rlags_project/scripts/sedi_camera/sedi.* /home/linaro/latestData
+
+#delete local copy
+rm sedi.*

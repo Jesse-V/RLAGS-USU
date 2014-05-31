@@ -1,4 +1,4 @@
-sleep 3
+#!/bin/bash
 
 sudo ps aux | grep GoQat | grep -v grep | awk {'print $2'} | xargs sudo kill
 sudo /home/linaro/Rlags_project/scripts/sedi_camera/start_goqat.sh &
