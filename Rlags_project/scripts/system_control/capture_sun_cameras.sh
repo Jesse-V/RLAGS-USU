@@ -15,9 +15,11 @@ sleep 0.2
 	#sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_1.sh > cameras.txt
 	#sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_2.sh > cameras.txt
 
-	sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_0.sh
-        sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_1.sh
-        sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_2.sh
+	#sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_0.sh
+        #sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_1.sh
+        #sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_2.sh
+
+	sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_all.sh
 
 	echo "waiting..."
 	while [ $(expr $(date +%s) - $start)  -lt 10 ]; do
