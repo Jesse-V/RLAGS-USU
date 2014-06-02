@@ -10,6 +10,7 @@ sleep 0.2
 #while true
 #do
 	start=$(date +%s)
+	echo $start
 
 	#sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_0.sh > cameras.txt
 	#sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_1.sh > cameras.txt
@@ -21,8 +22,7 @@ sleep 0.2
 
 	sudo /home/linaro/Rlags_project/scripts/sun_cameras/capture_sun_all.sh
 
-	echo "waiting..."
-	while [ $(expr $(date +%s) - $start)  -lt 10 ]; do
-		sleep 0.001
-	done
+	duration=$(( $(date +%s) - $start ))
+	sleep $(( 10 - duration ))
+	echo $(date +%s)
 #done
