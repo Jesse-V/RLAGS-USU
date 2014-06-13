@@ -1,0 +1,7 @@
+Angle for sun_cam_0.jpg:
+Angle for sun_cam_1.jpg:
+(1036, 887)
+169.55515968
+Angle for sun_cam_2.jpg:
+(729, 656)
+106.318086522
