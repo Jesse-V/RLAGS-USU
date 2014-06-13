@@ -1,5 +1,5 @@
 all:
-	gcc robotserial.c -o serial
+	g++ robotserial.cpp -o serial
 
 clean:
 	rm serial
