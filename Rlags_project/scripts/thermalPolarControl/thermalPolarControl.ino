@@ -1,20 +1,21 @@
 #include <Time.h>
-#include <Servo.h>
+// #include <Servo.h>
+
 
 #include<OneWire.h>
 #include<DallasTemperature.h>
 
-Servo myservo;  // create servo object to control a servo
+// Servo myservo;  // create servo object to control a servo
 
-#define SERVO_PIN = 9;
-
+#define SERVO_PIN 19
 #define DTS_PRECISION 12  // thermal sensor resolution (bits)
 
 #define ONE_WIRE_BUS1 10  //   etalon DTS -> Arduino pin 10
 #define ONE_WIRE_BUS2 11  // powerBox DTS -> Arduino pin 11
 #define ONE_WIRE_BUS3 12  //     sedi DTS -> Arduino pin 12
 #define ONE_WIRE_BUS4 13  //  control DTS -> Arduino pin 13
-#define ONE_WIRE_BUS5 14  // attitude DTS -> Arduino pin 14
+#define ONE_WIRE_BUS5 14  // attitude1 DTS -> Arduino pin 14
+#define ONE_WIRE_BUS6 15  // attitude2 DTS -> Arduino pin 15
 
 #define RELAY_CTRL_CH1 2 // thermalControl -> Arduino pin 2
 #define RELAY_CTRL_CH2 3 // thermalControl -> Arduino pin 3
@@ -29,22 +30,21 @@ Servo myservo;  // create servo object to control a servo
 #define LOWER_HIST_BOUND 29.5
 #define UPPER_HIST_BOUND 30.5
 
-// the angle that the servo will turn to
-float servoAngle = 0;
-
 // setup a oneWire instance to communicate with any OneWire devices
 OneWire oneWire_etalon(ONE_WIRE_BUS1);
-//OneWire oneWire_power(ONE_WIRE_BUS2);
+OneWire oneWire_power(ONE_WIRE_BUS2);
 OneWire oneWire_sedi(ONE_WIRE_BUS3);
-//OneWire oneWire_control(ONE_WIRE_BUS4);
-//OneWire oneWire_attitude(ONE_WIRE_BUS5);
+OneWire oneWire_control(ONE_WIRE_BUS4);
+//OneWire oneWire_att1(ONE_WIRE_BUS5);
+//OneWire oneWire_att2(ONE_WIRE_BUS6);
 
 // pass oneWire reference to Dallas Temperature.
 DallasTemperature sensors_etalon(&oneWire_etalon);
-//DallasTemperature sensors_power(&oneWire_power);
+DallasTemperature sensors_power(&oneWire_power);
 DallasTemperature sensors_sedi(&oneWire_sedi);
-//DallasTemperature sensors_control(&oneWire_control);
-//DallasTemperature sensors_attitude(&oneWire_attitude);
+DallasTemperature sensors_control(&oneWire_control);
+//DallasTemperature sensors_att1(&oneWire_att1);
+//DallasTemperature sensors_att2(&oneWire_att2);
 
 /*-----------------------------etalon DTS------------------------------*/
 DeviceAddress DTS_1 = { 0x28, 0x03, 0x9A, 0x8E, 0x05, 0x00, 0x00, 0xB4 };
@@ -105,6 +105,7 @@ int relayStateCh1, relayStateCh2, relayStateCh3, relayStateCh4,
     relayStateCh5, relayStateCh6, relayStateCh7, relayStateCh8;
 
 void setup() {
+
   // initialization
   relayStateCh1 = LOW;
   relayStateCh2 = LOW;
@@ -124,13 +125,17 @@ void setup() {
   pinMode(RELAY_CTRL_CH7, OUTPUT);
   pinMode(RELAY_CTRL_CH8, OUTPUT);
 
+  pinMode(SERVO_PIN, OUTPUT);
+  // myservo.attach(SERVO_PIN);
+
   Serial.begin(19200);  // start serial port
 
   sensors_etalon.begin();   // start up library for etalon sensors
-  //  sensors_power.begin();    // start up library for powerBox sensors
+  sensors_power.begin();    // start up library for powerBox sensors
   sensors_sedi.begin();     // start up library for sedi sensors
-  //  sensors_control.begin();  // start up library for control sensors
-  //  sensors_attitude.begin(); // start up library for attitude sensors
+  sensors_control.begin();  // start up library for control sensors
+//  sensors_att1.begin();     // start up library for attitude 1 sensors
+//  sensors_att2.begin();     // start up library for attitude 2 sensors
 
   // set the resolution
   /*-------------------etalon DTS------------------*/
@@ -141,9 +146,9 @@ void setup() {
   /*-----------------------------------------------*/
 
   /*-----------------powerBox DTS------------------*/
-  //  sensors_power.setResolution(DTS_5,  DTS_PRECISION);
-  //  sensors_power.setResolution(DTS_6,  DTS_PRECISION);
-  //  sensors_power.setResolution(DTS_7, DTS_PRECISION);
+  sensors_power.setResolution(DTS_5,  DTS_PRECISION);
+  sensors_power.setResolution(DTS_6,  DTS_PRECISION);
+  sensors_power.setResolution(DTS_7, DTS_PRECISION);
   /*-----------------------------------------------*/
 
   /*-------------------sedi DTS-------------------*/
@@ -154,22 +159,22 @@ void setup() {
   /*----------------------------------------------*/
 
   /*--------------------control DTS------------------*/
-  //  sensors_control.setResolution(DTS_12, DTS_PRECISION);
-  //  sensors_control.setResolution(DTS_13, DTS_PRECISION);
-  //  sensors_control.setResolution(DTS_14, DTS_PRECISION);
-  //  sensors_control.setResolution(DTS_15, DTS_PRECISION);
+  sensors_control.setResolution(DTS_12, DTS_PRECISION);
+  sensors_control.setResolution(DTS_13, DTS_PRECISION);
+  sensors_control.setResolution(DTS_14, DTS_PRECISION);
+  sensors_control.setResolution(DTS_15, DTS_PRECISION);
   /*-------------------------------------------------*/
 
-  //  /*--------------------control DTS-------------------*/
-  //  sensors_attitude.setResolution(DTS_16, DTS_PRECISION);
-  //  sensors_attitude.setResolution(DTS_17, DTS_PRECISION);
-  //  sensors_attitude.setResolution(DTS_18, DTS_PRECISION);
-  //  sensors_attitude.setResolution(DTS_19, DTS_PRECISION);
-  //  sensors_attitude.setResolution(DTS_20, DTS_PRECISION);
-  //  sensors_attitude.setResolution(DTS_21, DTS_PRECISION);
-  //  sensors_attitude.setResolution(DTS_22, DTS_PRECISION);
-  //  sensors_attitude.setResolution(DTS_23, DTS_PRECISION);
-  //  /*--------------------------------------------------*/
+//  /*--------------------control DTS-------------------*/
+//  sensors_att1.setResolution(DTS_16, DTS_PRECISION);
+//  sensors_att1.setResolution(DTS_17, DTS_PRECISION);
+//  sensors_att1.setResolution(DTS_18, DTS_PRECISION);
+//  sensors_att1.setResolution(DTS_19, DTS_PRECISION);
+//  sensors_att2.setResolution(DTS_20, DTS_PRECISION);
+//  sensors_att2.setResolution(DTS_21, DTS_PRECISION);
+//  sensors_att2.setResolution(DTS_22, DTS_PRECISION);
+//  sensors_att2.setResolution(DTS_23, DTS_PRECISION);
+//  /*--------------------------------------------------*/
 
   Serial.print("\rAcquiring Data...:\r");
 
@@ -188,17 +193,28 @@ void setup() {
   Serial.print("DTS1\t");
   Serial.print("DTS2\t");
   Serial.print("DTS3\t");
-  Serial.print("DTS4:\r");
+  Serial.print("DTS4\t");
+  Serial.print("DTS5\t");
+  Serial.print("DTS6\t");
+  Serial.print("DTS7\t");
+  Serial.print("DTS12\t");
+  Serial.print("DTS13\t");
+  Serial.print("DTS14\t");
+  Serial.print("DTS15:\r");
 }
 
 void loop() {
-  long startTime = millis();
+//  long startTime = millis();
   // relay control based on a thermal sensor
+  Serial.print("Done:");
   tempControl_sedi();
+
 
   /*----------------etalon DTS---------------*/
   sensors_etalon.requestTemperatures();
-
+  sensors_power.requestTemperatures();
+  sensors_control.requestTemperatures();
+  
   thermalInfo(sensors_etalon, DTS_1, degC_1);
   Serial.print("\t");
   thermalInfo(sensors_etalon, DTS_2, degC_2);
@@ -206,145 +222,46 @@ void loop() {
   thermalInfo(sensors_etalon, DTS_3, degC_3);
   Serial.print("\t");
   thermalInfo(sensors_etalon, DTS_4, degC_4);
+  Serial.print("\t");
+  thermalInfo(sensors_etalon, DTS_5, degC_5);
+  Serial.print("\t");
+  thermalInfo(sensors_etalon, DTS_6, degC_6);
+  Serial.print("\t");
+  thermalInfo(sensors_etalon, DTS_7, degC_7);
+  Serial.print("\t");
+  thermalInfo(sensors_etalon, DTS_12, degC_12);
+  Serial.print("\t");
+  thermalInfo(sensors_etalon, DTS_13, degC_13);
+  Serial.print("\t");
+  thermalInfo(sensors_etalon, DTS_14, degC_14);
+  Serial.print("\t");
+  thermalInfo(sensors_etalon, DTS_15, degC_15);
 
-//  thermalInfo(sensors_etalon, DTS_1);
-//  Serial.print("\t");
-//  thermalInfo(sensors_etalon, DTS_2);
-//  Serial.print("\t");
-//  thermalInfo(sensors_etalon, DTS_3);
-//  Serial.print("\t");
-//  thermalInfo(sensors_etalon, DTS_4);
-//
 //  Serial.print((startTime-millis()));
 //  Serial.print("\t");
 
+  if(Serial.available())
+  {
+    byte servoAngle = Serial.read();
+    if(servoAngle <= 180 && servoAngle >= 0)
+    {
+      Serial.print(" ");
+      setServoAngle(servoAngle);
+      Serial.print(servoAngle);
+      Serial.print(" ");
+    }
+  }
+
   Serial.print(":\r");
-  /*-----------------------------------------*/
-
-  //  /*-----------powerBox DTS-----------*/
-  //  sensors_power.requestTemperatures();
-  //  Serial.print("PowerBox temperature:");
-  //  Serial.print("\n\r");
-  //  Serial.print("Sensor #5: ");
-  //  printTemp_power(DTS_5);
-  //  Serial.print("\n\r");
-  //  Serial.print("Sensor #6: ");
-  //  printTemp_power(DTS_6);
-  //  Serial.print("\n\r");
-  //  Serial.print("Sensor #7: ");
-  //  printTemp_power(DTS_7);
-  //  Serial.print("\n\r\n\r");
-  //  /*----------------------------------*/
-
-  //  /*-------------control DTS------------*/
-  //  sensors_control.requestTemperatures();
-  //  Serial.print("ControlBox temperature:");
-  //  Serial.print("\n\r");
-  //  Serial.print("Sensor #12: ");
-  //  printTemp_control(DTS_12);
-  //  Serial.print("\n\r");
-  //  Serial.print("Sensor #13: ");
-  //  printTemp_control(DTS_14);
-  //  Serial.print("\n\r");
-  //  Serial.print("Sensor #14: ");
-  //  printTemp_control(DTS_14);
-  //  Serial.print("\n\r");
-  //  Serial.print("Sensor #15: ");
-  //  printTemp_control(DTS_15);
-  //  Serial.print("\n\r\n\r");
-  //  /*------------------------------------*/
 }
-
-//void printTemp_power(DeviceAddress deviceAddress) {
-//  float tempC = sensors_power.getTempC(deviceAddress);
-//  if (tempC == ERROR_TEMP) {
-//    Serial.print("Error");
-//  }
-//
-//  else {
-//    Serial.print(tempC);
-//  }
-//}
-
-//void printTemp_control(DeviceAddress deviceAddress) {
-//  float tempC = sensors_control.getTempC(deviceAddress);
-//  if (tempC == ERROR_TEMP) {
-//    Serial.print("Error");
-//  }
-//
-//  else {
-//    Serial.print(tempC);
-//  }
-//}
-
-//void printTemp_attitude(DeviceAddress deviceAddress) {
-//  float tempC = sensors_attitude.getTempC(deviceAddress);
-//  if (tempC == ERROR_TEMP) {
-//    Serial.print("Error");
-//  }
-//
-//  else {
-//    Serial.print(tempC);
-//  }
-//}
 
 void tempControl_sedi() {
   sensors_sedi.requestTemperatures();
-//  thermalCtrl(sensors_sedi, DTS_8, RELAY_CTRL_CH1, relayStateCh1);
-//  thermalCtrl(sensors_sedi, DTS_9, RELAY_CTRL_CH2, relayStateCh2);
-//  thermalCtrl(sensors_sedi, DTS_10, RELAY_CTRL_CH3, relayStateCh3);
-//  thermalCtrl(sensors_sedi, DTS_11, RELAY_CTRL_CH4, relayStateCh4);
   thermalCtrl(sensors_sedi, DTS_8, RELAY_CTRL_CH1, relayStateCh1, degC_8);
   thermalCtrl(sensors_sedi, DTS_9, RELAY_CTRL_CH2, relayStateCh2, degC_9);
   thermalCtrl(sensors_sedi, DTS_10, RELAY_CTRL_CH3, relayStateCh3, degC_10);
   thermalCtrl(sensors_sedi, DTS_11, RELAY_CTRL_CH4, relayStateCh4, degC_11);
 }
-
-//void thermalInfo(DallasTemperature dataLine, DeviceAddress& dts)
-//{
-//  float tempC = dataLine.getTempC(dts);
-//  tempC += retrieveOffset(dts);
-//  if (tempC == ERROR_TEMP) {
-//    Serial.print("Error");
-//  }
-//
-//  else {
-//    Serial.print(tempC);
-//  }
-//}
-//
-//void thermalCtrl(DallasTemperature dataLine, DeviceAddress& dts, int pin, int relayStateCh)
-//{
-//  float tempC = dataLine.getTempC(dts);
-//  tempC = tempC + retrieveOffset(dts);
-//
-//  if (tempC != ERROR_TEMP) {
-//    if (tempC <= LOWER_HIST_BOUND) {
-//      relayStateCh = HIGH;
-//      Serial.print("1\t");
-//    }
-//    else if (tempC >= UPPER_HIST_BOUND) {
-//      relayStateCh = LOW;
-//      Serial.print("0\t");
-//    }
-//    else if (tempC < UPPER_HIST_BOUND && tempC > LOWER_HIST_BOUND) {
-//      if (relayStateCh == LOW) {
-//        Serial.print("0\t");
-//      }
-//      else {
-//        Serial.print("1\t");
-//      }
-//    }
-//  }
-//  else {
-//    relayStateCh = LOW;
-//    Serial.print("0\t");
-//    Serial.print("Error\t");
-//  }
-//  digitalWrite(pin, relayStateCh);
-//  Serial.print(tempC);
-//  Serial.print("\t");
-//}
 
 void thermalInfo(DallasTemperature dataLine, DeviceAddress& dts, float* arr)
 {
@@ -460,14 +377,23 @@ float retrieveOffset(DeviceAddress& dev)
 
 void setServoAngle(int servoAngle)
 {
-  const int SERVO_LOW = 36;
-  const int SERVO_HIGH = 142;
+  const int SERVO_LOW = 900;
+  const int SERVO_HIGH = 2500;
 
   servoAngle = servoMap(servoAngle, 0, 180, SERVO_LOW, SERVO_HIGH);     // scale it to use it with the servo (value between 0 and 180)
-  myservo.write(servoAngle);                  // sets the servo position according to the scaled value
+  // myservo.write(servoAngle);                  // sets the servo position according to the scaled value
+  setPWM(servoAngle);                  // sets the servo position according to the scaled value
 }
 
 float servoMap(float x, float in_min, float in_max, float out_min, float out_max)
 {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+void setPWM(long pwm)
+{
+  long start = micros();
+  digitalWrite(SERVO_PIN, HIGH);
+  while (micros() - start < pwm);
+  digitalWrite(SERVO_PIN, LOW);
 }

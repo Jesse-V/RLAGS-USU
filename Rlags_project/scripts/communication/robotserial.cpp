@@ -71,16 +71,14 @@ int main(int argc, char *argv[])
     int fd = 0;
     char serialport[256];
     int baudrate = 19200;  // default
-    char buf[20], dat[20], use[1];
+    char buf[50], dat[50], use[1];
     int rc,n;
 
 	//baudrate = 9600;
 	fd = serialport_init("/dev/ttyACM0", baudrate);
             	if(fd==-1) return -1;
-	usleep(1000 * 1000 );
+	usleep(1000 * 1000);
  	n = serialport_read_until(fd, buf, ':');
-    if(TEMP++ == 10)
-        serialport_writebyte(fd, 0x00);
 	std::ofstream outFile;
 	std::stringstream fileName;
 	time_t timer;
@@ -88,6 +86,8 @@ int main(int argc, char *argv[])
 	time (&timer);
 	y2k = localtime(&timer);
 	fileName << "RLAGS_" << y2k->tm_mon << "_" << y2k->tm_mday << "_" << y2k->tm_hour << "_" << y2k->tm_min << "_" << y2k->tm_sec << ".txt";
+    int blah = 0;
+    bool update = true;
 	while(1) {
 		strcpy(dat, "00000000:\0");
 		//gets(use);
@@ -95,11 +95,24 @@ int main(int argc, char *argv[])
   //          		if(rc==-1) return -1;
 	 	//printf("Waiting until UART buffer clears: %d\n", tcdrain(fd));
 	 	n = serialport_read_until(fd, buf, ':');
-         	printf("%s\n", buf);
+     	printf("%s\n", buf);
 		outFile.open(fileName.str().c_str(), std::ofstream::out | std::ofstream::app);
 		outFile << buf << std::endl;
 		outFile.close();
-		usleep(1000 * 1000);
+        if(update)
+        {
+            // sleep(2);
+            // tcflush( fd, TCIFLUSH );
+            serialport_writebyte(fd, blah);
+            if(blah >= 180)
+                blah = 0;
+            else
+                blah += 45;
+            // update = false;
+        }
+
+
+		usleep(1000);
 //         	printf("wrote %d bytes, read %d bytes: %s\n", rc, n, buf);
 	}
 
@@ -108,7 +121,7 @@ int main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
 } // end main
 
-int serialport_writebyte( int fd, uint8_t b)
+int serialport_writebyte(int fd, uint8_t b)
 {
     int n = write(fd,&b,1);
     if( n!=1)
@@ -193,7 +206,7 @@ int serialport_init(const char* serialport, int baud)
     toptions.c_cflag &= ~CSIZE;
     toptions.c_cflag |= CS8;
     // no flow control
-    toptions.c_cflag &= ~CRTSCTS;
+    // toptions.c_cflag &= ~CRTSCTS;
 
     toptions.c_cflag |= CREAD | CLOCAL;  // turn on READ & ignore ctrl lines
     toptions.c_iflag &= ~(IXON | IXOFF | IXANY); // turn off s/w flow ctrl
@@ -202,9 +215,11 @@ int serialport_init(const char* serialport, int baud)
     toptions.c_oflag &= ~OPOST; // make raw
 
     // see: http://unixwiz.net/techtips/termios-vmin-vtime.html
-    toptions.c_cc[VMIN]  = 0;
+    toptions.c_cc[VMIN]  = 1;
     toptions.c_cc[VTIME] = 20;
 
+    sleep(2);
+    tcflush( fd, TCIFLUSH );
     if( tcsetattr(fd, TCSANOW, &toptions) < 0) {
         perror("init_serialport: Couldn't set term attributes");
         return -1;
