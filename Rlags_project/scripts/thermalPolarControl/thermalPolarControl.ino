@@ -206,7 +206,6 @@ void setup() {
 void loop() {
 //  long startTime = millis();
   // relay control based on a thermal sensor
-  Serial.print("Done:");
   tempControl_sedi();
 
 
@@ -378,7 +377,7 @@ float retrieveOffset(DeviceAddress& dev)
 void setServoAngle(int servoAngle)
 {
   const int SERVO_LOW = 900;
-  const int SERVO_HIGH = 2500;
+  const int SERVO_HIGH = 2100;
 
   servoAngle = servoMap(servoAngle, 0, 180, SERVO_LOW, SERVO_HIGH);     // scale it to use it with the servo (value between 0 and 180)
   // myservo.write(servoAngle);                  // sets the servo position according to the scaled value
