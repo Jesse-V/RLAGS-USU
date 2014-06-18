@@ -1,4 +1,4 @@
-function [SFS,DOT] = polarizer (lat,lon,alt,GMT,day,IMU)
+function [SFS,DOT] = polarizer (lat,lon,GMT,day,IMU)
 % Input is
 %                     -----FROM GPS-----
 %          GMT is Greenwich Mean Time, an output of the GPS.
@@ -37,6 +37,7 @@ function [SFS,DOT] = polarizer (lat,lon,alt,GMT,day,IMU)
 
 % Converts the date to J (Julian Epoch - 2000, to within a minute or so)
 J = (juliandate([day,GMT]) - 2451545)/365.25;
+% vpa(J)
 
 % Mean longitude of Sun (L), corrected for aberration: 
 L_raw=4.894961213+628.3319706889*J;
@@ -65,19 +66,14 @@ y = cos(epsilon)*sin(lambda);
 z = sin(epsilon)*sin(lambda);
 
 % Vector format
-sun_vector_raw= [x;y;z];
-
-% Normalization
-ECI = sun_vector_raw/sqrt(sun_vector_raw'*sun_vector_raw);
-
-
+ECI = [x;y;z];
 
 % Section 2: Conversion from ECI to East-North-Up (ENU) coordinates
 
 % Generate Local Standard Time in radians (LRT)
 %       Assumption: GMT is in [hh,mm,ss] format.
-  GRT = sum([pi/12, pi/720, pi/43200].*GMT);
-  
+GRT = sum([pi/12, pi/720, pi/43200].*GMT);
+
 % Convert lat and lon into radians
 
 latR = sum([pi/180,pi/10800].*lat);
@@ -85,7 +81,7 @@ lonR = sum([pi/180,pi/10800].*lon);
   
 % Convert GRT to LRT (takes values from 0 to 4pi)
 %       Assumption: it's okay that this goes up to 4pi
-  LRT = GRT + lonR;
+LRT = GRT + lonR;
 
 % Define Rotation Matrix
 ECI2ENU = [           -sin(LRT) ,            cos(LRT) ,       0       ;
@@ -119,9 +115,7 @@ Body2SFS = [ -.9380 ,  .0814 ,  .3370 ;
 %             -sin(FOV2(2))*cos(FOV2(1)),-sin(FOV2(2))*sin(FOV2(1)), cos(FOV2(2))];
 
 % Coordinate change
-SFS = Body2SFS*Body;
-
-
+SFS = Body2SFS*Body
 
 % Section 4: Generating the command for the filter Servo (DOT)
 
@@ -135,4 +129,4 @@ if theta1 >= 0
 else
     theta2 = theta1 + pi;
 end
-DOT = 180/pi*(pi-theta2);
+DOT = 180/pi*(pi-theta2)
