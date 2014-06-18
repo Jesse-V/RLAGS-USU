@@ -2,17 +2,28 @@
 
 using namespace Eigen;
 
-
 int main(int argc, char const *argv[])
 {
+  if(argc != 20)
+  {
+    printf("Error, incorrect number of arguments: %i\n", argc);
+    return 1;
+  }
 
-
-  GMT gmt(10, 10, 10);
-  Day date(2014, 06, 18);
-  Degree lat(50, 30.5);
-  Degree lon(30, 22.5);
+  GMT gmt(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
+  Day date(atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
+  Degree lat(atoi(argv[7]), atof(argv[8]));
+  Degree lon(atoi(argv[9]), atof(argv[10]));
   Matrix_3x3d IMU;
-  IMU << 1,0,0,0,1,0,0,0,1;
+  IMU <<  atoi(argv[11]),atoi(argv[12]),atoi(argv[13]),
+          atoi(argv[14]),atoi(argv[15]),atoi(argv[16]),
+          atoi(argv[17]),atoi(argv[18]),atoi(argv[19]);
+  // GMT gmt(10, 10, 10);
+  // Day date(2014, 06, 18);
+  // Degree lat(50, 30.5);
+  // Degree lon(30, 22.5);
+  // Matrix_3x3d IMU;
+  // IMU << 1,0,0,0,1,0,0,0,1;
 
   polarizer(lat, lon, gmt, date, IMU);
 
@@ -183,4 +194,6 @@ void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_
   else
     theta2 = theta1 + M_PI;
   double DOT = 180/M_PI*(M_PI-theta2);
+
+  printf("DOT: %f\n", DOT);
 }
