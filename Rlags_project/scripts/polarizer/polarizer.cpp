@@ -6,12 +6,12 @@ int main(int argc, char const *argv[])
 {
   if(argc != 20)
   {
-    printf("Error, incorrect number of arguments: %i\n", argc);
+    printf("polarizer [Year][Month][Day][Hour][Min][Sec][LatDeg][LatMin][LonDeg][LonMin][IMU00][IMU01][IMU02][IMU10][IMU11][IMU12][IMU20][IMU21][IMU22]\n");
     return 1;
   }
 
-  GMT gmt(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
-  Day date(atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
+  GMT gmt(atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
+  Day date(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]));
   Degree lat(atoi(argv[7]), atof(argv[8]));
   Degree lon(atoi(argv[9]), atof(argv[10]));
   Matrix_3x3d IMU;
@@ -195,5 +195,5 @@ void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_
     theta2 = theta1 + M_PI;
   double DOT = 180/M_PI*(M_PI-theta2);
 
-  printf("DOT: %f\n", DOT);
+  printf("%f", DOT);
 }

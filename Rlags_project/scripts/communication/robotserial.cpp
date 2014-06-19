@@ -39,34 +39,42 @@
 #include <fstream>
 #include <ctime>
 #include <sstream>
+#include <thread>
+#include <cmath>
+#include <iostream>
 
-void usage(void);
+// void usage(void);
+void getAngle(void);
+bool is_number(const std::string& s);
 int serialport_init(const char* serialport, int baud);
 int serialport_writebyte(int fd, uint8_t b);
 int serialport_write(int fd, const char* str);
 int serialport_read_until(int fd, char* buf, char until);
 
-void usage(void) {
-    printf("Usage: arduino-serial -p <serialport> [OPTIONS]\n"
-    "\n"
-    "Options:\n"
-    "  -h, --help                   Print this help message\n"
-    "  -p, --port=serialport        Serial port Arduino is on\n"
-    "  -b, --baud=baudrate          Baudrate (bps) of Arduino\n"
-    "  -s, --send=data              Send data to Arduino\n"
-    "  -r, --receive                Receive data from Arduino & print it out\n"
-    "  -n  --num=num                Send a number as a single byte\n"
-    "  -d  --delay=millis           Delay for specified milliseconds\n"
-    "\n"
-    "Note: Order is important. Set '-b' before doing '-p'. \n"
-    "      Used to make series of actions:  '-d 2000 -s hello -d 100 -r' \n"
-    "      means 'wait 2secs, send 'hello', wait 100msec, get reply'\n"
-    "\n");
-}
+bool shouldTerminate = false;
+float servoAngle = 90.0;
+bool angleUpdated = true;
+
+// void usage(void) {
+//     printf("Usage: arduino-serial -p <serialport> [OPTIONS]\n"
+//     "\n"
+//     "Options:\n"
+//     "  -h, --help                   Print this help message\n"
+//     "  -p, --port=serialport        Serial port Arduino is on\n"
+//     "  -b, --baud=baudrate          Baudrate (bps) of Arduino\n"
+//     "  -s, --send=data              Send data to Arduino\n"
+//     "  -r, --receive                Receive data from Arduino & print it out\n"
+//     "  -n  --num=num                Send a number as a single byte\n"
+//     "  -d  --delay=millis           Delay for specified milliseconds\n"
+//     "\n"
+//     "Note: Order is important. Set '-b' before doing '-p'. \n"
+//     "      Used to make series of actions:  '-d 2000 -s hello -d 100 -r' \n"
+//     "      means 'wait 2secs, send 'hello', wait 100msec, get reply'\n"
+//     "\n");
+// }
 
 int main(int argc, char *argv[])
 {
-    int TEMP = 0;
     printf("starting program..\n");
     int fd = 0;
     char serialport[256];
@@ -74,40 +82,46 @@ int main(int argc, char *argv[])
     char buf[50], dat[50], use[1];
     int rc,n;
 
-	//baudrate = 9600;
-	fd = serialport_init("/dev/ttyACM0", baudrate);
-            	if(fd==-1) return -1;
-	usleep(1000 * 1000);
- 	n = serialport_read_until(fd, buf, ':');
-	std::ofstream outFile;
-	std::stringstream fileName;
-	time_t timer;
-	struct tm* y2k;
-	time (&timer);
-	y2k = localtime(&timer);
-	fileName << "RLAGS_" << y2k->tm_mon << "_" << y2k->tm_mday << "_" << y2k->tm_hour << "_" << y2k->tm_min << "_" << y2k->tm_sec << ".txt";
-    int blah = 0;
-    bool update = true;
-	while(1) {
+    //baudrate = 9600;
+    printf("initializing serial communication...");
+    fd = serialport_init("/dev/ttyACM0", baudrate);
+                if(fd==-1) return -1;
+    printf("Done\n");
+    usleep(1000 * 1000);
+
+    printf("Spawning angle update thread..\n");
+    std::thread t(getAngle);
+
+    printf("Starting data collect..\n");
+    n = serialport_read_until(fd, buf, ':');
+    std::ofstream outFile;
+    std::stringstream fileName;
+    time_t timer;
+    struct tm* y2k;
+    time (&timer);
+    y2k = localtime(&timer);
+	fileName << "RLAGS_Data/RLAGS_" << y2k->tm_mon << "_" << y2k->tm_mday << "_" << y2k->tm_hour << "_" << y2k->tm_min << "_" << y2k->tm_sec << ".txt";
+	while(!shouldTerminate) {
 		strcpy(dat, "00000000:\0");
 		//gets(use);
 //		rc = serialport_write(fd, dat);
   //          		if(rc==-1) return -1;
 	 	//printf("Waiting until UART buffer clears: %d\n", tcdrain(fd));
 	 	n = serialport_read_until(fd, buf, ':');
-     	printf("%s\n", buf);
+     	printf("%s", buf);
 		outFile.open(fileName.str().c_str(), std::ofstream::out | std::ofstream::app);
-		outFile << buf << std::endl;
+		outFile << buf;
 		outFile.close();
-        if(update)
+        if(angleUpdated)
         {
             // sleep(2);
             // tcflush( fd, TCIFLUSH );
-            serialport_writebyte(fd, blah);
-            if(blah >= 180)
-                blah = 0;
-            else
-                blah += 45;
+            serialport_writebyte(fd, servoAngle);
+            angleUpdated = false;
+            // if(blah >= 180)
+            //     blah = 0;
+            // else
+            //     blah += 45;
             // update = false;
         }
 
@@ -115,11 +129,49 @@ int main(int argc, char *argv[])
 		usleep(1000);
 //         	printf("wrote %d bytes, read %d bytes: %s\n", rc, n, buf);
 	}
-
-	 close(fd);
+    t.join();
+	close(fd);
 
     exit(EXIT_SUCCESS);
 } // end main
+
+bool is_number(std::string s)
+{
+    return !s.empty() && s.find_first_not_of("0123456789") == std::string::npos;
+}
+
+void getAngle()
+{
+    while(!shouldTerminate)
+    {
+        float angle = 0;
+        // std::cin.clear();
+        std::cin >> angle;
+        // if(!std::cin)
+        // {
+            int newAngle = round(angle);
+            if(angle == 181)
+            {
+                angle--;
+                servoAngle = angle;
+                angleUpdated = true;
+            }
+            else if (angle > 180 || angle < 0)
+            {
+                printf("\nMust be angle between 0-180 degrees\n");
+            }
+            else
+            {
+                servoAngle = angle;
+                angleUpdated = true;
+            }
+        // }
+        // else
+        // {
+        //     printf("\nMust be angle between 0-180 degrees\n");
+        // }
+    }
+}
 
 int serialport_writebyte(int fd, uint8_t b)
 {
