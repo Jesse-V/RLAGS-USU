@@ -5,7 +5,7 @@ start=$(date +"%d.%H.%M.%S")
 while [ ! -f /root/GoQat/ccd_display.fit ];
 do
 	echo "Doesn't exist yet"
-	sleep 0.1
+	sleep 0.5
 done
 
 sudo mv /root/GoQat/ccd_display.fit /home/linaro/Rlags_project/scripts/sedi_camera/

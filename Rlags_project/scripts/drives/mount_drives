@@ -8,7 +8,7 @@ while [ $COUNTER -lt $DRIVES ];
 do
 	sudo mkdir /media/ssd_$COUNTER 2> /dev/null
 	NUMBER=NR==$COUNTER+1
-	PARTITION=$(awk $NUMBER /home/linaro/Rlags_project/scripts/drives/partition_list)
+	PARTITION=/dev/$(awk $NUMBER /home/linaro/Rlags_project/scripts/drives/partition_list)
 	sudo umount $PARTITION
 	sudo mount $PARTITION /media/ssd_$COUNTER
 	let COUNTER=COUNTER+1

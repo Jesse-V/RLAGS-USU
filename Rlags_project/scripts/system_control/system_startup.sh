@@ -33,8 +33,12 @@ fi
 echo "End of sanity checks"
 echo "Begin scientific capture"
 
-sudo ps aux | grep GoQat | grep -v grep | awk {'print $2'} | xargs sudo kill
-sudo /home/linaro/Rlags_project/scripts/sedi_camera/start_goqat.sh &
+
+
+#sudo ps aux | grep GoQat | grep -v grep | awk {'print $2'} | xargs sudo kill
+#sudo /home/linaro/Rlags_project/scripts/sedi_camera/start_goqat.sh &
+
+
 
 #------------------------------- SCIENTIFIC CAPTURE ---------------------------
 #nSunCameras=sudo -u linaro sleep 5; /home/linaro/Rlags_project/scripts/system_control/initialize_system.sh

@@ -16,10 +16,7 @@ int  main()
 
 	startCapture(); //get image
 	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-	cvSaveImage("/home/linaro/Rlags_project/scripts/sun_cameras/sun_cam_2.jpg",pRgb);
+	cvSaveImage("/home/linaro/Rlags_project/scripts/sun_cameras/sun_cam_2.jpg", pRgb);
 	stopCapture();
 
 	return 1;

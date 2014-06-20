@@ -1,5 +1,3 @@
 #!/bin/bash
-hwinfo --block --short 2> /dev/null > /home/linaro/Rlags_project/scripts/drives/device_list
-grep Apricorn /home/linaro/Rlags_project/scripts/drives/device_list | awk '{print $1}'> /home/linaro/Rlags_project/scripts/drives/drive_list
-grep -f /home/linaro/Rlags_project/scripts/drives/drive_list /home/linaro/Rlags_project/scripts/drives/device_list | grep Partition | awk '{print $1}' > /home/linaro/Rlags_project/scripts/drives/partition_list
-exit
+
+cat /proc/partitions | grep 62656464 | awk '{ print $NF }' > /home/linaro/Rlags_project/scripts/drives/partition_list

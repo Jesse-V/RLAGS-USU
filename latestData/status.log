@@ -1,0 +1,779 @@
+-e 
+System startup at Wed Jun 11 23:47:30 UTC 2014
+
+[    4.952715] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    4.959511]  sdb: sdb1
+[    4.964747] sd 1:0:0:0: [sdb] No Caching mode page found
+[    4.968836] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    4.974868] sd 1:0:0:0: [sdb] Attached SCSI disk
+[    5.155030] NET: Registered protocol family 10
+[    5.235497] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    6.860467] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    6.861444] smsc95xx 1-2.1.1:1.0 eth0: link up, 100Mbps, full-duplex, lpa 0x45E1
+[    9.012902] init: failsafe main process (1720) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+ERR: Not enough sun cameras (counted 0)
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Thu Jun 12 00:19:53 UTC 2014
+
+[    4.857369] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    4.863777]  sdb: sdb1
+[    4.867181] sd 1:0:0:0: [sdb] No Caching mode page found
+[    4.868883] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    4.876418] sd 1:0:0:0: [sdb] Attached SCSI disk
+[    5.232551] NET: Registered protocol family 10
+[    5.320181] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    6.994987] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    6.995969] smsc95xx 1-2.1.1:1.0 eth0: link up, 100Mbps, full-duplex, lpa 0x45E1
+[    9.127559] init: failsafe main process (1723) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+ERR: Not enough sun cameras (counted 0)
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Thu Jun 12 00:22:43 UTC 2014
+
+[    5.187241] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    5.196234] sd 1:0:0:0: [sdb] No Caching mode page found
+[    5.198204] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    5.205051]  sdb: sdb1
+[    5.207909] sd 1:0:0:0: [sdb] No Caching mode page found
+[    5.209648] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    5.215674] sd 1:0:0:0: [sdb] Attached SCSI disk
+[    6.736461] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    6.737388] smsc95xx 1-2.1.1:1.0 eth0: link up, 100Mbps, full-duplex, lpa 0x45E1
+[    7.723824] init: failsafe main process (1746) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+ERR: Not enough sun cameras (counted 0)
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+sudo: /home/linaro/control_scripts/system_startup.sh: command not found
+sudo: /home/linaro/control_scripts/system_startup.sh: command not found
+-e 
+System startup at Fri Jun 13 17:46:13 UTC 2014
+
+[    5.040993] sd 1:0:0:0: [sdb] No Caching mode page found
+[    5.043036] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    5.050059]  sdb: sdb1
+[    5.053539] sd 1:0:0:0: [sdb] No Caching mode page found
+[    5.056236] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    5.060901] sd 1:0:0:0: [sdb] Attached SCSI disk
+[    5.106646] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    6.782944] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    6.783871] smsc95xx 1-2.1.1:1.0 eth0: link up, 100Mbps, full-duplex, lpa 0x45E1
+[    7.861529] init: failsafe main process (1751) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+ERR: Not enough sun cameras (counted 2)
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Sat Jan 1 01:00:22 UTC 2000
+
+[    4.904735] sd 1:0:0:0: [sdb] No Caching mode page found
+[    4.907072] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    4.913873]  sdb: sdb1
+[    4.920574] sd 1:0:0:0: [sdb] No Caching mode page found
+[    4.922369] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    4.929211] sd 1:0:0:0: [sdb] Attached SCSI disk
+[    4.995384] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    6.663064] smsc95xx 1-2.1.1:1.0 eth0: link up, 100Mbps, full-duplex, lpa 0x45E1
+[    6.666818] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    7.949412] init: failsafe main process (1730) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+ERR: Not enough sun cameras (counted 0)
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Sat Jan 1 08:13:59 UTC 2000
+
+[    4.865409]  sdb: sdb1
+[    4.868669] sd 1:0:0:0: [sdb] No Caching mode page found
+[    4.870239] sd 1:0:0:0: [sdb] Assuming drive cache: write through
+[    4.876092] sd 1:0:0:0: [sdb] Attached SCSI disk
+[    5.021055] NET: Registered protocol family 10
+[    5.161271] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    5.406409] EXT4-fs (mmcblk0p2): re-mounted. Opts: (null)
+[    6.882529] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    6.883506] smsc95xx 1-2.1.1:1.0 eth0: link up, 100Mbps, full-duplex, lpa 0x45E1
+[    9.095905] init: failsafe main process (1778) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+ERR: Not enough sun cameras (counted 0)
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Sat Jan 1 08:45:57 UTC 2000
+
+[    7.865715] sd 3:0:0:0: [sdb] Write Protect is off
+[    7.865726] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    7.866475] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.867971] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.878094] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.879491] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.886124]  sdb: sdb1
+[    7.892725] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.894641] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.901705] sd 3:0:0:0: [sdb] Attached SCSI disk
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Thu Jun 19 00:41:11 UTC 2014
+
+[    7.863080] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    7.863794] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.865270] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.873652] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.876250] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.882909]  sdb: sdb1
+[    7.885414] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.887659] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.893704] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.263367] init: failsafe main process (1720) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Thu Jun 19 02:25:01 UTC 2014
+
+[    8.089390] usb 1-2.2: SerialNumber: 303030303630303737303239
+[    8.090360] scsi2 : usb-storage 1-2.2:1.0
+[    8.252324] init: failsafe main process (1762) killed by TERM signal
+[    8.293243] usb 1-2.3: new high-speed USB device number 20 using s5p-ehci
+[    8.399446] usb 1-2.3: New USB device found, idVendor=0984, idProduct=0040
+[    8.399457] usb 1-2.3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[    8.399466] usb 1-2.3: Product: SATAWire        
+[    8.399473] usb 1-2.3: Manufacturer: Apricorn
+[    8.399481] usb 1-2.3: SerialNumber: 303030303630303737303239
+[    8.400459] scsi3 : usb-storage 1-2.3:1.0
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Thu Jun 19 16:19:51 UTC 2014
+
+[    7.864559] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    7.865409] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.866530] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.874893] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.877475] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.884273]  sdb: sdb1
+[    7.886781] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.888872] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.894943] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.463900] init: failsafe main process (1780) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Thu Jun 19 17:05:39 UTC 2014
+
+[    7.874623] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    7.875628] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.877141] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.885205] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.888093] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.894711]  sdb: sdb1
+[    7.897224] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.899515] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.905551] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.130769] init: failsafe main process (1721) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Fri Jun 20 05:19:54 UTC 2014
+
+[    8.120257] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.121269] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.122987] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.131838] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.133889] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.140589]  sdb: sdb1
+[    8.143348] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.145259] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.151321] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.248481] init: failsafe main process (1719) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+
+Usage:
+ kill [options] <pid> [...]
+
+Options:
+ <pid> [...]            send signal to every <pid> listed
+ -<signal>, -s, --signal <signal>
+                        specify the <signal> to be sent
+ -l, --list=[<signal>]  list all signal names, or convert one to a name
+ -L, --table            list all signal names in a nice table
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see kill(1).
+/usr/bin/xvfb-run: 184: /usr/bin/xvfb-run: GoQat: not found
+-e 
+System startup at Fri Jun 20 17:13:30 UTC 2014
+
+[    7.865583] sd 3:0:0:0: [sdb] Write Protect is off
+[    7.865593] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    7.866354] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.867975] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.876244] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.879113] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.885378]  sdb: sdb1
+[    7.888244] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.890532] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.896923] sd 3:0:0:0: [sdb] Attached SCSI disk
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+-e 
+System startup at Fri Jun 20 17:15:41 UTC 2014
+
+[    8.079171] Buffer I/O error on device sdb1, logical block 104
+[    8.085078] Buffer I/O error on device sdb1, logical block 0
+[    8.091058] Buffer I/O error on device sdb1, logical block 0
+[    8.096189] Buffer I/O error on device sdb1, logical block 2
+[    8.101636] Buffer I/O error on device sdb1, logical block 2
+[    8.107314] Buffer I/O error on device sdb1, logical block 0
+[    8.112922] Buffer I/O error on device sdb1, logical block 0
+[    8.118562] Buffer I/O error on device sdb1, logical block 0
+[    8.124174] Buffer I/O error on device sdb1, logical block 512
+[    8.140082] systemd-udevd[1554]: inotify_add_watch(6, /dev/sdb1, 10) failed: No such file or directory
+Initializing system...
+SSDs recognized by kernel, will now mount
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+ERR: ssd_0 improperly mounted or sun_camera directory is missing
+End of sanity checks
+Begin scientific capture
+-e 
+System startup at Fri Jun 20 19:39:51 UTC 2014
+
+[    9.090275] sd 2:0:0:0: [sda] Write Protect is off
+[    9.090287] sd 2:0:0:0: [sda] Mode Sense: 23 00 00 00
+[    9.091041] sd 2:0:0:0: [sda] No Caching mode page found
+[    9.092128] sd 2:0:0:0: [sda] Assuming drive cache: write through
+[    9.101029] sd 2:0:0:0: [sda] No Caching mode page found
+[    9.105793] sd 2:0:0:0: [sda] Assuming drive cache: write through
+[    9.110879]  sda: sda1
+[    9.118053] sd 2:0:0:0: [sda] No Caching mode page found
+[    9.127388] sd 2:0:0:0: [sda] Assuming drive cache: write through
+[    9.130592] sd 2:0:0:0: [sda] Attached SCSI disk
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+-e 
+System startup at Fri Jun 20 19:43:16 UTC 2014
+
+[    7.866186] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    7.866999] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.868059] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.876538] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.879031] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.885665]  sdb: sdb1
+[    7.888303] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.890448] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.896536] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.293096] init: failsafe main process (1757) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture
+-e 
+System startup at Fri Jun 20 19:57:18 UTC 2014
+
+[    7.875094] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    7.876365] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.877531] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.885400] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.888288] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.894906]  sdb: sdb1
+[    7.897296] sd 3:0:0:0: [sdb] No Caching mode page found
+[    7.899941] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    7.905829] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.055591] init: failsafe main process (1773) killed by TERM signal
+Initializing system...
+SSDs recognized by kernel, will now mount
+umount: /dev/sda1: not mounted
+umount: /dev/sdb1: not mounted
+System initialization complete
+Beginning sanity checks
+NOTICE: Counted 4 sun cameras
+NOTICE: ssd_0 is mounted, sun_camera directory exists
+NOTICE: SSD write capability functioning normally
+End of sanity checks
+Begin scientific capture

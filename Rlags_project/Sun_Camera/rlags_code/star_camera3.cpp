@@ -16,9 +16,6 @@ int  main()
 
 	startCapture(); //get image
 	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
-	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
 	cvSaveImage("/home/linaro/Rlags_project/scripts/star_camera/star_cam.jpg", pRgb);
 	stopCapture();
 
