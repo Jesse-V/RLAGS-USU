@@ -628,7 +628,7 @@ configure:6344: $? = 0
 configure:6344: result: yes
 configure:6353: checking for _ZN10CCCDCamera16get_ReadoutSpeedERNS_12ReadoutSpeedE
 configure:6353: gcc -o conftest -g -O2   conftest.c  >&5
-/tmp/cc2g1P7g.o: In function `main':
+/tmp/ccYFtxMy.o: In function `main':
 /home/linaro/Rlags_project/SEDI_Camera2/conftest.c:75: undefined reference to `CCCDCamera::get_ReadoutSpeed(CCCDCamera::ReadoutSpeed&)'
 collect2: error: ld returned 1 exit status
 configure:6353: $? = 1
@@ -736,6 +736,7 @@ config.status:918: creating data/GoQat_SExtractor.pl
 config.status:918: creating Makefile
 config.status:918: creating src/Makefile
 config.status:918: creating src/config.h
+config.status:1099: src/config.h is unchanged
 config.status:1147: executing depfiles commands
 
 ## ---------------- ##

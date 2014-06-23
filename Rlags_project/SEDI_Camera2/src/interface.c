@@ -11407,7 +11407,8 @@ int main (int argc, char *argv[])
 {
 	struct cam_img *aug;
 	FILE *fp;
-	
+	printf("main");
+
     /* Initialise gtk */
 
 	g_thread_init (NULL);
@@ -11518,6 +11519,10 @@ int main (int argc, char *argv[])
 	 */
 	
 	restore_watch_file ();
+
+	menu.OpenCCDCam = 1;
+	ccdcam_open();
+	loop_ccd_open (menu.OpenCCDCam);
 	
     /* Enter the main gtk loop */
     
