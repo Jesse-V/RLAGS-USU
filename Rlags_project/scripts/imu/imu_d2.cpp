@@ -1,6 +1,6 @@
 //Example code for interfacing with the Microstrain 3DM-GX3-25 Sensor
 
-/* compile using: gcc -o imu_cc imu_cc.c -lm
+/* compile using: gcc -o imu_d2 imu_d2.c -lm
 
   Once compiled the desired device can be specified using a command line argument:
 
@@ -16,7 +16,9 @@
 #include <fcntl.h>   // File control definitions
 #include <errno.h>   // Error number definitions
 #include <assert.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <string>
 #include <string.h>
 #include <math.h>
 
@@ -33,16 +35,13 @@ float Bytes2Float(const unsigned char*);
 unsigned long Bytes2Ulong(unsigned char*);
 #define PI 3.14159265359
 
-typedef struct _CC_AAMM
+typedef struct _D2_Stab_AAM
 {
-	float Accel[3]; 	/* Accel        x y z   */
-	float AngRate[3]; 	/* Ang Rate     x y z   */
-	float Mag[3];		/* Magnetomer   x y z   */
-	float M1[3];		/* M(1,1) M(1,2) M(1,3) */
-	float M2[3];		/* M(2,1) M(2,2) M(2,3) */
-	float M3[3];		/* M(3,1) M(3,2) M(3,3) */
-	unsigned long timer;	/* Timer in Seconds     */
-} CC_AAMM;
+	float StabAccel[3];	/* Accel      x y z */
+	float AngRate[3]; 	/* Ang Rate   x y z */
+	float StabMag[3]; 	/* Magnetomer x y z */
+	unsigned long timer;	/* Timer in Seconds */
+} D2_Stab_AAM;
 /*----------------------------------------------------*/
 
 // Utility functions for working with a com port in Linux
@@ -195,75 +194,54 @@ int CommandDialog(ComPortHandle comPort, unsigned int command){
        return TRUE;
       }
       else{
-
-	/* --------------------------Print Command 0xC2 Numerical Values------------------------------- */
-	CC_AAMM CC_Data;
+	/* --------------------------Print Command 0xD2 Numerical Values------------------------------- */
+	D2_Stab_AAM D2_Data;
         for(i=0;i<3;i++)
 	{
-		CC_Data.Accel[i] = Bytes2Float(&response[1 + i*4]);		
-		CC_Data.AngRate[i] = Bytes2Float(&response[13 + i*4]);
-		CC_Data.Mag[i] = Bytes2Float(&response[25 + i*4]);
-		CC_Data.M1[i] = Bytes2Float(&response[37 + i*4]);
-		CC_Data.M2[i] = Bytes2Float(&response[49 + i*4]);
-		CC_Data.M3[i] = Bytes2Float(&response[61 + i*4]);
+		D2_Data.StabAccel[i] = Bytes2Float(&response[1 + i*4]);
+		D2_Data.AngRate[i] = Bytes2Float(&response[13 + i*4]);
+		D2_Data.StabMag[i] = Bytes2Float(&response[25 + i*4]);
         }
-	
-	printf("\n\tAcceleration, Angular Rate & Magnetometer Vectors & Orientation Matrix\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\n\tAccel X\t\t\tAccel Y\t\t\tAccel Z\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f (G)\t\t%f (G)\t\t%f (G)\n\n", CC_Data.Accel[0], CC_Data.Accel[1], CC_Data.Accel[2]);
+	printf("\n\tGyro Stabilized Acceleration, Angular Rate & Magnetometer\n");
+	printf("\t-------------------------------------------------------------------\n");
+	printf("\n\tStab Accel X\t\tStab Accel Y\t\tStab Accel Z\n");
+	printf("\t-------------------------------------------------------------------\n");
+	printf("\t%f (G)\t\t%f (G)\t\t%f (G)\n\n", D2_Data.StabAccel[0], D2_Data.StabAccel[1], D2_Data.StabAccel[2]);
 	printf("\n\tAng Rate X\t\tAng Rate Y\t\tAng Rate Z\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f (deg/sec)\t%f (deg/sec)\t%f (deg/sec)\n\n", (180.0/PI)*CC_Data.AngRate[0], (180.0/PI)*CC_Data.AngRate[1], (180.0/PI)*CC_Data.AngRate[2]);
-	printf("\n\tMagneto X\t\tMagneto Y\t\tMagneto Z\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f (Gauss)\t%f (Gauss)\t%f (Gauss)\n\n", CC_Data.Mag[0], CC_Data.Mag[1], CC_Data.Mag[2]);
-	printf("\n\tM(1,1)\t\t\tM(1,2)\t\t\tM(1,3)\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f\t\t%f\t\t%f\n\n", CC_Data.M1[0], CC_Data.M1[1], CC_Data.M1[2]);
-	printf("\n\tM(2,1)\t\t\tM(2,2)\t\t\tM(2,3)\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f\t\t%f\t\t%f\n\n", CC_Data.M2[0], CC_Data.M2[1], CC_Data.M2[2]);
-	printf("\n\tM(3,1)\t\t\tM(3,2)\t\t\tM(3,3)\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f\t\t%f\t\t%f\n\n", CC_Data.M3[0], CC_Data.M3[1], CC_Data.M3[2]);
+	printf("\t-------------------------------------------------------------------\n");
+	printf("\t%f (deg/sec)\t%f (deg/sec)\t%f (deg/sec)\n\n", (180.0/PI)*D2_Data.AngRate[0], (180.0/PI)*D2_Data.AngRate[1], (180.0/PI)*D2_Data.AngRate[2]);
+	printf("\n\tStab Magneto X\t\tStab Magneto Y\t\tStab Magneto Z\n");
+	printf("\t-------------------------------------------------------------------\n");
+	printf("\t%f (Gauss)\t%f (Gauss)\t%f (Gauss)\n\n", D2_Data.StabMag[0], D2_Data.StabMag[1], D2_Data.StabMag[2]);
 
-		float mag_heading;
-	if(CC_Data.Mag[1] > 0) {
-		mag_heading = 90.0-(180.0/PI)*atan(CC_Data.Mag[0]/CC_Data.Mag[1]);
+	float north;
+	if(D2_Data.StabMag[1] > 0) {
+		north = 90.0-(180.0/PI)*atan(D2_Data.StabMag[0]/D2_Data.StabMag[1]);
 	}
 
-	if(CC_Data.Mag[1] < 0) {
-		mag_heading = 270.0-(180.0/PI)*atan(CC_Data.Mag[0]/CC_Data.Mag[1]);
-	}
-	
-	if(CC_Data.Mag[1]==0 && CC_Data.Mag[0]<0) {
-		mag_heading = 180.0;
+	if(D2_Data.StabMag[1] < 0) {
+		north = 270.0-(180.0/PI)*atan(D2_Data.StabMag[0]/D2_Data.StabMag[1]);
 	}
 
-	if(CC_Data.Mag[1]==0 && CC_Data.Mag[0]>0) {
-		mag_heading = 0.0;
+	if(D2_Data.StabMag[1]==0 && D2_Data.StabMag[0]<0) {
+		north = 180.0;
 	}
 
-	mag_heading = 360.0-mag_heading;
+	if(D2_Data.StabMag[1]==0 && D2_Data.StabMag[0]>0) {
+		north = 0.0;
+	}
 
-	float pitch = (180.0/PI)*asin(-CC_Data.M1[2]);
-	float roll = (180.0/PI)*atan(CC_Data.M2[2]/CC_Data.M3[2]);
-	float yaw = (180.0/PI)*atan(CC_Data.M1[1]/CC_Data.M1[0]);
-	printf("\n\t----------------------------------------------------------------------");
-	printf("\n\tPitch: %f (deg)\n", pitch);
-	printf("\n\tRoll:  %f (deg)\n", roll);
-	printf("\n\tYaw:   %f (deg)\n", yaw);
-	printf("\n\tHeading: %f (deg)\n", mag_heading);
+	north = 360.0-north;
 
-	CC_Data.timer = Bytes2Ulong(&response[73]);
+	D2_Data.timer = Bytes2Ulong(&response[37]);
 	float sec;
-	sec = (float) (CC_Data.timer/262144.0);
+	sec = (float) (D2_Data.timer/262144.0);
+	printf("\n\t-------------------------------------------------------------------");
+	printf("\n\tHeading: %f (deg)\n", north);
 	printf("\n\tTime Stamp: %f (sec)\n", sec);
-	printf("\t----------------------------------------------------------------------\n\n");
+	printf("\t-------------------------------------------------------------------\n\n");
 	/* -------------------------------------------------------------------------------------------- */
-	
+
         return TRUE;
       }
       size = readComPort(comPort, &response[0], 4096);
@@ -281,13 +259,13 @@ char* scandev(){
   int userchoice=0;
   char* device;
 
-  char *command = "find /dev/serial -print | grep -i microstrain";//search /dev/serial for microstrain devices
+  std::string command = "find /dev/serial -print | grep -i microstrain";//search /dev/serial for microstrain devices
   //printf("Searching for devices...\n");
 
-  instream=popen(command, "r");//execute piped command in read mode
+  instream=popen(command.c_str(), "r");//execute piped command in read mode
 
   if(!instream){//SOMETHING WRONG WITH THE SYSTEM COMMAND PIPE...EXITING
-    printf("ERROR BROKEN PIPELINE %s\n", command);
+    printf("ERROR BROKEN PIPELINE %s\n", command.c_str());
     return device;
   }
 
@@ -360,7 +338,7 @@ int main(int argc, char* argv[]){
 
   if(comPort > 0) {
     unsigned int command;
-    command = 0xcc;
+    command = 0xd2;
     CommandDialog(comPort,command);
     CloseComPort(comPort);
   }
@@ -384,15 +362,15 @@ float Bytes2Float(const unsigned char* pBytes)
 	   ((Byte*)(&f))[2] = pBytes[2];
 	   ((Byte*)(&f))[3] = pBytes[3];
 	}
-	
-	return f; 
+
+	return f;
 }
 
 unsigned long Bytes2Ulong(unsigned char* plByte)
 {
 	unsigned long ul = 0;
 	if(TestByteOrder() != FALSE) {
-	   ul = (plByte[0] <<24) + (plByte[1] <<16) + (plByte[2] <<8) + (plByte[3] & 0xFF);    
+	   ul = (plByte[0] <<24) + (plByte[1] <<16) + (plByte[2] <<8) + (plByte[3] & 0xFF);
 	}else{
 		ul = (unsigned long)plByte;
 	}

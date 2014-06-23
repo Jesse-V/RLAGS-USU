@@ -213,7 +213,7 @@ void loop() {
   sensors_etalon.requestTemperatures();
   sensors_power.requestTemperatures();
   sensors_control.requestTemperatures();
-  
+
   thermalInfo(sensors_etalon, DTS_1, degC_1);
   Serial.print("\t");
   thermalInfo(sensors_etalon, DTS_2, degC_2);
@@ -222,19 +222,19 @@ void loop() {
   Serial.print("\t");
   thermalInfo(sensors_etalon, DTS_4, degC_4);
   Serial.print("\t");
-  thermalInfo(sensors_etalon, DTS_5, degC_5);
+  thermalInfo(sensors_power, DTS_5, degC_5);
   Serial.print("\t");
-  thermalInfo(sensors_etalon, DTS_6, degC_6);
+  thermalInfo(sensors_power, DTS_6, degC_6);
   Serial.print("\t");
-  thermalInfo(sensors_etalon, DTS_7, degC_7);
+  thermalInfo(sensors_power, DTS_7, degC_7);
   Serial.print("\t");
-  thermalInfo(sensors_etalon, DTS_12, degC_12);
+  thermalInfo(sensors_control, DTS_12, degC_12);
   Serial.print("\t");
-  thermalInfo(sensors_etalon, DTS_13, degC_13);
+  thermalInfo(sensors_control, DTS_13, degC_13);
   Serial.print("\t");
-  thermalInfo(sensors_etalon, DTS_14, degC_14);
+  thermalInfo(sensors_control, DTS_14, degC_14);
   Serial.print("\t");
-  thermalInfo(sensors_etalon, DTS_15, degC_15);
+  thermalInfo(sensors_control, DTS_15, degC_15);
 
 //  Serial.print((startTime-millis()));
 //  Serial.print("\t");
