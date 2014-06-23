@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <string>
 #include <math.h>
 #include <fstream>
 
@@ -282,13 +283,13 @@ char* scandev(){
   int userchoice=0;
   char* device;
 
-  char *command = "find /dev/serial -print | grep -i microstrain";//search /dev/serial for microstrain devices
+  std::string command = "find /dev/serial -print | grep -i microstrain";//search /dev/serial for microstrain devices
   //printf("Searching for devices...\n");
 
-  instream=popen(command, "r");//execute piped command in read mode
+  instream=popen(command.c_str(), "r");//execute piped command in read mode
 
   if(!instream){//SOMETHING WRONG WITH THE SYSTEM COMMAND PIPE...EXITING
-    printf("ERROR BROKEN PIPELINE %s\n", command);
+    printf("ERROR BROKEN PIPELINE %s\n", command.c_str());
     return device;
   }
 
