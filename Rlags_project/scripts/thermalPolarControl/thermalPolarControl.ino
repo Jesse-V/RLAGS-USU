@@ -10,12 +10,12 @@
 #define SERVO_PIN 19
 #define DTS_PRECISION 12  // thermal sensor resolution (bits)
 
-#define ONE_WIRE_BUS1 10  //   etalon DTS -> Arduino pin 10
-#define ONE_WIRE_BUS2 11  // powerBox DTS -> Arduino pin 11
-#define ONE_WIRE_BUS3 12  //     sedi DTS -> Arduino pin 12
-#define ONE_WIRE_BUS4 13  //  control DTS -> Arduino pin 13
-#define ONE_WIRE_BUS5 14  // attitude1 DTS -> Arduino pin 14
-#define ONE_WIRE_BUS6 15  // attitude2 DTS -> Arduino pin 15
+#define ONE_WIRE_BUS1 10  //    etalon DTS -> Arduino pin 10
+#define ONE_WIRE_BUS2 11  //  powerBox DTS -> Arduino pin 11
+#define ONE_WIRE_BUS3 12  //      sedi DTS -> Arduino pin 12
+#define ONE_WIRE_BUS4 13  //   control DTS -> Arduino pin 13
+#define ONE_WIRE_BUS5 15  // attitude1 DTS -> Arduino pin 15 A1
+#define ONE_WIRE_BUS6 16  // attitude2 DTS -> Arduino pin 16 A2 
 
 #define RELAY_CTRL_CH1 2 // thermalControl -> Arduino pin 2
 #define RELAY_CTRL_CH2 3 // thermalControl -> Arduino pin 3
@@ -35,16 +35,16 @@ OneWire oneWire_etalon(ONE_WIRE_BUS1);
 OneWire oneWire_power(ONE_WIRE_BUS2);
 OneWire oneWire_sedi(ONE_WIRE_BUS3);
 OneWire oneWire_control(ONE_WIRE_BUS4);
-//OneWire oneWire_att1(ONE_WIRE_BUS5);
-//OneWire oneWire_att2(ONE_WIRE_BUS6);
+OneWire oneWire_att1(ONE_WIRE_BUS5);
+OneWire oneWire_att2(ONE_WIRE_BUS6);
 
 // pass oneWire reference to Dallas Temperature.
 DallasTemperature sensors_etalon(&oneWire_etalon);
 DallasTemperature sensors_power(&oneWire_power);
 DallasTemperature sensors_sedi(&oneWire_sedi);
 DallasTemperature sensors_control(&oneWire_control);
-//DallasTemperature sensors_att1(&oneWire_att1);
-//DallasTemperature sensors_att2(&oneWire_att2);
+DallasTemperature sensors_att1(&oneWire_att1);
+DallasTemperature sensors_att2(&oneWire_att2);
 
 /*-----------------------------etalon DTS------------------------------*/
 DeviceAddress DTS_1 = { 0x28, 0x03, 0x9A, 0x8E, 0x05, 0x00, 0x00, 0xB4 };
@@ -73,6 +73,17 @@ DeviceAddress DTS_14 = { 0x28, 0x1C, 0xD0, 0x8F, 0x05, 0x00, 0x00, 0x10 };
 DeviceAddress DTS_15 = { 0x28, 0xE2, 0x89, 0x8F, 0x05, 0x00, 0x00, 0x17 };
 /*----------------------------------------------------------------------*/
 
+/*-----------------------------attitude DTS-----------------------------*/
+DeviceAddress DTS_16 = { 0x28, 0xAC, 0xDB, 0xE7, 0x05, 0x00, 0x00, 0xEB };
+DeviceAddress DTS_17 = { 0x28, 0x3D, 0xF7, 0xE7, 0x05, 0x00, 0x00, 0xB4 };
+DeviceAddress DTS_18 = { 0x28, 0xDE, 0xE8, 0xE7, 0x05, 0x00, 0x00, 0xD7 };
+DeviceAddress DTS_19 = { 0x28, 0x17, 0x2C, 0xE8, 0x05, 0x00, 0x00, 0x79 };
+DeviceAddress DTS_20 = { 0x28, 0xE1, 0xEC, 0xE8, 0x05, 0x00, 0x00, 0x9B };
+DeviceAddress DTS_21 = { 0x28, 0x30, 0x79, 0xE8, 0x05, 0x00, 0x00, 0x0D };
+DeviceAddress DTS_22 = { 0x28, 0x74, 0x90, 0xE8, 0x05, 0x00, 0x00, 0x8D };
+DeviceAddress DTS_23 = { 0x28, 0x10, 0x07, 0xE8, 0x05, 0x00, 0x00, 0x74 };
+/*----------------------------------------------------------------------*/
+
 float degC_1[3] = {0, 0, 0};
 float degC_2[3] = {0, 0, 0};
 float degC_3[3] = {0, 0, 0};
@@ -88,18 +99,14 @@ float degC_12[3] = {0, 0, 0};
 float degC_13[3] = {0, 0, 0};
 float degC_14[3] = {0, 0, 0};
 float degC_15[3] = {0, 0, 0};
-
-/*-----------------------------attitude DTS-----------------------------*/
-//DeviceAddress DTS_16 = {  };
-//DeviceAddress DTS_17 = {  };
-//DeviceAddress DTS_18 = {  };
-//DeviceAddress DTS_19 = {  };
-//DeviceAddress DTS_20 = {  };
-//DeviceAddress DTS_21 = {  };
-//DeviceAddress DTS_22 = {  };
-//DeviceAddress DTS_23 = {  };
-/*----------------------------------------------------------------------*/
-
+float degC_16[3] = {0, 0, 0};
+float degC_17[3] = {0, 0, 0};
+float degC_18[3] = {0, 0, 0};
+float degC_19[3] = {0, 0, 0};
+float degC_20[3] = {0, 0, 0};
+float degC_21[3] = {0, 0, 0};
+float degC_22[3] = {0, 0, 0};
+float degC_23[3] = {0, 0, 0};
 
 int relayStateCh1, relayStateCh2, relayStateCh3, relayStateCh4,
     relayStateCh5, relayStateCh6, relayStateCh7, relayStateCh8;
@@ -134,8 +141,8 @@ void setup() {
   sensors_power.begin();    // start up library for powerBox sensors
   sensors_sedi.begin();     // start up library for sedi sensors
   sensors_control.begin();  // start up library for control sensors
-//  sensors_att1.begin();     // start up library for attitude 1 sensors
-//  sensors_att2.begin();     // start up library for attitude 2 sensors
+  sensors_att1.begin();     // start up library for attitude 1 sensors
+  sensors_att2.begin();     // start up library for attitude 2 sensors
 
   // set the resolution
   /*-------------------etalon DTS------------------*/
@@ -165,16 +172,17 @@ void setup() {
   sensors_control.setResolution(DTS_15, DTS_PRECISION);
   /*-------------------------------------------------*/
 
-//  /*--------------------control DTS-------------------*/
-//  sensors_att1.setResolution(DTS_16, DTS_PRECISION);
-//  sensors_att1.setResolution(DTS_17, DTS_PRECISION);
-//  sensors_att1.setResolution(DTS_18, DTS_PRECISION);
-//  sensors_att1.setResolution(DTS_19, DTS_PRECISION);
-//  sensors_att2.setResolution(DTS_20, DTS_PRECISION);
-//  sensors_att2.setResolution(DTS_21, DTS_PRECISION);
-//  sensors_att2.setResolution(DTS_22, DTS_PRECISION);
-//  sensors_att2.setResolution(DTS_23, DTS_PRECISION);
-//  /*--------------------------------------------------*/
+  /*----------------attitude DTS------------------*/
+  sensors_att1.setResolution(DTS_16, DTS_PRECISION);
+  sensors_att1.setResolution(DTS_17, DTS_PRECISION);
+  sensors_att1.setResolution(DTS_18, DTS_PRECISION);
+  sensors_att1.setResolution(DTS_19, DTS_PRECISION);
+  
+  sensors_att2.setResolution(DTS_20, DTS_PRECISION);
+  sensors_att2.setResolution(DTS_21, DTS_PRECISION);
+  sensors_att2.setResolution(DTS_22, DTS_PRECISION);
+  sensors_att2.setResolution(DTS_23, DTS_PRECISION);
+  /*----------------------------------------------*/
 
   Serial.print("\rAcquiring Data...:\r");
 
@@ -189,6 +197,15 @@ void setup() {
 
   Serial.print("KAH4\t");
   Serial.print("DTS11\t");
+  
+  Serial.print("KAH5\t");
+  Serial.print("DTS16\t");
+  
+  Serial.print("KAH6\t");
+  Serial.print("DTS16\t");
+  
+  Serial.print("KAH7\t");
+  Serial.print("DTS16\t");
 
   Serial.print("DTS1\t");
   Serial.print("DTS2\t");
@@ -200,19 +217,27 @@ void setup() {
   Serial.print("DTS12\t");
   Serial.print("DTS13\t");
   Serial.print("DTS14\t");
-  Serial.print("DTS15:\r");
+  Serial.print("DTS15\t");
+  Serial.print("DTS17\t");
+  Serial.print("DTS18\t");
+  Serial.print("DTS19\t");
+  Serial.print("DTS20\t");
+  Serial.print("DTS21\t");
+  Serial.print("DTS22\t");
+  Serial.print("DTS23:\r");
 }
 
 void loop() {
 //  long startTime = millis();
   // relay control based on a thermal sensor
   tempControl_sedi();
-
-
-  /*----------------etalon DTS---------------*/
+  tempControl_sunCam();
+  
   sensors_etalon.requestTemperatures();
   sensors_power.requestTemperatures();
   sensors_control.requestTemperatures();
+  sensors_att1.requestTemperatures();
+  sensors_att2.requestTemperatures();
 
   thermalInfo(sensors_etalon, DTS_1, degC_1);
   Serial.print("\t");
@@ -235,6 +260,20 @@ void loop() {
   thermalInfo(sensors_control, DTS_14, degC_14);
   Serial.print("\t");
   thermalInfo(sensors_control, DTS_15, degC_15);
+  Serial.print("\t");
+  thermalInfo(sensors_att1, DTS_17, degC_17);
+  Serial.print("\t");
+  thermalInfo(sensors_att1, DTS_18, degC_18);
+  Serial.print("\t");
+  thermalInfo(sensors_att1, DTS_19, degC_19);
+  Serial.print("\t");
+  thermalInfo(sensors_att2, DTS_20, degC_20);
+  Serial.print("\t");
+  thermalInfo(sensors_att2, DTS_21, degC_21);
+  Serial.print("\t");
+  thermalInfo(sensors_att2, DTS_22, degC_22);
+  Serial.print("\t");
+  thermalInfo(sensors_att2, DTS_23, degC_23);
 
 //  Serial.print((startTime-millis()));
 //  Serial.print("\t");
@@ -260,6 +299,13 @@ void tempControl_sedi() {
   thermalCtrl(sensors_sedi, DTS_9, RELAY_CTRL_CH2, relayStateCh2, degC_9);
   thermalCtrl(sensors_sedi, DTS_10, RELAY_CTRL_CH3, relayStateCh3, degC_10);
   thermalCtrl(sensors_sedi, DTS_11, RELAY_CTRL_CH4, relayStateCh4, degC_11);
+}
+
+void tempControl_sunCam() {
+  sensors_att1.requestTemperatures();
+  thermalCtrl(sensors_att1, DTS_16, RELAY_CTRL_CH5, relayStateCh5, degC_16);
+  thermalCtrl(sensors_att1, DTS_16, RELAY_CTRL_CH6, relayStateCh6, degC_16);
+  thermalCtrl(sensors_att1, DTS_16, RELAY_CTRL_CH7, relayStateCh7, degC_16);
 }
 
 void thermalInfo(DallasTemperature dataLine, DeviceAddress& dts, float* arr)
@@ -369,6 +415,30 @@ float retrieveOffset(DeviceAddress& dev)
     retVal = 0.0;
   }
   else if (dev == DTS_15) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_16) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_17) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_18) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_19) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_20) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_21) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_22) {
+    retVal = 0.0;
+  }
+  else if (dev == DTS_23) {
     retVal = 0.0;
   }
   return retVal;
