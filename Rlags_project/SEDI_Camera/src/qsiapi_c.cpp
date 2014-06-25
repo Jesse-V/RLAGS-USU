@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Conversion from C to the QSI C++ library takes place here.                 */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */

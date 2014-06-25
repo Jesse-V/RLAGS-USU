@@ -5,7 +5,7 @@
 /* This is designed to interface with the Losmandy Gemini System L4 1.04 or   */
 /* higher, and LX200-compatibles.                                             */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -199,8 +199,8 @@ static FILE *fg = NULL;                  /* Guide corrections file            */
 void telescope_init (void);
 gboolean telescope_open_comms_port (void);
 void telescope_close_comms_port (void);
-gboolean telescope_open_autog_port (void);
-void telescope_close_autog_port (void);
+gboolean telescope_open_guide_port (void);
+void telescope_close_guide_port (void);
 #ifdef HAVE_LIBPARAPIN
 gboolean telescope_open_parallel_port (void);
 #endif
@@ -317,7 +317,7 @@ gboolean telescope_open_comms_port (void)
 		if (tel_status == TEL_UNKNOWN) {
 			telescope_close_comms_port ();
 			return show_error (__func__, "No response from telescope - "
-										"check port and serial cable!");
+										 "check port and cable!");
 		} else {
 			L_print("{b}Established communications with Gemini unit\n");
 			
@@ -355,18 +355,18 @@ void telescope_close_comms_port (void)
 	serial_close_port (tel_comms);
 }
 
-gboolean telescope_open_autog_port (void)
+gboolean telescope_open_guide_port (void)
 {
-	/* Open the requested serial port for autoguiding */
+	/* Open the requested port for sending guide singals */
 	
-	L_print ("{b}****---->>>> Opening autoguider comms link on "
+	L_print ("{b}****---->>>> Opening guide signals comms link on "
 	                                              "%s...\n", autog_comms->name);
 	
 	/* Return if already open */
 	
 	if (autog_comms->ref_count && autog_comms->user & PU_AUTOG) {
-		L_print ("{b}Port already open for autoguider communications!\n");
-		L_print ("{b}****---->>>> Opened autoguider link\n");
+		L_print ("{b}Port already open for guide signal communications!\n");
+		L_print ("{b}****---->>>> Opened guide signals comms link\n");
 		return TRUE;
 	} 
 	
@@ -374,13 +374,13 @@ gboolean telescope_open_autog_port (void)
 	
 	if (!autog_comms->ref_count) {
 		if (!serial_open_port (autog_comms, PU_AUTOG))
-			return show_error (__func__, "Unable to open autoguider "
+			return show_error (__func__, "Unable to open guide signal "
 							             "communications link");
 	} else {
 		autog_comms->ref_count++;
 		autog_comms->user |= PU_AUTOG;
 		L_print ("{b}Selected port %s is already open - sending guide "
-			                      "commands on same port\n", autog_comms->name);
+			                      "signals on same port\n", autog_comms->name);
 	}
 	
 	/* Assign telescope guiding functions for this port */
@@ -389,14 +389,14 @@ gboolean telescope_open_autog_port (void)
 	ports[autog_comms->pnum].guide_stop = telescope_s_stop;
 	ports[autog_comms->pnum].guide_pulse = telescope_s_pulse;
 	
-	L_print ("{b}****---->>>> Opened autoguider link\n");
+	L_print ("{b}****---->>>> Opened guide signals comms link\n");
 
 	return TRUE;
 }
 
-void telescope_close_autog_port (void)
+void telescope_close_guide_port (void)
 {
-	/* Close down the communications link with the autoguider if it's open and
+	/* Close down the guide signals communications link if it's open and
 	 * nothing else (e.g. telescope commands) is using this link.
 	 */
 	 
@@ -413,7 +413,7 @@ void telescope_close_autog_port (void)
 		ports[autog_comms->pnum].guide_stop = telescope_d_stop;
 		ports[autog_comms->pnum].guide_pulse = telescope_d_pulse;
 		
-		L_print ("{b}****---->>>> Communications with autoguider closed\n");
+		L_print ("{b}****---->>>> Guide signal communications closed\n");
 	}
 	if (autog_comms->ref_count)    /* If still ref'd by someone else, return */
 		return;
@@ -578,8 +578,8 @@ void telescope_d_pulse (enum TelMotion direction, gint duration)
 void telescope_s_start (enum TelMotion direction)
 {
 	/* Move the telescope in the desired direction, via LX200-compatible serial 
-	 * commands to the autoguider serial/USB port.  (For Gemini controllers at 
-	 * least, the telescope will move at the presently selected rate).
+	 * commands to the guide signals serial/USB port.  (For Gemini controllers 
+	 * at least, the telescope will move at the presently selected rate).
 	 */
 	
 	gchar *s = NULL;
@@ -599,7 +599,7 @@ void telescope_s_start (enum TelMotion direction)
 void telescope_s_stop (enum TelMotion direction)
 {
 	/* Stop the telescope motion, via LX200-compatible serial commands to the 
-	 * autoguider serial/USB port.
+	 * guide signals serial/USB port.
 	 */ 
 	
 	gchar *s = NULL;
@@ -992,7 +992,7 @@ gboolean telescope_yellow_button (void)
 	tasks_task_done (T_YBT);		
 	 
 	if (autog_comms->user & PU_TEL) {
-		L_print ("{o}Autoguider comms port is same as telescope comms "
+		L_print ("{o}Guide signal comms port is same as telescope comms "
 				 "port; won't be able to send command to relay box\n");
 		return FALSE;
 	}
@@ -1002,7 +1002,7 @@ gboolean telescope_yellow_button (void)
 		g_free (dirn);
 		return TRUE;
 	} else {
-		L_print ("{o}Autoguider comms port not open; can't send command to "
+		L_print ("{o}Guide signal comms port not open; can't send command to "
 				                                                 "relay box\n");
 		return FALSE;
 	}

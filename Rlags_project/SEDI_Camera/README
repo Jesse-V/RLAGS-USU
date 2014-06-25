@@ -9,10 +9,9 @@ sections as follows:
 2. GENERAL SOFTWARE INSTALLATION NOTES
 3. SOFTWARE LIBRARIES           (Please read this for QSI and SX camera support)
 4. ACCESSING DEVICE FILES
-5. CCD CAMERA FILTER NAMES IN GOQAT
-6. SOME COMMON PROBLEMS
-7. INSTALLED FILES
-8. OK, SO WHY IS IT CALLED GOQAT AND HOW DO I PRONOUNCE IT?
+5. SOME COMMON PROBLEMS
+6. INSTALLED FILES
+7. OK, SO WHY IS IT CALLED GOQAT AND HOW DO I PRONOUNCE IT?
 
 
 1. INTRODUCTION
@@ -26,7 +25,7 @@ of the libraries on which GoQat depends for a full installation are not yet
 compatible with gtk version 3.  However, you should have gtk version 2 bundled 
 with your distribution.  The configuration process fails unless gtk version 2.24
 or greater is available.  GoQat does not require any Gnome-specific libraries so
-it shouild work whether you are running Gnome 2 or Gnome 3, or even if you are 
+it should work whether you are running Gnome 2 or Gnome 3, or even if you are 
 not running the Gnome desktop at all.
 
 GoQat must be compiled from source code and for full functionality it does 
@@ -189,36 +188,57 @@ below.
 
 	ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1278", ATTR{idProduct}=="XXXX", MODE="0666"
 	
-	where XXXX depends on the model of camera(s) that you have.  You can get the
-	relevant number from the list on the Starlight-Xpress website or maybe from
-	your camera documentation.  Otherwise if /proc/bus/usb/devices exists on 
-	your system, find the group of entries for the Starlight Xpress device and 
-	look for the line beginning "P:  Vendor=1278".  The "ProdID" field gives you
-	the product ID that you require.  Alternatively, run lsusb (available in the
-	usbutils package) and find the entry containing ID 1278.  The product ID is
-	the four numbers following the colon in that entry.
+   where XXXX depends on the model of camera(s) that you have.  You can get the
+   relevant number from the list on the Starlight-Xpress website or maybe from
+   your camera documentation.  Otherwise if /proc/bus/usb/devices exists on 
+   your system, find the group of entries for the Starlight Xpress device and 
+   look for the line beginning "P:  Vendor=1278".  The "ProdID" field gives you
+   the product ID that you require.  Alternatively, run lsusb (available in the
+   usbutils package) and find the relevant entry containing ID 1278.  The 
+   product ID is the four numbers following the colon in that entry.
 
    Save the file (you need root permissions for this).
 
 3) Now plug in the SX camera.  You should be able to open it successfully and
    obtain an image in GoQat.
    
+   
+SX Filter wheel support
+-----------------------
+
+The code for SX filter wheels is built in to GoQat, but you will need the 
+libudev and libudev-devel packages to be installed.  These should be
+available as standard packages via your package manager.  You must also set the 
+relevant device file permissions as described below.
+
+1) Install libusb and libusb-devel with your package manager if it is not
+   installed already.
+
+2) To access the wheel, create a file in /etc/udev/rules.d called '99-sx.rules'
+   if it does not already exist and add the following (all on one line):
+
+	ACTION=="add", KERNEL=="hidraw*", ATTRS{idVendor}=="1278", ATTRS{idProduct}=="XXXX", MODE="0666"
+	
+   where XXXX depends on the model of filter wheel that you have.  You may be
+   able to get the relevant product ID from your filter wheel documentation.  
+   Otherwise if /proc/bus/usb/devices exists on your system, find the group of 
+   entries for the Starlight Xpress device and look for the line beginning 
+   "P:  Vendor=1278".  The "ProdID" field gives you the product ID that you 
+   require.  Alternatively, run lsusb (available in the usbutils package) and 
+   find the relevant entry containing ID 1278.  The product ID is the four 
+   numbers following the colon in that entry.
+
+   Save the file (you need root permissions for this).
+   
 
 Support for video-for-linux devices
 -----------------------------------
 
-GoQat provides simple support for video-for-linux (V4L) devices (e.g. webcams)
-using the v4l library:
+GoQat provides support for video-for-linux (V4L) devices (e.g. webcams) using 
+the v4l2 library:
 
-	# yum install libv4l*
+	# yum install libv4l2*
 	
-You can find the code here:
-
-	http://freecode.com/projects/libv4l
-	
-If the unicap library supports your V4L device, that will be better than the
-minimal support implemented in GoQat via libv4l.  See below.
-
 
 Support for Unicap-compatible devices
 -------------------------------------
@@ -283,7 +303,7 @@ library from:
 	
 Compile and install in the usual way.  Note that you will require to run GoQat
 with root privileges to access the port.  Please note that this has not been
-tested on version 3 of the Linux kernel.
+tested with GoQat on version 3 of the Linux kernel.
 
 
 Support for video photometry and astrometry
@@ -389,26 +409,10 @@ This gives read/write access to firewire device files for all users.
 CCD cameras
 -----------
 
-Accessing CCD cameras is described under 'QSI Camera support' and 'SX Camera
-support' in section 3 above.
+Accessing CCD cameras and the SX filter wheel is described in section 3 above.
 
 
-5. FILTER NAMES IN GOQAT
-========================
-
-GoQat permits you to select the filter that you would like to use for each CCD 
-camera exposure.  The filter name forms part of the FITS file name when you save
-the image.  GoQat comes with a pre-installed list of filter names but you can
-add or remove filter names if you wish.
-
-When GoQat has been run for the first time, there will be a folder called 
-'GoQat' in your home directory.  Edit the file called 'GoQat.conf' in that 
-folder.  Find the section called '[ListCCDFilterTypes]'.  You can add or remove
-filter names from this list, but do not remove the first two items, or GoQat may
-not function properly.
-
-
-6. SOME COMMON PROBLEMS
+5. SOME COMMON PROBLEMS
 =======================
 
 Q) After configuring GoQat, I see messages like:
@@ -494,7 +498,7 @@ A) The file permissions on the device file are not set properly.  You need to
    time you change the rule.
    
 
-7. INSTALLED FILES
+6. INSTALLED FILES
 ==================
 
 When you install GoQat, the following files are installed in the given locations
@@ -550,7 +554,7 @@ Documentation:
 /usr/local/share/doc/goqat/GoQat.pdf
 
 
-8. OK, SO WHY IS IT CALLED GOQAT AND HOW DO I PRONOUNCE IT?
+7. OK, SO WHY IS IT CALLED GOQAT AND HOW DO I PRONOUNCE IT?
 ===========================================================
 
 GoQat originally stood for:

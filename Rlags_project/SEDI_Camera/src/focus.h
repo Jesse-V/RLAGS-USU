@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Header file for focuser routines.                                          */
 /*                                                                            */
-/* Copyright (C) 2011 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2011 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */

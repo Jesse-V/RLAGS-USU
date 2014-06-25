@@ -11,6 +11,7 @@ GoQat_SOURCES = \
 	telescope.c \
 	serial.c \
 	gqusb.c \
+	filter.c \
 	focus.c \
 	tasks.c \
 	video.c \
@@ -45,6 +46,7 @@ AM_CPPFLAGS = \
 	@LIBGOOCANVAS_CFLAGS@ \
 	@LIBV4L2_CFLAGS@ \
 	@LIBUSB_CFLAGS@ \
+	@LIBUDEV_CFLAGS@ \
 	@LIBRAW1394_CFLAGS@ \
 	@LIBUNICAPGTK_CFLAGS@ \
 	@LIBGTHREAD_CFLAGS@
@@ -57,6 +59,7 @@ LDADD = \
 	@LIBGOOCANVAS_LIBS@ \
 	@LIBV4L2_LIBS@ \
 	@LIBUSB_LIBS@ \
+	@LIBUDEV_LIBS@ \
 	@LIBRAW1394_LIBS@ \
 	@LIBUNICAPGTK_LIBS@ \
 	@LIBGTHREAD_LIBS@

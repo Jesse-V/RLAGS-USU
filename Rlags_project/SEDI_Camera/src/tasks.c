@@ -84,7 +84,7 @@
 /*                                                                            */
 /* Exit             Immediately exits execution of the task list              */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -743,7 +743,7 @@ void tasks_add_EndWhile (void)
 
 void tasks_add_Aug (gboolean on)
 {
-	/* Adds a command to turn autoguider on/off to task list */
+	/* Adds a command to turn autoguider camera on/off to task list */
 	
 	GtkTreeIter s_iter, iter;
 	
@@ -982,7 +982,6 @@ gboolean tasks_execute_tasks (gboolean TestOnly, gboolean *error)
 	static gint line = 0;
 	gint i, n, o, intval;
 	gdouble val, val1;
-	static gchar filter[10];
 	static gchar *stra[15];
 	static gchar sRA[9], sDec[10];
 	static gchar obj[128];
@@ -1158,18 +1157,30 @@ gboolean tasks_execute_tasks (gboolean TestOnly, gboolean *error)
 				}
 				
 				exd.filter = g_strstrip (stra[1]);
-				BadFilter = TRUE;
-				for (i = 0; i < MAX_FILTERS; i++) {
-					if (!strcmp (exd.filter, get_filter_info (ccd, i, filter, 
-															             &o))) {
-						BadFilter = FALSE;
-						break;
+				if (strcmp (exd.filter, "-")) {
+					BadFilter = FALSE;
+					if (!strcmp (menu.filterwheel, "filterwheel_int")) {
+                        if (ccd->cam_cap.HasFilterWheel)
+							BadFilter = !get_filter_info (ccd,exd.filter,&i,&o);
+						else {
+							L_print ("{r}Task 'Expose': CCD camera does not "
+							         "have internal filter wheel at line %d\n",
+							         line);
+							Error = TRUE;
+						}
+					} else if (filter_is_open ())
+						BadFilter = !get_filter_info (NULL, exd.filter, &i, &o);
+					else {
+						L_print ("{r}Task 'Expose' at line %d requires filter "
+								 "wheel to be open\n", line);
+						Error = TRUE;
 					}
-				}
-				if (BadFilter) {
-					L_print ("{r}Task 'Expose' has invalid filter type at "
-							 "line %d\n", line);
-					Error = TRUE;
+						
+					if (BadFilter) {
+						L_print ("{r}Task 'Expose': Filter not found at "
+								 "line %d\n", line);
+						Error = TRUE;
+					}
 				}
 				
 				if (!get_entry_float (g_strstrip (stra[2]), 
@@ -1595,15 +1606,26 @@ gboolean tasks_execute_tasks (gboolean TestOnly, gboolean *error)
 				set_autog_on (FALSE);
 			}
 		} else if (!(strcmp (task.type, "GuideStart"))) {
-			if (!menu.OpenTelPort && !menu.OpenAutogPort) {
+			if (autog_comms->pnum == LPT && !menu.OpenParPort) {
+				L_print ("{r}Task 'GuideStart' at line %d requires parallel "
+				         "port to be open to send guide signals\n", line);
+				Error = TRUE;
+			} else if (autog_comms->pnum == USBAUG && !aug->Open) {
+				L_print ("{r}Task 'GuideStart' at line %d requires autoguider "
+				         "camera to be open to send guide signals\n", line);
+				Error = TRUE;
+			} else if (autog_comms->pnum == USBCCD && !menu.OpenCCDCam) {
+				L_print ("{r}Task 'GuideStart' at line %d requires CCD camera "
+				         "to be open to send guide signals\n", line);
+				Error = TRUE;
+			} else if (autog_comms->pnum >= TTY0 && !menu.OpenAutogPort) {
 				L_print ("{r}Task 'GuideStart' at line %d requires "
-						 "telescope link or autoguider link to be open\n", 
-						 line);
+						 "guide signals link to be open\n", line);
 				Error = TRUE;
 			}
 			if (!aug->Open) {
 				L_print ("{r}Task 'GuideStart' at line %d requires "
-						 "autoguider camera to be open\n", line);
+						 "autoguider camera to be open for guiding\n", line);
 				Error = TRUE;
 			}
 			if (!TestOnly && !Error) {
@@ -1792,7 +1814,7 @@ gboolean tasks_execute_tasks (gboolean TestOnly, gboolean *error)
 		} else if (!(strcmp (task.type, "YellowButton"))) {
 			if (!menu.OpenAutogPort) {
 				L_print ("{r}Task 'YellowButton' at line %d requires "
-						 "autoguider link to be open\n", line);
+						 "guide signals link to be open\n", line);
 				Error = TRUE;
 			}
 			if (!TestOnly && !Error) {
@@ -2072,22 +2094,35 @@ gboolean tasks_load_file (gchar *filename)
 		} else if (!strcmp (cmd, "YellowButton")) {
 			tasks_add_YellowButton ();
 		} else if (!strcmp (cmd, "Shutdown")) {
-				tasks_add_Shutdown ();
+			tasks_add_Shutdown ();
 		} else if (!strcmp (cmd, "Exit")) {
-				tasks_add_Exit ();
-		} else if (strncmp (cmd, "#", 1)) {
-			L_print ("{r}Invalid task: '%s' in file on line %d\n", cmd, i + 1);
-			return show_error (__func__, "Error reading file");
-		}			
+			tasks_add_Exit ();
+		} else if (!strncmp (cmd, "#", 1)) {
+			/* It's a comment! */;
+		} else {
+			if ((token = next_token (tokens, FALSE))) {
+				if (!ui_control_action (cmd, token))
+					goto cmd_error;
+	        } else
+				goto token_error;
+		}
 		g_strfreev (tokens);
 	}
 	g_strfreev (strings);
+			
 	return TRUE;
 	
+cmd_error:
+	L_print ("{r}Invalid task: '%s' in file on line %d\n", cmd, i + 1);
+	g_strfreev (tokens);
+	g_strfreev (strings);
+	return show_error (__func__, "Error reading file");
+	
 token_error:
-
 	L_print ("{r}Missing parameter for task '%s' in file on line %d\n", 
 			                                                        cmd, i + 1);
+	g_strfreev (tokens);
+	g_strfreev (strings);
 	return show_error (__func__, "Error reading file");
 }
 

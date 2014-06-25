@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Header file for Starlight Xpress hardware.                                  */
 /*                                                                            */
-/* Copyright (C) 2012 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2012 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -26,17 +26,25 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_LIBUSB
-#define HAVE_SX 1
+#ifdef HAVE_LIBUDEV
+#define HAVE_SX_FILTERWHEEL 1
 #endif
 
-#ifdef HAVE_SX
+#ifdef HAVE_SX_FILTERWHEEL
+#define SX_MAX_FILTERWHEELS 128
+#endif
+
+#ifdef HAVE_LIBUSB
+#define HAVE_SX_CAM 1
+#endif
+
+#ifdef HAVE_SX_CAM
 
 #include "gqusb.h"
 #include "ccd.h"
 #include "telescope.h"
 
-#define SX_MAX_CAMERAS 64
+#define SX_MAX_CAMERAS 128
 
 struct imparam {
 	unsigned int x;                          /* Image coordinates and binning */
@@ -61,13 +69,14 @@ struct cooler {
 
 struct sx_cam {
 	struct libusb_device *sxcams[SX_MAX_CAMERAS]; /* Detected cameras         */
-	struct udevice udev;                          /* Low-level USB data       */
+	struct usbdevice usbd;                        /* Low-level USB data       */
 	struct imparam ip;                            /* Image data               */
 	struct cooler cool;                           /* Cooler data              */
 	pthread_t sx_expose_thread;                   /* Camera exposure thread   */
 	int idx[SX_MAX_CAMERAS];                 /* Index no. of detected cameras */
 	short bitspp;                            /* Bits (not bytes!) per pixel   */
 	int status;                                   /* Camera status            */
+	int SXShutter;                                /* 1 if has shutter         */
 	int SXInterlaced;                             /* 1 if interlaced chip     */
 	int SXColour;                                 /* 1 if colour chip         */
 	int InvertImage;                              /* 1 if image to be inverted*/
@@ -98,7 +107,7 @@ extern void sx_guide_start (enum TelMotion direction);
 extern void sx_guide_stop (enum TelMotion direction);
 extern void sx_error_func (void (*err_func) (int *err, const char *func, 
 											 char *msg ));
-extern struct udevice sx_get_ccdcam_udev (void);
+extern struct usbdevice sx_get_ccdcam_usbd (void);
 											 
 extern int sxc_get_cameras (struct sx_cam *cam, const char *serial[], 
 							const char *desc[], int *num);
@@ -126,4 +135,19 @@ extern void sxc_guide_start (enum TelMotion direction);
 extern void sxc_guide_stop (enum TelMotion direction);
 extern void sxc_set_guide_command_cam (struct sx_cam *cam);
 
-#endif /* HAVE_SX */
+#endif /* HAVE_SX_CAM */
+
+#ifdef HAVE_SX_FILTERWHEEL
+
+extern int sxf_get_filterwheels (const char *devnode[], const char *desc[], 
+                                 int *num);
+extern int sxf_connect (int connect, const char *devnode);
+extern unsigned short sxf_get_filter_pos (void);
+extern int sxf_set_filter_pos (unsigned short pos);
+
+#endif /* HAVE_SX_FILTERWHEEL */
+
+void sx_error_func (void (*err_func) (int *err, const char *func, char *msg ));
+
+
+

@@ -4,7 +4,7 @@
 /* The routines in this file govern the operation of the event loop.  The     */
 /* loop is started when the application initialises.                          */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -52,7 +52,7 @@
 #define CEP 0x00000020     /* Ccd Exposure in Progress         */
 #define CIE 0x00000040     /* Ccd Interrupt Exposure           */
 #define CCE 0x00000080     /* Ccd Cancel Exposure              */
-#define CIR 0x00000100     /* Ccd Image Ready                  */
+#define CPI 0x00000100     /* Ccd Process Image                */
 #define CDI 0x00000200     /* Ccd Display single Image         */
 #define CAP 0x00000400     /* Ccd Autofocus calibration stoP   */
 #define CFP 0x00000800     /* Ccd autoFocus stoP               */
@@ -83,6 +83,8 @@
 #define AGI 0x00080000     /* AutoGuider display single Image  */
 #define ATP 0x00100000     /* Autoguider camera Thread stoP    */
 #define AGC 0x00200000     /* AutoGuider Close                 */
+#define AGR 0x00400000     /* AutoGuider camera Restart        */
+#define AVP 0x00800000     /* Autoguider V4l grabbing Paused   */
 
 #define FCO 0x00000001     /* FoCuser is Open                  */
 #define FCM 0x00000002     /* Focuser Check Moving             */
@@ -164,6 +166,7 @@ static struct AFFocusThreadData {/* Data for autofocus focusing thread        */
 } AFFocus_thread_data;
 
 static GThread *ccd_thread = NULL; /* CCD camera thread                       */
+static GThread *v4l_thread = NULL; /* V4L guide camera thread                 */
 static GThread *AFC_thread = NULL; /* Autofocus calibration thread            */
 static GThread *AFF_thread = NULL; /* Autofocus focusing thread               */
 static GThreadPool *thread_pool_autog_calib = NULL; /* Autog. calib. threads  */
@@ -173,7 +176,6 @@ static guint save_period;       /* Period for saving autoguider images (s)    */
 static guint handler_id;        /* Timeout handler id                         */
 static gint filter_offset;      /* Focus offset when changing camera filter   */
 static gint tempcomp_pos;  /* Focus position after applying focus temp. comp. */
-static gint cam_type;           /* Camera type for filter focus offset        */
 static gfloat calib_coords[5][2]; /* Autoguider calibration star coordinates  */
 static gdouble MoveRA, MoveDec; /* RA and Dec motion for telescope Move       */
 static gchar *sRA, *sDec;       /* Coordinates of object for telescope GoTo   */
@@ -197,6 +199,7 @@ void loop_ccd_autofocus (gboolean Start, gdouble LHSlope, gdouble RHSlope,
 						 gdouble near_HFD, gdouble exp_len, gint box); 
 void loop_ccd_temps (gboolean display, guint period);
 void loop_autog_open (gboolean Open);
+void loop_autog_restart (void);
 void loop_autog_calibrate (gboolean Calibrate);
 void loop_autog_exposure_wait (gboolean Wait, enum MotionDirection dirn);
 void loop_autog_guide (gboolean guide);
@@ -205,7 +208,7 @@ void loop_autog_DS9 (void);
 void loop_focus_open (gboolean Open);
 void loop_focus_stop (void);
 gboolean loop_focus_is_focusing (void);
-void loop_focus_apply_filter_offset (enum CamType type, gint offset);
+void loop_focus_apply_filter_offset (gint offset);
 void loop_focus_apply_temp_comp (gint pos);
 void loop_focus_check_done (void);
 void loop_LiveView_open (gboolean open);
@@ -229,6 +232,7 @@ void loop_display_blinkrect (gboolean Blink);
 guint loop_elapsed_since_first_iteration (void);
 static gboolean timeout (guint *timer, guint msec);
 static gpointer thread_func_ccd (gpointer data);
+static gpointer thread_func_v4l (gpointer data);
 static gpointer thread_func_AFCalib (gpointer data);
 static gpointer thread_func_AFFocus (gpointer data);
 static void AF_focuser_move_and_wait (gint pos);
@@ -373,6 +377,15 @@ void loop_autog_open (gboolean Open)
 		Flags.Aug |= AGC;
 }
 
+void loop_autog_restart (void)
+{
+	/* This routine is called to restart a V4L autoguider camera after adjusting
+	 * the camera settings.
+	 */
+	 
+	 Flags.Aug |= AGR;
+}
+
 void loop_autog_calibrate (gboolean Calibrate)
 {
 	/* This routine is called when the user clicks the autoguider calibration
@@ -473,14 +486,13 @@ gboolean loop_focus_is_focusing (void)
 	return Flags.Foc & (FIM | FFF);
 }
 
-void loop_focus_apply_filter_offset (enum CamType type, gint offset)
+void loop_focus_apply_filter_offset (gint offset)
 {
 	/* This routine is called to apply a focus offset after changing a filter.
 	 * It has to be done via the loop code to prevent it clashing with an
 	 * automatic temperature focusing movement.
 	 */
 	
-	cam_type = type;
 	filter_offset = offset;
 	Flags.Foc |= FAO;
 }
@@ -732,11 +744,13 @@ static gboolean timeout (guint *timer, guint msec)
 
 static gpointer thread_func_ccd (gpointer data)
 {
-	/* CCD camera monitoring thread function.  Periodic calls to the CCD camera
-	 * to monitor its status are made from this thread.  Calls to the QSI and SX
-	 * cameras are blocked while they are downloading an image.  Consquently,
-	 * any such calls made from the main thread would hang the application while
-	 * the camera was being read.
+	/* CCD camera thread function.  Periodic calls to the CCD camera to monitor 
+	 * its status are made from this thread, along with checking for completed
+	 * exposures and downloading the image data.  Status checks can return an
+	 * error or interfere with image downloads if made at the same time;  hence
+	 * these two must be called from the same thread.  Downloading the image
+	 * outside the main thread keeps the application responsive during image
+	 * download.
 	 * 
 	 * Guiding commands issued via the CCD camera are made from the guide 
 	 * timing thread in telescope.c.  They will block in that thread whilst the
@@ -756,10 +770,34 @@ static gpointer thread_func_ccd (gpointer data)
 		}
 		
 		if (Flags.CCD & CEP) {
-			if (ccdcam_image_ready ())
-				Flags.CCD |= CIR;
+			if (ccdcam_image_ready ()) {
+				Flags.CCD &= ~CEP;
+				if (ccdcam_download_image ())
+					Flags.CCD |= CPI;
+			}
 		}
+		
 	}
+	return NULL;
+}
+
+static gpointer thread_func_v4l (gpointer data)
+{
+	#ifdef HAVE_LIBV4L2
+	/* V4L (autoguiding camera) frame grabber thread function.
+	 * Frames are stored into a fifo buffer, which is then read whenever the
+	 * application is ready to use them.
+	 */
+	 
+	while (Flags.Aug & AGA) {
+		if (!(Flags.Aug & AGR)) {
+			if (!augcam_grab_v4l_buffer ())
+				Flags.Aug |= AGC;
+		} else
+			Flags.Aug |= AVP;
+		usleep (1000);
+	}
+	#endif
 	return NULL;
 }
 
@@ -1191,12 +1229,19 @@ static gint event_loop (gpointer data)
 	}
 	
 	if ((Flags.CCD & CSF) && !(Flags.CCD & CCE)) { /* Set CCD filter */
-		if (set_filter (CCD, (gchar *) NULL, &filter_offset)) {
+		if (set_filter (FALSE, (gchar *) NULL, &filter_offset)) {
 			Flags.CCD &= ~CSF;
+			/* NOTE: Both the QSI and SX filterwheel code blocks in the main
+			 * thread while waiting for confirmation that the correct 
+			 * position has been set, so analysis of autoguider images will
+			 * not happen during this period.  If this delay is excessive, 
+			 * could unset AGE here to make sure that any outstanding 
+			 * guide corrections have been made before next exposure begins.
+			 */  
 			if (get_apply_filter_offset ()) {
 				L_print ("{b}Applying filter focus offset of %d steps...\n", 
 						                                         filter_offset);
-				loop_focus_apply_filter_offset (CCD, filter_offset);
+				loop_focus_apply_filter_offset (filter_offset);
 			}
 		} else
 		    Flags.CCD |= CCE;
@@ -1247,13 +1292,13 @@ static gint event_loop (gpointer data)
 		ccdcam_cancel_exposure ();
 	}
 	
-	if (Flags.CCD & CIR) { /* CCD camera image ready */
-		Flags.CCD &= ~(CIR | CEP);
+	if (Flags.CCD & CPI) { /* CCD camera image downloaded */
+		Flags.CCD &= ~CPI;
 		set_progress_bar (TRUE, loop_elapsed_since_first_iteration ());
-		if (ccdcam_capture_exposure ()) {
+		if (ccdcam_process_image ()) {
 			Flags.CCD |= CDI;
 			Flags.Aug &= ~AGE; /* Unset autog. idle flag here; next exposure */
-		}                      /* can't start until autog. is next idle      */
+		}                      /*  can't start until autog. is next idle     */
 	}
 	
 	if (Flags.CCD & CDI) { /* Save CCD image for display and display it */
@@ -1311,11 +1356,13 @@ static gint event_loop (gpointer data)
 	
 	if (Flags.Aug & AGO) { /* Open autoguider */
 		Flags.Aug &= ~AGO;
-		if (!(Flags.Lvw & LVR)) { /* Open only if not already being used by   */
-			if (augcam_open ()) { /* live view                                */
+		if (!(Flags.Lvw & LVR)) { /* Open only if not already being used by */
+			if (augcam_open ()) { /*  live view                             */
 				ui_show_aug_window ();
 				set_autog_sensitive (TRUE, TRUE);
 			    Flags.Aug |= (AGA | ASE);
+				if ((get_aug_image_struct ())->device == V4L)
+					v4l_thread =g_thread_create(thread_func_v4l,NULL,TRUE,NULL);
 			} else {
 			    Flags.Aug |= AGC; /* Error condition - reset checkbox state   */
 				reset_checkbox_state (RCS_USE_AUTOGUIDER, FALSE);
@@ -1330,7 +1377,7 @@ static gint event_loop (gpointer data)
 	if ((Flags.Aug & AGA) && (Flags.Aug & ASE)) {/* Start autog. cam. exposure*/
 		Flags.Aug &= ~ASE;
 		if (Flags.Aug & ACM) { /* Need to store star position in this exposure*/
-			Flags.Aug &= ~ACM; /* for autoguider calibration.                 */
+			Flags.Aug &= ~ACM; /*  for autoguider calibration.                */
 			Flags.Aug |= ACE;
 		}
 		if (augcam_start_exposure ()) {
@@ -1339,20 +1386,27 @@ static gint event_loop (gpointer data)
 	}
 	
 	if (Flags.Aug & AEP) {/* Check for autoguider camera image */
-		if (augcam_image_ready ())
-			Flags.Aug |= AIR;
+		if (augcam_image_ready ()) {
+			Flags.Aug &= ~AEP;
+			if (augcam_capture_exposure ()) {
+				Flags.Aug |= AIR;
+			} else {
+				Flags.Aug |= AGC; /* Error condition - reset checkbox state   */
+				reset_checkbox_state (RCS_USE_AUTOGUIDER, FALSE);
+			}
+		}
 	}
 	
 	if (Flags.Aug & AIR) { /* Autoguider image ready */
-		Flags.Aug &= ~(AIR | AEP);
-		if (augcam_capture_exposure ()) {
+		Flags.Aug &= ~AIR;
+		if (augcam_process_image ()) {
 			Flags.Aug |= ASE;
-		    if (Flags.Aug & ACE) { /* Finished an exposure following telescope*/
-			    Flags.Aug &= ~ACE; /*  motion by the autoguider calibration   */
-			    Flags.Aug |= ACG;  /*  procedure, so store this star position.*/
-			}
+			if (Flags.Aug & ACE) { /* Finished an exposure following telescope*/
+				Flags.Aug &= ~ACE; /*  motion by the autoguider calibration   */
+				Flags.Aug |= ACG;  /*  procedure, so store this star position.*/
+			} 
 		} else {
-			Flags.Aug |= AGC; /* Error condition - reset checkbox state       */
+			Flags.Aug |= AGC; /* Error condition - reset checkbox state   */
 			reset_checkbox_state (RCS_USE_AUTOGUIDER, FALSE);
 		}
 	}
@@ -1447,15 +1501,33 @@ static gint event_loop (gpointer data)
 				Flags.Aug &= ~(AGQ | AGG | ACI);
 				telescope_guide (QUIT, loop_elapsed_since_first_iteration ());
 			}
-			if (!(Flags.Lvw & LVR)) /* Close only if camera not being used  */
-				augcam_close ();    /* by live view                         */
+			if (!(Flags.Lvw & LVR)) {/* Close only if camera not being used by*/
+				if (v4l_thread) {    /*  live view                            */  
+					g_thread_join (v4l_thread);
+					v4l_thread = NULL;
+				}
+				augcam_close ();
+			}
 		}
+	}
+	
+	if (Flags.Aug & AGR) { /* Re-open (V4L only) autoguider camera after     */
+		if ((get_aug_image_struct ())->device == V4L) {/* change of settings */
+			if ((Flags.Aug & AGA) && (Flags.Aug & AVP) && !(Flags.Aug & AGG)) {
+				augcam_close ();
+				augcam_open ();
+				ui_set_augcanv_crosshair (-1, -1);
+				ui_set_augcanv_rect_full_area ();
+				Flags.Aug &= ~(AGR | AVP);
+			}
+		} else
+			Flags.Aug &= ~AGR;
 	}
 	
 	if (Flags.Aug & AGI) { /* Save autoguider image for display and display it*/
 		Flags.Aug &= ~AGI;
 		set_fits_data (get_aug_image_struct (), NULL, 
-			  (get_aug_image_struct ()->exd.FreeRunning ? FALSE : TRUE), FALSE);			
+			  ((get_aug_image_struct())->exd.FreeRunning ? FALSE : TRUE),FALSE);			
 		if (save_file (get_aug_image_struct (), GREY, TRUE))
 			xpa_display_image (get_aug_image_struct (), GREY);
 	}
@@ -1464,7 +1536,7 @@ static gint event_loop (gpointer data)
 		if (Flags.Img & SSA) {
 			Flags.Img &= ~SSA;
 			set_fits_data (get_aug_image_struct (), NULL, 
-			  (get_aug_image_struct ()->exd.FreeRunning ? FALSE : TRUE), FALSE);			
+			  ((get_aug_image_struct())->exd.FreeRunning ? FALSE : TRUE),FALSE);			
 			save_file (get_aug_image_struct (), GREY, FALSE);
 		}
 	}
@@ -1495,7 +1567,7 @@ static gint event_loop (gpointer data)
 	
 	if ((Flags.Foc & FCO) && (Flags.Foc & FAO)) { /* Apply filter focus offset*/
 		if (!(Flags.Foc & FIM)) {
-			apply_filter_focus_offset (cam_type, filter_offset);
+			apply_filter_focus_offset (filter_offset);
 			Flags.Foc &= ~FAO;
 		}
 	}
@@ -1515,7 +1587,7 @@ static gint event_loop (gpointer data)
 	if (Flags.Lvw & LVO) { /* Open live view display */
 		Flags.Lvw &= ~LVO;
 		if (!(Flags.Aug & AGA)) { /* Open only if not already being used by   */
-			if (augcam_open ())   /* autoguider                               */
+			if (augcam_open ())   /*  autoguider                              */
 				Flags.Lvw |= LVR;
 			else {
 			    Flags.Aug |= AGC; /* Error condition - reset checkbox state   */
@@ -1550,7 +1622,7 @@ static gint event_loop (gpointer data)
 			Flags.Lvw &= ~LVR;
 			hide_liveview_window ();
 			if (!(Flags.Aug & AGA)) /* Close only if camera not being used  */
-				augcam_close ();    /* by autoguider                        */
+				augcam_close ();    /*  by autoguider                       */
 		}
 	}
 	#endif /*HAVE_UNICAP*/
@@ -1593,8 +1665,8 @@ static gint event_loop (gpointer data)
 
 	if (Flags.Tel & TGP) { /* Telescope GoTo is in progress */
 		if (timeout (&check_goto_done_t, 5000)) { /* Check every 5s, waiting  */
-			if (telescope_goto_done ())           /* 5s initially to make     */
-				Flags.Tel &= ~TGP;                /* sure GoTo has started!   */
+			if (telescope_goto_done ())           /*  5s initially to make    */
+				Flags.Tel &= ~TGP;                /*  sure GoTo has started!  */
 		}
 	}
 	
@@ -1657,10 +1729,10 @@ static gint event_loop (gpointer data)
 	/***************************************************/
 	
 	if (Flags.Img & SPA) {     /* Save a periodic autoguider image */
-		if (Flags.Aug & AGA) { /* provided autoguider is idle      */
+		if (Flags.Aug & AGA) { /*  provided autoguider is idle     */
 			if (timeout (&save_autog_t, save_period * 1000)) {
 				set_fits_data (get_aug_image_struct (), NULL, 													  
-							  (get_aug_image_struct ()->exd.FreeRunning ? 
+							  ((get_aug_image_struct ())->exd.FreeRunning ? 
 								FALSE : TRUE), FALSE);			
 				if (Flags.Aug & AGG) {
 					if (Flags.Aug & AGE) {

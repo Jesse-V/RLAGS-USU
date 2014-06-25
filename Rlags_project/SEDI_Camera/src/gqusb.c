@@ -4,7 +4,7 @@
 /* All the routines for interfacing with the USB subsystem are contained in   */
 /* this module.                                                               */
 /*                                                                            */
-/* Copyright (C) 2012 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2012 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -38,47 +38,69 @@
 
 #define GQUSB_BULK_TIMEOUT 1000
 
+static struct libusb_context *gqctx;
 static struct libusb_device **devices;
 
 /******************************************************************************/
 /*                           MISCELLANEOUS FUNCTIONS                          */
 /******************************************************************************/
 
-int gqusb_list_devices (int vendor, int pids[], struct libusb_device *devs[]);
-int gqusb_open_device (struct udevice *u_dev);
-void gqusb_close_device (struct udevice *u_dev);
-int gqusb_bulk_read (struct udevice *u_dev, unsigned char *data, int length);
-int gqusb_bulk_write (struct udevice *u_dev, unsigned char *data, int length);
-int gqusb_bulk_write_lock (struct udevice *u_dev, unsigned char *data, 
+void gqusb_init (void);
+void gqusb_exit (void);
+int gqusb_list_devices (int vendor, int maxdev, int pids[], 
+                        struct libusb_device *devs[]);
+int gqusb_open_device (struct usbdevice *u_dev);
+void gqusb_close_device (struct usbdevice *u_dev);
+int gqusb_bulk_read (struct usbdevice *u_dev, unsigned char *data, int length);
+int gqusb_bulk_write (struct usbdevice *u_dev, unsigned char *data, int length);
+int gqusb_bulk_write_lock (struct usbdevice *u_dev, unsigned char *data, 
 						   int length);
-int gqusb_bulk_write_unlock (struct udevice *u_dev, unsigned char *data, 
+int gqusb_bulk_write_unlock (struct usbdevice *u_dev, unsigned char *data, 
 							 int length);
-int gqusb_bulk_io (struct udevice *u_dev, unsigned char *wdata, int wlength,
-										  unsigned char *rdata, int rlength);
+int gqusb_bulk_io (struct usbdevice *u_dev, unsigned char *wdata, int wlength,
+										    unsigned char *rdata, int rlength);
 
 
 /******************************************************************************/
 /*                           MISCELLANEOUS FUNCTIONS                          */
 /******************************************************************************/
 
-int gqusb_list_devices (int vendor, int pids[], struct libusb_device *devs[])
+void gqusb_init (void)
+{
+	/* Initialise libusb */
+	
+	libusb_init (&gqctx);
+    libusb_set_debug (gqctx, 3);
+}
+
+void gqusb_exit (void)
+{
+	/* Close libusb */
+	
+	libusb_exit (gqctx);
+}
+
+int gqusb_list_devices (int vendor, int maxdev, int pids[],
+                        struct libusb_device *devs[])
 {
 	/* Create a list of product id's for all devices that match the given
-	 * vendor id and return the number of such devices found.  Also store
-	 * pointers to each device.
+	 * vendor id and return the number of such devices found, up to a maximum of
+	 * 'maxdev' devices.  Also store pointers to each device.
 	 */
 	 
 	struct libusb_device_descriptor dev_desc;
 	ssize_t num;
 	int i, j = 0;
 	
-	num = libusb_get_device_list (NULL, &devices);
+	num = libusb_get_device_list (gqctx, &devices);
 	if (num > 0) {
 		for (i = 0; i < num; i++) {
 			libusb_get_device_descriptor (devices[i], &dev_desc);
 			if (dev_desc.idVendor == vendor) {
 				pids[j] = dev_desc.idProduct;
 				devs[j++] = devices[i];
+				if (j == maxdev)
+					break;
 			}
 		}
 	} else
@@ -87,7 +109,7 @@ int gqusb_list_devices (int vendor, int pids[], struct libusb_device *devs[])
 	return j;
 }
 
-int gqusb_open_device (struct udevice *u_dev)
+int gqusb_open_device (struct usbdevice *u_dev)
 {
 	/* Open the usb device.  Assumes one configuration, interface and altsetting
 	 * as is appropriate for Starlight Xpress cameras and throws an error if
@@ -188,7 +210,7 @@ int gqusb_open_device (struct udevice *u_dev)
 	return TRUE;
 }
 
-void gqusb_close_device (struct udevice *u_dev)
+void gqusb_close_device (struct usbdevice *u_dev)
 {
 	/* Close the usb device */
 	
@@ -198,7 +220,7 @@ void gqusb_close_device (struct udevice *u_dev)
 	pthread_mutex_destroy (&u_dev->io_mutex);
 }
 
-int gqusb_bulk_read (struct udevice *u_dev, unsigned char *data, int length)
+int gqusb_bulk_read (struct usbdevice *u_dev, unsigned char *data, int length)
 {
 	/* Do a bulk read from the usb device.  libusb_close can hang if a bulk
 	 * read is cancelled part way through, so prevent the calling thread from
@@ -240,7 +262,7 @@ int gqusb_bulk_read (struct udevice *u_dev, unsigned char *data, int length)
 	return TRUE;	
 }
 
-int gqusb_bulk_write (struct udevice *u_dev, unsigned char *data, int length)
+int gqusb_bulk_write (struct usbdevice *u_dev, unsigned char *data, int length)
 {
 	/* Do a bulk write to the usb device.  libusb_close can hang if a bulk
 	 * write is cancelled part way through, so prevent the calling thread from
@@ -277,7 +299,7 @@ int gqusb_bulk_write (struct udevice *u_dev, unsigned char *data, int length)
 	return TRUE;	
 }
 
-int gqusb_bulk_write_lock (struct udevice *u_dev, unsigned char *data, 
+int gqusb_bulk_write_lock (struct usbdevice *u_dev, unsigned char *data, 
 						   int length)
 {
 	/* Do a bulk write to the usb device, locking the mutex and keeping it 
@@ -324,7 +346,7 @@ write_error:
 	return FALSE;
 }
 
-int gqusb_bulk_write_unlock (struct udevice *u_dev, unsigned char *data, 
+int gqusb_bulk_write_unlock (struct usbdevice *u_dev, unsigned char *data, 
 							 int length)
 {
 	/* Do a bulk write to the usb device, then unlock the mutex and reset the
@@ -367,8 +389,8 @@ write_error:
 	return FALSE;
 }
 
-int gqusb_bulk_io (struct udevice *u_dev, unsigned char *wdata, int wlength,
-										  unsigned char *rdata, int rlength)
+int gqusb_bulk_io (struct usbdevice *u_dev, unsigned char *wdata, int wlength,
+										    unsigned char *rdata, int rlength)
 {
 	/* Combined bulk write/read, protected by a mutex to prevent more than one
 	 * thread attempting to read or write to the same camera at the same time.

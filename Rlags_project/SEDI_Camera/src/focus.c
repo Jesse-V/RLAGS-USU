@@ -3,7 +3,7 @@
 /*                                                                            */
 /* All the routines for interacting with the focuser are contained in here.   */
 /*                                                                            */
-/* Copyright (C) 2011 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2011 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -43,8 +43,8 @@ static gfloat current_temp = 0.0, ref_temp = 0.0;
 /*                           MISCELLANEOUS FUNCTIONS                          */
 /******************************************************************************/
 
-gboolean focus_open_focus_port (void);
-void focus_close_focus_port (void);
+gboolean focus_open_comms_port (void);
+void focus_close_comms_port (void);
 gboolean focus_is_moving (void);
 void focus_store_temp_and_pos (void);
 void focus_get_temp_diff_pos (gdouble *temp_diff, gint *pos);
@@ -58,9 +58,9 @@ static gchar *rf_chksum (gchar *string, gchar *c);
 /*                           MISCELLANEOUS FUNCTIONS                          */
 /******************************************************************************/
 
-gboolean focus_open_focus_port (void)
+gboolean focus_open_comms_port (void)
 {
-	/* Open the requested serial port for the focuser */
+	/* Open the requested port for the focuser */
 	
 	struct focus f;
 	
@@ -95,7 +95,7 @@ gboolean focus_open_focus_port (void)
 		f.cmd = FC_VERSION;
 		focus_comms->focus (&f);
 		if (f.Error) {
-			focus_close_focus_port ();
+			focus_close_comms_port ();
 			return show_error (__func__, "Can't find Robofocus!");
 		} else
 			L_print ("Found Robofocus version %.3f\n", f.version);
@@ -108,10 +108,10 @@ gboolean focus_open_focus_port (void)
 	return TRUE;
 }
 
-void focus_close_focus_port (void)
+void focus_close_comms_port (void)
 {
 	/* Close down the communications link with the focuser if it's open and
-	 * nothing else (e.g. telescope commands) is using this link.
+	 * nothing else is using this link.
 	 */
 	 
 	if (!focus_comms->ref_count)  /* Return if not open */

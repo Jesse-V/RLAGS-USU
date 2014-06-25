@@ -4,7 +4,7 @@
 /* This file contains the function prototypes for the interface functions to  */
 /* the QSI API.                                                               */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */

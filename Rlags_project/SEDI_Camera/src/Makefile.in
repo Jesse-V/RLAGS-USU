@@ -67,9 +67,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_GoQat_OBJECTS = interface.$(OBJEXT) ccdcam.$(OBJEXT) \
 	augcam.$(OBJEXT) image.$(OBJEXT) loop.$(OBJEXT) \
 	telescope.$(OBJEXT) serial.$(OBJEXT) gqusb.$(OBJEXT) \
-	focus.$(OBJEXT) tasks.$(OBJEXT) video.$(OBJEXT) \
-	debayer.$(OBJEXT) sx.$(OBJEXT) qsiapi_c.$(OBJEXT) \
-	qsi.$(OBJEXT)
+	filter.$(OBJEXT) focus.$(OBJEXT) tasks.$(OBJEXT) \
+	video.$(OBJEXT) debayer.$(OBJEXT) sx.$(OBJEXT) \
+	qsiapi_c.$(OBJEXT) qsi.$(OBJEXT)
 GoQat_OBJECTS = $(am_GoQat_OBJECTS)
 GoQat_LDADD = $(LDADD)
 GoQat_DEPENDENCIES =
@@ -136,6 +136,8 @@ LIBOBJS = @LIBOBJS@
 LIBRAW1394_CFLAGS = @LIBRAW1394_CFLAGS@
 LIBRAW1394_LIBS = @LIBRAW1394_LIBS@
 LIBS = @LIBS@
+LIBUDEV_CFLAGS = @LIBUDEV_CFLAGS@
+LIBUDEV_LIBS = @LIBUDEV_LIBS@
 LIBUNICAPGTK_CFLAGS = @LIBUNICAPGTK_CFLAGS@
 LIBUNICAPGTK_LIBS = @LIBUNICAPGTK_LIBS@
 LIBUSB_CFLAGS = @LIBUSB_CFLAGS@
@@ -214,6 +216,7 @@ GoQat_SOURCES = \
 	telescope.c \
 	serial.c \
 	gqusb.c \
+	filter.c \
 	focus.c \
 	tasks.c \
 	video.c \
@@ -248,6 +251,7 @@ AM_CPPFLAGS = \
 	@LIBGOOCANVAS_CFLAGS@ \
 	@LIBV4L2_CFLAGS@ \
 	@LIBUSB_CFLAGS@ \
+	@LIBUDEV_CFLAGS@ \
 	@LIBRAW1394_CFLAGS@ \
 	@LIBUNICAPGTK_CFLAGS@ \
 	@LIBGTHREAD_CFLAGS@
@@ -260,6 +264,7 @@ LDADD = \
 	@LIBGOOCANVAS_LIBS@ \
 	@LIBV4L2_LIBS@ \
 	@LIBUSB_LIBS@ \
+	@LIBUDEV_LIBS@ \
 	@LIBRAW1394_LIBS@ \
 	@LIBUNICAPGTK_LIBS@ \
 	@LIBGTHREAD_LIBS@
@@ -370,6 +375,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/augcam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccdcam.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debayer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/focus.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gqusb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/image.Po@am__quote@

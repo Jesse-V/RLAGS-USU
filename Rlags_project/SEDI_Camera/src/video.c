@@ -4,7 +4,7 @@
 /* All the routines for recording/playing back video are contained in this    */
 /* module.  Also contains the routines for video photometry.                  */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -260,7 +260,10 @@ void video_record_stop (void)
 #ifdef HAVE_UNICAP
 void video_buffer_frame (guchar *buffer, struct timeval *fill_time, guint now)
 {
-	/* Buffer every 'save_every' video frames */
+	/* Buffer every 'save_every' video frames.  Note that this buffers only
+	 * the first rp.fr_size bytes of the passed buffer - i.e. enough for one
+	 * byte per pixel greyscale data but no more.
+	 */
 	
 	/*struct cam_img *aug = get_aug_image_struct ();*/
 		
@@ -411,12 +414,12 @@ gboolean video_open_file (gchar *file)
 	vid->canv.r.hbr = rp.h - 1;
 	vid->canv.r.vbr = rp.v - 1;
 	vid->canv.NewRect = FALSE;
-	vid->vadr = NULL;
-    vid->disp_8_3 = NULL;
+	vid->r161 = NULL;
+    vid->disp083 = NULL;
     
 	/* Allocate buffer memory, read and display the first frame */
 	
-	if (!(vid->disp_8_3 = (guchar *) g_malloc0 (vid->exd.h_pix * 
+	if (!(vid->disp083 = (guchar *) g_malloc0 (vid->exd.h_pix * 
 	                                   vid->exd.v_pix * 3 * sizeof (guchar)))) {
         video_close_file ();
 		return show_error (__func__, "Unable to allocate buffer memory");
@@ -436,7 +439,7 @@ gboolean video_open_file (gchar *file)
         
 	memcpy (&rp.tv, rp.vid_buf, sizeof (struct timeval));
 	set_fits_data (vid, &rp.tv, TRUE, FALSE);
-    disp = vid->disp_8_3;
+    disp = vid->disp083;
     val = rp.vid_buf + rp.hd_size;
     for (i = 0; i < rp.fr_size; i++) { /* Expand data to 3 x 8 bits per pixel */
         for (j = 0; j < 3; j++)
@@ -530,7 +533,7 @@ gboolean video_show_frame (guint frame_num)
     
 	memcpy (&rp.tv, rp.vid_buf, sizeof (struct timeval));
 	set_fits_data (vid, &rp.tv, TRUE, FALSE);
-    disp = vid->disp_8_3;
+    disp = vid->disp083;
     val = rp.vid_buf + rp.hd_size;
     for (i = 0; i < rp.fr_size; i++) { /* Expand data to 3 x 8 bits per pixel */
         for (j = 0; j < 3; j++)
@@ -669,9 +672,9 @@ void video_close_file (void)
 		rp.fp = NULL;
 	}
     
-	if (vid->disp_8_3) {
-		g_free (vid->disp_8_3);
-		vid->disp_8_3 = NULL;
+	if (vid->disp083) {
+		g_free (vid->disp083);
+		vid->disp083 = NULL;
 	}
 	
 	if (rp.vid_buf) {
@@ -750,7 +753,7 @@ gboolean video_save_frames (gchar *file, gint filetype, gboolean Range)
 		strcpy (vid->fits.Dec, "");
 		vid->exd.req_len = 0;
 		
-		if (!(vid->vadr = (gushort *) g_malloc0 (vid->exd.h_pix * 
+		if (!(vid->r161 = (gushort *) g_malloc0 (vid->exd.h_pix * 
                                                  vid->exd.v_pix * 
                                                  sizeof (gushort))))
 			return show_error (__func__, "Unable to allocate buffer memory "
@@ -939,16 +942,16 @@ gboolean video_iter_frames (gboolean Final)
 				g_free (rp.savefile);
 				rp.savefile = NULL;
 			}
-			if (vid->vadr) {
-				g_free (vid->vadr);
-				vid->vadr = NULL;
+			if (vid->r161) {
+				g_free (vid->r161);
+				vid->r161 = NULL;
 			}
 			video_action = VA_NONE;
 			return TRUE;
 		}
 
 		/* Save selected frames as FITS files in batches of 10, allowing the
-		 * user to cancel between batches.  Note that vadr is gushort and  
+		 * user to cancel between batches.  Note that r161 is gushort and  
 		 * vid_buf is guchar, so we can't do a memcpy.  Perform photometry on
 		 * saved frames if requested.
 		 */
@@ -978,7 +981,7 @@ gboolean video_iter_frames (gboolean Final)
 				video_show_frame (rp.cur_frame);
 				for (j = 0, r = yo1; r <= yo2; r++)
 					for (c = xo1; c <= xo2; c++)
-						vid->vadr[j++] =rp.vid_buf[(r * rp.h) + c + rp.hd_size];
+						vid->r161[j++] =rp.vid_buf[(r * rp.h) + c + rp.hd_size];
                 image_save_as_fits (vid, rp.savefile, GREY, FALSE);
                 if (!(video_action & VA_PS))
                     L_print ("Saved %s\n", rp.savefile);

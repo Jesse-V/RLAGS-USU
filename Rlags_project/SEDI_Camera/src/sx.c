@@ -4,7 +4,7 @@
 /* All the routines for interfacing with SX hardware are contained in         */
 /* this module.                                                               */
 /*                                                                            */
-/* Copyright (C) 2012 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2012 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -27,29 +27,39 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_LIBUSB
-#define HAVE_SX 1
-#endif
+#define TRUE  1
+#define FALSE 0
 
-#ifdef HAVE_SX
+#define SX_VID 0x1278
 
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "sx.h"
+
+#ifdef HAVE_SX_FILTERWHEEL
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <time.h>
+#include <libudev.h>
+
+#endif /* HAVE_SX_FILTERWHEEL */
+
+#ifdef HAVE_SX_CAM
+
 #include <stdarg.h>
 #include <math.h>
 #include <sys/time.h>
 #include <pthread.h>
 
-#include "sx.h"
 #include "ccd.h"
 #include "telescope.h"
 
-#define TRUE  1
-#define FALSE 0
-
-#define SX_VID 0x1278
 #define SHORT_EXPOSURE 0.1
 
 enum RowData {
@@ -77,21 +87,24 @@ enum SXStatus
 	SXError
 };
 
-
 enum CamType {
 	CCD,
 	AUG
 };
 
-
 int cam_pids[SX_MAX_CAMERAS] = {
 				0x0507,
 				0x0509,
 				0x0517,
+				0x0519,
+				0x0100,
 				0x0115,
 				0x0119,
+				0x0719,
+				0x0720,
 				0x0319,
 				0x0126,
+				0x0127,
 				0x0128,
 				0x0135,
 				0x0136,
@@ -101,14 +114,16 @@ int cam_pids[SX_MAX_CAMERAS] = {
 				0x0374,
 				0x0194,
 				0x0394,
+				0x0198,
+				0x0398,
 				0x0105,
 				0x0107,
 				0x0109,
 				0x0305,
 				0x0307,
+				0x0308,
 				0x0325,
 				0x0326,
-				0x0308,
 				0x0200,
 				0                  /* Zero marks end of list */
 };
@@ -117,28 +132,35 @@ const char cam_descriptions[SX_MAX_CAMERAS][15] = {
 				"Lodestar",
 				"Superstar",
 				"CoStar",
-				"SXVR-H5",
-				"SXVR-H9",
-				"SXVR-H9C",
-				"SXVR-H16",
-				"SXVR-H18",
-				"SXVR-H35",
-				"SXVR-H36",
-				"SXVR-H360",
-				"SXVR-H390",
-				"SXVR-H674",
-				"SXVR-H674C",
-				"SXVR-H694",
-				"SXVR-H694C",
-				"SXVF-M5",
-				"SXVF-M7",
-				"SXVR-M9",
-				"SXVR-M5C",
-				"SXVR-M7C",
-				"SXVR-M25C",
-				"SXVR-M26C",
-				"SXVR-M8C",
-				"SXV-USB2.0"
+				"Oculus",
+				"SXVRH9",
+				"SXVRH5",
+				"SXVRH9",
+				"LuntLSI",
+				"LuntHLSI",
+				"SXVRH9C",
+				"SXVRH16",
+				"SXVRH17",
+				"SXVRH18",
+				"SXVRH35",
+				"SXVRH36",
+				"SXVRH360",
+				"SXVRH390",
+				"SXVRH674",
+				"SXVRH674C",
+				"SXVRH694",
+				"SXVRH694C",
+				"SXVRH814",
+				"SXVRH814C",
+				"SXVFM5",
+				"SXVFM7",
+				"SXVRM9",
+				"SXVRM5C",
+				"SXVRM7C",
+				"SXVRM8C",
+				"SXVRM25C",
+				"SXVRM26C",
+				"SXVInterface"
 };
 
 struct sx_cam *guide_cam = NULL; /* Pointer to whichever camera is used for   */
@@ -148,8 +170,19 @@ struct sx_cam c_cam;      /* This represents the CCD camera.  It can't be     */
                           /* prototypes need to match the ones defined by the */
                           /* QSI API (since I wrote that bit first!).         */
 
+#endif /* HAVE_SX_CAM */
+
+#ifdef HAVE_SX_FILTERWHEEL
+                          
+int fw_fd;                /* File descriptor for filter wheel device node     */
+
+#endif /* HAVE_SX_FILTERWHEEL */
+
+#ifdef HAVE_SX_CAM
+
 /******************************************************************************/
 /*    THE FOLLOWING FUNCTION PROTOTYPES MATCH THOSE DEFINED BY THE QSI API    */
+/*                           FOR CAMERA CONTROL                               */
 /******************************************************************************/
 
 int sx_get_cameras (const char *serial[], const char *desc[], int *num);
@@ -207,27 +240,52 @@ void sxc_set_guide_command_cam (struct sx_cam *cam);
 /******************************************************************************/
 
 extern struct sx_cam *augcam_get_sx_cam_struct (void);
-static int SX_STATUS (struct udevice *u_dev, int OK);
-static void (*error_func) (int *err, const char *func, char *msg);
-void sx_error_func (void (*err_func) (int *err, const char *func, char *msg ));
-struct udevice sx_get_ccdcam_udev (void);
-static int sx_reset (struct udevice *u_dev);
-static char *sx_get_firmware_version (struct udevice *u_dev);
-static int sx_get_camera_info (struct udevice *u_dev, 
+static int SX_STATUS (struct usbdevice *u_dev, int OK);
+struct usbdevice sx_get_ccdcam_usbd (void);
+static int sx_reset (struct usbdevice *u_dev);
+static char *sx_get_firmware_version (struct usbdevice *u_dev);
+static int sx_get_camera_info (struct usbdevice *u_dev, 
 							   struct ccd_capability *cam_cap);
-static int sx_dump_charge (struct udevice *u_dev);
-static int sx_clear_vert (struct udevice *u_dev);
-static int sx_get_row_data (struct udevice *u_dev, enum RowData rows, 
+static int sx_open_shutter (struct usbdevice *u_dev, int HasShutter);
+static int sx_close_shutter (struct usbdevice *u_dev, int HasShutter);
+static int sx_dump_charge (struct usbdevice *u_dev);
+static int sx_clear_vert (struct usbdevice *u_dev);
+static int sx_get_row_data (struct usbdevice *u_dev, enum RowData rows, 
 							unsigned char *buf, long bytes, 
 							unsigned int x, unsigned int y, 
 							unsigned int x_wid, unsigned int y_wid,
 							unsigned int x_bin, unsigned int y_bin);
-static void sx_guide (struct udevice *u_dev, unsigned short cmd);
-static void sx_guide_pulse (struct udevice *u_dev, enum SXGuide cmd,
+static void sx_guide (struct usbdevice *u_dev, unsigned short cmd);
+static void sx_guide_pulse (struct usbdevice *u_dev, enum SXGuide cmd,
 							int duration);
-static int sx_set_cooling (struct udevice *u_dev, struct cooler *cool);
+static int sx_set_cooling (struct usbdevice *u_dev, struct cooler *cool);
 static void *sx_expose (void *data);
+static void delay (struct usbdevice *u_dev, struct timespec *length);
 static unsigned short int torben (unsigned short int m[], int n);
+
+#endif /* HAVE_SX_CAM */
+
+#ifdef HAVE_SX_FILTERWHEEL
+
+/******************************************************************************/
+/* THE FOLLOWING FUNCTION PROTOTYPES ARE FOR FILTER WHEEL CONTROL             */
+/******************************************************************************/
+ 
+int sxf_get_filterwheels (const char *devnode[], const char *desc[], int *num);
+int sxf_connect (int connect, const char *devnode);
+int sxf_set_filter_pos (unsigned short pos);
+unsigned short sxf_get_filter_pos (void);
+
+#endif /* HAVE_SX_FILTERWHEEL */
+
+/******************************************************************************/
+/*                           ERROR HANDLING                                   */
+/******************************************************************************/
+
+static void (*error_func) (int *err, const char *func, char *msg);
+void sx_error_func (void (*err_func) (int *err, const char *func, char *msg ));
+
+#ifdef HAVE_SX_CAM
 
 
 /******************************************************************************/
@@ -356,7 +414,6 @@ void sx_guide_stop (enum TelMotion direction)
 	sxc_guide_stop (direction);	
 }
 
-
 /******************************************************************************/
 /* THE FOLLOWING FUNCTIONS MATCH THOSE ABOVE BUT WITH THE ADDITION OF A       */
 /* CAMERA POINTER AS THE FIRST PARAMETER.  THIS ENABLES US TO DISTINGUISH     */
@@ -366,19 +423,28 @@ void sx_guide_stop (enum TelMotion direction)
 int sxc_get_cameras (struct sx_cam *cam, const char *serial[], 
 					 const char *desc[], int *num)
 {
-	/* Return a list of detected cameras and the total number found */
+	/* Return a list of detected cameras and the total number found.  On entry, 
+	 * 'num' is the maximum number of cameras to search for.  On return, 'num' 
+	 * is the actual number found. 
+	 */
 	
 	int i = 0, j = 0, k = 0, nd;
 	int pids[SX_MAX_CAMERAS];
 	static char s[SX_MAX_CAMERAS][15];
 	
-	if ((nd = gqusb_list_devices (SX_VID, pids, cam->sxcams)) < 0)
+	*num = *num > SX_MAX_CAMERAS ? SX_MAX_CAMERAS : *num;
+	if ((nd = gqusb_list_devices (SX_VID, *num, pids, cam->sxcams)) < 0)
 		return FALSE;
-
+		
+	/* Note below that the synthetic serial number must be the index of the
+	 * device in the pids array returned by gqusb_list_devices; otherwise GoQat
+	 * may not find the correct device when it tries to open it.
+	 */
+		
 	while (cam_pids[i++]) {
 		for (k = 0; k < nd; k++) {
 			if (cam_pids[i - 1] == pids[k]) {
-				sprintf (s[j], "#%02d", j);  /* synthetic serial number */
+				sprintf (s[j], "#%02d", k);  /* synthetic serial number */
 				serial[j] = &s[j][0];
 				desc[j] = cam_descriptions[i - 1];
 				cam->idx[j] = i - 1;
@@ -396,16 +462,16 @@ int sxc_connect (struct sx_cam *cam, int connect, const char *serial)
 	/* Connect/disconnect the camera */
 	
 	if (connect) {
-		if (cam->udev.id == 0) { /* Only need to do this for main camera */
-			cam->udev.dev = cam->sxcams[strtol (serial+1, NULL, 10)];
-			cam->udev.idx = cam->idx[strtol (serial+1, NULL, 10)];
-			if (!SX_STATUS (&cam->udev, gqusb_open_device (&cam->udev)))
+		if (cam->usbd.id == 0) { /* Only need to do this for main camera */
+			cam->usbd.dev = cam->sxcams[strtol (serial+1, NULL, 10)];
+			cam->usbd.idx = cam->idx[strtol (serial+1, NULL, 10)];
+			if (!SX_STATUS (&cam->usbd, gqusb_open_device (&cam->usbd)))
 				return FALSE;
 		}
-		sx_reset (&cam->udev);
+		sx_reset (&cam->usbd);
 		cam->status = SXIdle;
 	} else {
-		gqusb_close_device (&cam->udev);
+		gqusb_close_device (&cam->usbd);
 		if (cam->all_buf) {
 			free (cam->all_buf);
 			cam->all_buf = NULL;
@@ -436,9 +502,8 @@ int sxc_get_cap (struct sx_cam *cam, struct ccd_capability *cam_cap)
 	long buf_size; 
 	char *c;
 	
-	strcpy (cam_cap->camera_name, cam_descriptions[cam->udev.idx]);
+	strcpy (cam_cap->camera_name, cam_descriptions[cam->usbd.idx]);
 	//strcpy (cam_cap->camera_desc, ""); /* Already set by calling routine */
-	strcpy (cam_cap->camera_snum, "");
 	cam_cap->max_well = 0;
 	cam_cap->e_adu = 0;
 	cam_cap->max_binh = 8;
@@ -447,21 +512,21 @@ int sxc_get_cap (struct sx_cam *cam, struct ccd_capability *cam_cap)
 	cam_cap->max_exp = 86400.0;
 	cam_cap->CanAsymBin = 1;
 	cam_cap->CanGetCoolPower = 0;  /* May be able to with recent models    */
-	cam_cap->CanSetCCDTemp = 0;    /* Set by user in camera config. dialog */
 	cam_cap->CanAbort = 1;
 	cam_cap->CanStop = 1;
 	cam_cap->HasFilterWheel = 0;
-	cam_cap->HasShutter = 0;
-	if (cam->udev.id == 0) {  /* Only need to do this for main camera */
-		if ((c = sx_get_firmware_version (&cam->udev)) == NULL)
+	if (cam->usbd.id == 0) {  /* Only need to do this for main camera */
+		if ((c = sx_get_firmware_version (&cam->usbd)) == NULL)
 			return FALSE;
 		strcpy (cam_cap->camera_dinf, c);
 	}
-	if (!sx_get_camera_info (&cam->udev, cam_cap))
+	if (!sx_get_camera_info (&cam->usbd, cam_cap))
 		return FALSE;
 	cam->ip.max_x = cam_cap->max_h;
 	cam->ip.max_y = cam_cap->max_v;
+	cam->cool.CanSetCCDTemp = cam_cap->CanSetCCDTemp;
 	cam->bitspp = cam_cap->bitspp;
+	cam->SXShutter = cam_cap->HasShutter;
 	cam->SXInterlaced = cam_cap->IsInterlaced;
 	cam->SXColour = cam_cap->IsColour;
 	
@@ -505,8 +570,6 @@ int sxc_set_state (struct sx_cam *cam, enum CamState state, int ival,
 	/* Set the camera state */
 	
 	switch (state) {
-		case S_CANCOOL:
-			cam->cool.CanSetCCDTemp = ival;
 		case S_TEMP:
 			/* Store the requested CCD temperature */
 			cam->cool.req_temp = dval;
@@ -514,7 +577,7 @@ int sxc_set_state (struct sx_cam *cam, enum CamState state, int ival,
 		case S_COOL:
 			/* Turn cooling on or off */
 			cam->cool.req_coolstate = ival;
-			sx_set_cooling (&cam->udev, &cam->cool);
+			sx_set_cooling (&cam->usbd, &cam->cool);
 			break;
 		case S_INVERT:
 			/* Set flag to invert image or not */
@@ -530,7 +593,7 @@ int sxc_get_state (struct sx_cam *cam, struct ccd_state *state, int AllSettings)
 {
 	/* Check and return the camera state */
 	
-	if (cam->udev.err)
+	if (cam->usbd.err)
 		cam->status = SXError;
 		
 	switch (cam->status) {
@@ -558,7 +621,7 @@ int sxc_get_state (struct sx_cam *cam, struct ccd_state *state, int AllSettings)
 	}
 	
 	if (cam->cool.CanSetCCDTemp) {
-		sx_set_cooling (&cam->udev, &cam->cool);
+		sx_set_cooling (&cam->usbd, &cam->cool);
 		state->CoolState = cam->cool.act_coolstate;
 		state->c_ccd = cam->cool.act_temp;
 		state->c_amb = state->c_ccd;
@@ -576,8 +639,8 @@ int sxc_set_imagearraysize (struct sx_cam *cam, long x, long y, long x_wid,
 	 * the Lodestar at least.
 	 */
 	
-	cam->ip.x = cam->ip.max_x - (unsigned int) x - (unsigned int) x_wid;
-	cam->ip.y = cam->ip.max_y - (unsigned int) y - (unsigned int) y_wid;
+	cam->ip.x = (unsigned int) x;
+	cam->ip.y = (unsigned int) y;
 	cam->ip.x_wid = (unsigned int) x_wid;
 	cam->ip.y_wid = (unsigned int) y_wid;
 	cam->ip.x_bin = (unsigned int) x_bin;
@@ -628,10 +691,12 @@ int sxc_cancel_exposure (struct sx_cam *cam)
 	 */
 	
 	if (!cam->sx_expose_thread)
-		return FALSE;
+		return TRUE;
 
 	if (pthread_cancel (cam->sx_expose_thread) == 0) {
 		pthread_join (cam->sx_expose_thread, NULL);
+		cam->sx_expose_thread = 0;
+		cam->status = SXIdle;
 		return TRUE;
 	} else {
 		return FALSE;
@@ -650,9 +715,9 @@ int sxc_interrupt_exposure (struct sx_cam *cam)
 		
 	if (pthread_cancel (cam->sx_expose_thread) == 0) {
 		pthread_join (cam->sx_expose_thread, NULL);
-		sx_clear_vert (&cam->udev);
+		sx_clear_vert (&cam->usbd);
 		cam->Expose = FALSE;
-		return (pthread_create (&cam->sx_expose_thread, NULL, 
+		return (pthread_create (&cam->sx_expose_thread, NULL,
 								&sx_expose, cam) == 0);
 	} else
 		return FALSE;
@@ -662,12 +727,11 @@ int sxc_get_imageready (struct sx_cam *cam, int *ready)
 {
 	/* Returns TRUE when an image has been read from the camera */
 	
-	/* Should check remaining exposure time and call sx_clear_vert if fewer   */
-	/* than e.g. 10s remain?                                                  */
-	 
 	*ready = cam->ImageReady;
-	if (*ready)   /* Release thread resources */
+	if (*ready) {  /* Release thread resources */
 		pthread_join (cam->sx_expose_thread, NULL);
+		cam->sx_expose_thread = 0;
+	}
 		
 	return TRUE;
 }
@@ -720,13 +784,13 @@ void sxc_pulseguide (enum TelMotion direction, int duration)
 		return;
 	
 	if (direction & TM_NORTH)
-		sx_guide_pulse (&guide_cam->udev, SXNorth, duration);
+		sx_guide_pulse (&guide_cam->usbd, SXNorth, duration);
 	if (direction & TM_SOUTH)
-		sx_guide_pulse (&guide_cam->udev, SXSouth, duration);
+		sx_guide_pulse (&guide_cam->usbd, SXSouth, duration);
 	if (direction & TM_EAST)
-		sx_guide_pulse (&guide_cam->udev, SXEast, duration);
+		sx_guide_pulse (&guide_cam->usbd, SXEast, duration);
 	if (direction & TM_WEST)
-		sx_guide_pulse (&guide_cam->udev, SXWest, duration);
+		sx_guide_pulse (&guide_cam->usbd, SXWest, duration);
 }
 
 void sxc_guide_start (enum TelMotion direction)
@@ -737,13 +801,13 @@ void sxc_guide_start (enum TelMotion direction)
 		return;
 	
 	if (direction & TM_NORTH)
-		sx_guide (&guide_cam->udev, SXNorth);
+		sx_guide (&guide_cam->usbd, SXNorth);
 	if (direction & TM_SOUTH)
-		sx_guide (&guide_cam->udev, SXSouth);
+		sx_guide (&guide_cam->usbd, SXSouth);
 	if (direction & TM_EAST)
-		sx_guide (&guide_cam->udev, SXEast);
+		sx_guide (&guide_cam->usbd, SXEast);
 	if (direction & TM_WEST)
-		sx_guide (&guide_cam->udev, SXWest);
+		sx_guide (&guide_cam->usbd, SXWest);
 }
 
 void sxc_guide_stop (enum TelMotion direction)
@@ -754,13 +818,13 @@ void sxc_guide_stop (enum TelMotion direction)
 		return;
 		
 	if (direction & TM_NORTH)
-		sx_guide (&guide_cam->udev, (SXStop | SXNorth));
+		sx_guide (&guide_cam->usbd, (SXStop | SXNorth));
 	if (direction & TM_SOUTH)
-		sx_guide (&guide_cam->udev, (SXStop | SXSouth));
+		sx_guide (&guide_cam->usbd, (SXStop | SXSouth));
 	if (direction & TM_EAST)
-		sx_guide (&guide_cam->udev, (SXStop | SXEast));
+		sx_guide (&guide_cam->usbd, (SXStop | SXEast));
 	if (direction & TM_WEST)
-		sx_guide (&guide_cam->udev, (SXStop | SXWest));
+		sx_guide (&guide_cam->usbd, (SXStop | SXWest));
 }
 
 void sxc_set_guide_command_cam (struct sx_cam *cam)
@@ -775,12 +839,11 @@ void sxc_set_guide_command_cam (struct sx_cam *cam)
 		guide_cam = cam;
 }
 
-
 /******************************************************************************/
 /*                           MISCELLANEOUS FUNCTIONS                          */
 /******************************************************************************/
 
-static int SX_STATUS (struct udevice *u_dev, int OK)
+static int SX_STATUS (struct usbdevice *u_dev, int OK)
 {
 	/* Prints error message and returns FALSE if OK == FALSE */
 
@@ -796,24 +859,17 @@ static int SX_STATUS (struct udevice *u_dev, int OK)
 	}
 }
 
-void sx_error_func (void (*err_func) (int *err, const char *func, char *msg ))
+struct usbdevice sx_get_ccdcam_usbd (void)
 {
-	/* Set the error function callback */
-	
-	error_func = err_func;
-}
-
-struct udevice sx_get_ccdcam_udev (void)
-{
-	/* Return the udevice part of the ccd camera structure for use by the
+	/* Return the usbdevice part of the ccd camera structure for use by the
 	 * autoguiding code if it is using a guide head attached to the main
 	 * camera.
 	 */
 	 
-	return c_cam.udev;
+	return c_cam.usbd;
 }
 
-static int sx_reset (struct udevice *u_dev)
+static int sx_reset (struct usbdevice *u_dev)
 {
 	/* Reset the camera */
 	
@@ -834,7 +890,7 @@ static int sx_reset (struct udevice *u_dev)
 	return TRUE;
 }
 
-static char *sx_get_firmware_version (struct udevice *u_dev)
+static char *sx_get_firmware_version (struct usbdevice *u_dev)
 {
 	/* Get firmware version */
 	
@@ -858,14 +914,16 @@ static char *sx_get_firmware_version (struct udevice *u_dev)
 							   ((uint8_t) ReadBlock[3] << 8),
 							   (uint8_t) ReadBlock[0] |
 							   ((uint8_t) ReadBlock[1]));
+
 	return version;
 }
 
-static int sx_get_camera_info (struct udevice *u_dev, 
+static int sx_get_camera_info (struct usbdevice *u_dev, 
 							   struct ccd_capability *cam_cap)
 {
 	/* Get camera details */
 
+	unsigned short modnum;
 	unsigned char CommandBlock[12];
 	unsigned char ReadBlock[512];
 	
@@ -883,7 +941,16 @@ static int sx_get_camera_info (struct udevice *u_dev,
 	if (!SX_STATUS (u_dev, gqusb_bulk_io(u_dev, CommandBlock, 8, ReadBlock, 2)))
 		return FALSE;
 	
-	cam_cap->IsInterlaced = ReadBlock[0] & 0x40 ? TRUE : FALSE;
+	modnum = ReadBlock[0] | (ReadBlock[1] << 8);
+	sprintf (cam_cap->camera_snum, "%d", modnum);
+	
+	cam_cap->IsInterlaced = modnum & 0x40 ? TRUE : FALSE;
+	if (modnum == 0x84)
+		cam_cap->IsInterlaced = TRUE;
+	modnum &= 0x1F;
+	if (modnum == 0x16 || modnum == 0x17 || modnum == 0x18 || modnum == 0x19)
+		cam_cap->IsInterlaced = FALSE;
+	
 	cam_cap->IsColour = ReadBlock[0] & 0x80 ? TRUE : FALSE;
 	
 	/* CCD parameters... */
@@ -927,11 +994,65 @@ static int sx_get_camera_info (struct udevice *u_dev,
 	
 	/* Pulse guide? */
 	cam_cap->CanPulseGuide = ReadBlock[16] & 0x01 ? TRUE : FALSE;
+	/* Cooler? */
+	cam_cap->CanSetCCDTemp = ReadBlock[16] & 0x10 ? TRUE : FALSE;
+	/* Shutter? */
+	cam_cap->HasShutter = ReadBlock[16] & 0x20 ? TRUE : FALSE;
 	
 	return TRUE;	
 }
 
-static int sx_dump_charge (struct udevice *u_dev)
+static int sx_open_shutter (struct usbdevice *u_dev, int HasShutter)
+{
+	/* Open the camera shutter (if there is one) */
+	
+	unsigned char CommandBlock[8];
+	unsigned char ReadBlock[2];
+	
+	if (HasShutter) {
+		CommandBlock[0] = 64;
+		CommandBlock[1] = 32;
+		CommandBlock[2] = 0;
+		CommandBlock[3] = 64;
+		CommandBlock[4] = 0;
+		CommandBlock[5] = 0;
+		CommandBlock[6] = 0;
+		CommandBlock[7] = 0;
+		
+		if (!SX_STATUS (u_dev, gqusb_bulk_io (u_dev, CommandBlock, 8, 
+		                                             ReadBlock, 2)))
+			return FALSE;
+	}
+	
+	return TRUE;
+}
+
+static int sx_close_shutter (struct usbdevice *u_dev, int HasShutter)
+{
+	/* Close the camera shutter (if there is one) */
+	
+	unsigned char CommandBlock[8];
+	unsigned char ReadBlock[2];
+	
+	if (HasShutter) {
+		CommandBlock[0] = 64;
+		CommandBlock[1] = 32;
+		CommandBlock[2] = 0;
+		CommandBlock[3] = 128;
+		CommandBlock[4] = 0;
+		CommandBlock[5] = 0;
+		CommandBlock[6] = 0;
+		CommandBlock[7] = 0;
+		
+		if (!SX_STATUS (u_dev, gqusb_bulk_io (u_dev, CommandBlock, 8, 
+		                                             ReadBlock, 2)))
+			return FALSE;
+	}
+	
+	return TRUE;
+}
+
+static int sx_dump_charge (struct usbdevice *u_dev)
 {
 	/* Dump the charge in all pixels */
 	
@@ -952,7 +1073,7 @@ static int sx_dump_charge (struct udevice *u_dev)
 	return TRUE;
 }
 
-static int sx_clear_vert (struct udevice *u_dev)
+static int sx_clear_vert (struct usbdevice *u_dev)
 {
 	/* Clear the vertical registers of thermal charge */
 	
@@ -962,7 +1083,7 @@ static int sx_clear_vert (struct udevice *u_dev)
 	CommandBlock[1] = 1;
 	CommandBlock[2] = 8;
 	CommandBlock[3] = 0;
-	CommandBlock[4] = 0;
+	CommandBlock[4] = u_dev->id;
 	CommandBlock[5] = 0;
 	CommandBlock[6] = 0;
 	CommandBlock[7] = 0;
@@ -973,7 +1094,7 @@ static int sx_clear_vert (struct udevice *u_dev)
 	return TRUE;
 }
 
-static int sx_get_row_data (struct udevice *u_dev, enum RowData rows, 
+static int sx_get_row_data (struct usbdevice *u_dev, enum RowData rows, 
 							unsigned char *buf, long bytes, 
 							unsigned int x, unsigned int y, 
 							unsigned int x_wid, unsigned int y_wid,
@@ -1009,7 +1130,7 @@ static int sx_get_row_data (struct udevice *u_dev, enum RowData rows,
 	return TRUE;
 }
 
-static void sx_guide (struct udevice *u_dev, unsigned short cmd)
+static void sx_guide (struct usbdevice *u_dev, unsigned short cmd)
 {
 	/* Start or stop guide motions in the requested direction.  Guide commands
 	 * sent using this routine are not protected by a mutex, so they can occur
@@ -1037,7 +1158,7 @@ static void sx_guide (struct udevice *u_dev, unsigned short cmd)
 	SX_STATUS (u_dev, gqusb_bulk_io (u_dev, CommandBlock, 8, NULL, 0));
 }
 
-static void sx_guide_pulse (struct udevice *u_dev, enum SXGuide cmd,
+static void sx_guide_pulse (struct usbdevice *u_dev, enum SXGuide cmd,
 							int duration)
 {
 	/* Pulse guide with timing done here.  The mutex controlling access to the
@@ -1074,20 +1195,20 @@ static void sx_guide_pulse (struct udevice *u_dev, enum SXGuide cmd,
 	}
 }
 
-static int sx_set_cooling (struct udevice *u_dev, struct cooler *cool)
+static int sx_set_cooling (struct usbdevice *u_dev, struct cooler *cool)
 {
 	/* Start or stop the cooling at the desired temperature */
 	
 	unsigned char CommandBlock[8];
 	unsigned char ReadBlock[3];
 	int cool_temp;
-
+	
 	cool_temp = (int) rint (10.0 * (273.0 + cool->req_temp));
 
 	CommandBlock[0] = 64;
 	CommandBlock[1] = 30;
-	CommandBlock[2] = cool_temp - ((cool_temp >> 8) << 8);
-	CommandBlock[3] = cool_temp >> 8;
+	CommandBlock[2] = cool_temp & 0xFF;
+	CommandBlock[3] = (cool_temp >> 8) & 0xFF;
 	CommandBlock[4] = cool->req_coolstate;
 	CommandBlock[5] = 0;
 	CommandBlock[6] = 0;
@@ -1095,7 +1216,7 @@ static int sx_set_cooling (struct udevice *u_dev, struct cooler *cool)
 	
 	if (!SX_STATUS(u_dev, gqusb_bulk_io (u_dev, CommandBlock, 8, ReadBlock, 3)))
 		return FALSE;
-		
+	
 	cool->act_temp = (double)((ReadBlock[1] << 8) + ReadBlock[0] - 2730) / 10.0;
 	cool->act_coolstate = ReadBlock[2] > 0 ? 1 : 0;
 	
@@ -1142,13 +1263,15 @@ static void *sx_expose (void *params)
 		buf_size = 2 * x_wid * y_wid;
 		
 		if (cam->Expose) { /* ...otherwise, just read the chip */ 
-			sx_dump_charge (&cam->udev);
+			sx_dump_charge (&cam->usbd);
 			gettimeofday (&start, NULL);
-			nanosleep (&length, NULL);
+			sx_open_shutter (&cam->usbd, cam->SXShutter);
+			delay (&cam->usbd, &length);
 		}
+		sx_close_shutter (&cam->usbd, cam->SXShutter);
 		gettimeofday (&stop, NULL);
 		cam->status = SXReading;
-		sx_get_row_data (&cam->udev, SXAllRows,
+		sx_get_row_data (&cam->usbd, SXAllRows,
 						 cam->all_buf, buf_size, 
 						 cam->ip.x, cam->ip.y, 
 						 cam->ip.x_wid, cam->ip.y_wid, 
@@ -1197,18 +1320,22 @@ static void *sx_expose (void *params)
 			 
 			if (cam->ip.req_len < SHORT_EXPOSURE) {
 				if (cam->Expose) { /* No point in permitting user to interrupt*/
-					sx_dump_charge (&cam->udev);  /* such a short exposure    */
+					sx_dump_charge (&cam->usbd);  /* such a short exposure    */
 					gettimeofday (&start, NULL);
+					sx_open_shutter (&cam->usbd, cam->SXShutter);
 					nanosleep (&length, NULL);
+					sx_close_shutter (&cam->usbd, cam->SXShutter);
 					gettimeofday (&stop, NULL);
-					sx_get_row_data (&cam->udev, SXOddRows,
+					sx_get_row_data (&cam->usbd, SXOddRows,
 									 cam->all_buf, buf_size, 
 									 cam->ip.x, cam->ip.y,
 									 cam->ip.x_wid, cam->ip.y_wid, 
 									 cam->ip.x_bin, cam->ip.y_bin);
-					sx_dump_charge (&cam->udev);
+					sx_dump_charge (&cam->usbd);
+					sx_open_shutter (&cam->usbd, cam->SXShutter);
 					nanosleep (&length, NULL);
-					sx_get_row_data (&cam->udev, SXEvenRows,
+					sx_close_shutter (&cam->usbd, cam->SXShutter);
+					sx_get_row_data (&cam->usbd, SXEvenRows,
 									 cam->all_buf+buf_size, buf_size, 
 									 cam->ip.x, cam->ip.y, 
 									 cam->ip.x_wid, cam->ip.y_wid, 
@@ -1217,19 +1344,20 @@ static void *sx_expose (void *params)
 			} else {
 	
 				if (cam->Expose) { /* ...otherwise, just read the chip */
-					sx_dump_charge (&cam->udev);
+					sx_dump_charge (&cam->usbd);
 					gettimeofday (&start, NULL);
-					nanosleep (&length, NULL);
+					sx_open_shutter (&cam->usbd, cam->SXShutter);
+					delay (&cam->usbd, &length);
 				}
-				//gettimeofday (&stop, NULL);  /*** Option A (see below) ***/
+				sx_close_shutter (&cam->usbd, cam->SXShutter);
 				cam->status = SXReading;
-				sx_get_row_data (&cam->udev, SXOddRows,
+				sx_get_row_data (&cam->usbd, SXOddRows,
 								 cam->all_buf, buf_size, 
 								 cam->ip.x, cam->ip.y, 
 								 cam->ip.x_wid, cam->ip.y_wid, 
 								 cam->ip.x_bin, cam->ip.y_bin);
-				gettimeofday (&stop, NULL);    /*** Option B (see below) ***/
-				sx_get_row_data (&cam->udev, SXEvenRows,
+				gettimeofday (&stop, NULL);
+				sx_get_row_data (&cam->usbd, SXEvenRows,
 								 cam->all_buf+buf_size, buf_size, 
 								 cam->ip.x, cam->ip.y, 
 								 cam->ip.x_wid, cam->ip.y_wid, 
@@ -1260,24 +1388,14 @@ static void *sx_expose (void *params)
 					
 			/* Optionally invert the image if requested.
 			 * Scale the odd and even fields to the same median value to
-			 * allow for differences in exposure length.  There are two ways to 
-			 * do this:-
-			 * Option A: 
-			 * Scale the longer exposure so that it matches the shorter
-			 * exposure.  This then gives an effective exposure length equal to
-			 * the requested value.  The disadvantage is that saturated values
-			 * can't reliably be scaled down and in places where the longer
-			 * field exposure saturated and the shorter one didn't, this looks
-			 * ugly.
-			 * Option B:
-			 * Scale the shorter exposure so that it matches the longer
-			 * exposure.  This then gives an effective exposure length longer
-			 * than the requested value by an amount equal to the time to read
-			 * the shorter field exposure (slightly more than 0.1s).  But values
-			 * in the shorter exposure can be scaled up and capped at the
+			 * allow for differences in exposure length.  In practice we scale 
+			 * the shorter exposure so that it matches the longer exposure.  
+			 * This then gives an effective exposure length longer than the 
+			 * requested value by an amount equal to the time to read the 
+			 * shorter field exposure (slightly more than 0.1s).  Values
+			 * in the shorter exposure are scaled up and capped at the
 			 * maximum permissible value (typically 65535) and this gives a
-			 * clean-looking image even in the saturated parts.  So option B is
-			 * implemented here.
+			 * clean-looking image even in the saturated parts.
 			 * Note that this simple scaling procedure scales bias + signal, 
 			 * rather than scaling just the signal and then adding it onto the 
 			 * bias, but the error is small.  Note also that field scaling 
@@ -1290,23 +1408,30 @@ static void *sx_expose (void *params)
 			i = cam->InvertImage ? x_wid * (2 * y_wid - 2) : 0;
 			for (v = 0; v < y_wid; v++) {
 				for (h = 0; h < x_wid; h++) {
-					/*** Option A ***/
-					//int val1;
-					//val = cam->e_buf[(v + 1) * x_wid - (h + 1)];
-					///* For exposures < SHORT_EXPOSURE, ratio could be greater
-					 //* than or less than 1, so we have to allow for that here.
-					 //*/
-					//val1 = val / ratio < maxval ? val / ratio : maxval;
-					//cam->img_buf[i++] = val < maxval ? val1 : maxval;
-					/*** Option B ***/
-					cam->img_buf[i++] = cam->e_buf[(v + 1) * x_wid - (h + 1)];
+					if (!cam->InvertImage) {
+						val = cam->o_buf[(v + 1) * x_wid - (h + 1)];
+						if (ratio >= 1)
+							val = val * ratio < maxval ? val * ratio : maxval;
+						cam->img_buf[i++] = val;
+					} else {
+						val = cam->e_buf[(v + 1) * x_wid - (h + 1)];
+						if (ratio < 1)
+							val = val / ratio < maxval ? val / ratio : maxval;
+						cam->img_buf[i++] = val;
+					}
 				}
 				for (h = 0; h < x_wid; h++) {
-					/*** Option A ***/
-					//cam->img_buf[i++] = cam->o_buf[(v + 1) * x_wid - (h + 1)];
-					/*** Option B ***/
-					val = ratio * cam->o_buf[(v + 1) * x_wid - (h + 1)];
-					cam->img_buf[i++] = val > maxval ? maxval : val;
+					if (!cam->InvertImage) {
+						val = cam->e_buf[(v + 1) * x_wid - (h + 1)];
+						if (ratio < 1)
+							val = val / ratio < maxval ? val / ratio : maxval;
+						cam->img_buf[i++] = val;
+					} else {
+						val = cam->o_buf[(v + 1) * x_wid - (h + 1)];
+						if (ratio >= 1)
+							val = val * ratio < maxval ? val * ratio : maxval;
+						cam->img_buf[i++] = val;
+					}
 				}
 				i -= cam->InvertImage ? 4 * x_wid : 0;
 			}
@@ -1327,13 +1452,15 @@ static void *sx_expose (void *params)
 			buf_size = 2 * x_wid * y_wid;
 			
 			if (cam->Expose) { /* ...otherwise, just read the chip */ 
-				sx_dump_charge (&cam->udev);
+				sx_dump_charge (&cam->usbd);
 				gettimeofday (&start, NULL);
-				nanosleep (&length, NULL);
+				sx_open_shutter (&cam->usbd, cam->SXShutter);
+				delay (&cam->usbd, &length);
 			}
+			sx_close_shutter (&cam->usbd, cam->SXShutter);
 			gettimeofday (&stop, NULL);
 			cam->status = SXReading;
-			sx_get_row_data (&cam->udev, SXAllRows,
+			sx_get_row_data (&cam->usbd, SXAllRows,
 							 cam->all_buf, buf_size, 
 							 cam->ip.x, cam->ip.y, 
 							 cam->ip.x_wid, cam->ip.y_wid, 
@@ -1366,6 +1493,36 @@ static void *sx_expose (void *params)
 					 (start.tv_sec + start.tv_usec/1.e6);
 	cam->status = SXIdle;
 	cam->ImageReady = TRUE;
+}
+
+static void delay (struct usbdevice *u_dev, struct timespec *length)
+{
+	/* Delay execution of the calling thread by the given amount.  If the
+	 * requested value is longer than 5 seconds, then at 5 seconds before the
+	 * end, clear the thermal charge from the CCD storage registers and then
+	 * finish the delay.
+	 */
+	 
+	struct timespec now, end;
+	
+	if (length->tv_sec < 5) {
+		nanosleep (length, NULL);
+	} else {
+		/* CLOCK_MONOTONIC would be better below, but not sure which versions of
+		 * Linux support it.
+		 */
+		clock_gettime (CLOCK_REALTIME, &now);
+		end.tv_sec = now.tv_sec + length->tv_sec;
+		end.tv_nsec = now.tv_nsec + length->tv_nsec;
+		if (end.tv_nsec > 999999999L) {
+			end.tv_nsec -= 1000000000L;
+			end.tv_sec++;
+		}
+		length->tv_sec -= 5;
+		nanosleep (length, NULL);
+		sx_clear_vert (u_dev);
+		clock_nanosleep (CLOCK_REALTIME, TIMER_ABSTIME, &end, NULL);
+	}
 }
 
 /*
@@ -1409,4 +1566,210 @@ static unsigned short int torben (unsigned short int m[], int n)
 	else return mingtguess;
 }
 
-#endif /* HAVE_SX */
+#endif /* HAVE_SX_CAM */
+
+#ifdef HAVE_SX_FILTERWHEEL
+
+/******************************************************************************/
+/*           THE FOLLOWING FUNCTIONS ARE FOR FILTER WHEEL CONTROL             */
+/******************************************************************************/
+ 
+int sxf_get_filterwheels (const char *devnode[], const char *desc[], int *num)
+{
+	/* Return device nodes and descriptions for any filter wheels found, as well
+	 * as the number found.  On entry, 'num' is the maximum number of filter
+	 * wheels to search for.  On return, 'num' is the actual number found. The 
+	 * following is based on the example code by Alan Ott, Signal 11 Software.
+	 */
+	 
+	#define MAX_STRING 128
+	 
+	struct udev *udev;
+	struct udev_enumerate *enumerate;
+	struct udev_list_entry *devices, *dev_list_entry;
+	struct udev_device *hiddev, *usbdev;
+
+	int j;
+	const char *path;
+	static char dn[SX_MAX_FILTERWHEELS][MAX_STRING];
+	static char ds[SX_MAX_FILTERWHEELS][MAX_STRING];
+	
+	/* Create a new udev object */
+	
+	udev = udev_new ();
+	if (!udev) {
+		error_func ((int *) 1, __func__, "Unable to search for device nodes");
+		return FALSE;
+	}
+	
+	/* Create a list of the devices in the 'hidraw' subsystem. */
+	
+	enumerate = udev_enumerate_new (udev);
+	udev_enumerate_add_match_subsystem (enumerate, "hidraw");
+	udev_enumerate_scan_devices (enumerate);
+	devices = udev_enumerate_get_list_entry (enumerate);
+	
+	/* udev_list_entry_foreach is a macro that expands to a loop. The loop will 
+	 * be executed for each member in devices, setting dev_list_entry to a list 
+	 * entry that contains the device's path in /sys.
+	 */
+	
+	j = 0; 
+	*num = *num > SX_MAX_FILTERWHEELS ? SX_MAX_FILTERWHEELS : *num;
+	udev_list_entry_foreach (dev_list_entry, devices) {
+		
+		/* Get the filename of the /sys entry for the device and create a 
+		 * udev_device object (dev) representing it.
+		 */
+		 
+		path = udev_list_entry_get_name (dev_list_entry);
+		hiddev = udev_device_new_from_syspath (udev, path);
+
+		/* The device pointed to by dev contains information about the hidraw 
+		 * device. To get information about the USB device, get the parent 
+		 * device with the subsystem/devtype pair of "usb"/"usb_device". This 
+		 * will be several levels up the tree, but the function will find it.
+		 */
+		 
+		usbdev = udev_device_get_parent_with_subsystem_devtype (hiddev, "usb",
+		                                                          "usb_device");
+		if (!usbdev) {
+			error_func ((int *) 1, __func__, "Unable to find USB device");
+			return FALSE;
+		}
+	
+		/* Call get_sysattr_value() for each file in the device's /sys entry. 
+		 * The strings passed into these functions (idProduct, idVendor, serial,
+		 * etc.) correspond directly to the files in the /sys directory that
+		 * represents the USB device.
+		 */
+		 
+		if (strtol (udev_device_get_sysattr_value (
+		                      usbdev, "idVendor"), NULL, 16) == (long) SX_VID) {
+			strncpy (dn[j], udev_device_get_devnode(hiddev), MAX_STRING);
+			snprintf (ds[j], MAX_STRING, "%s:%s %s %s %s\n",
+						 udev_device_get_sysattr_value (usbdev, "idVendor"),
+						 udev_device_get_sysattr_value (usbdev, "idProduct"),
+						 udev_device_get_sysattr_value (usbdev, "manufacturer"),
+						 udev_device_get_sysattr_value (usbdev, "product"),
+						 udev_device_get_sysattr_value (usbdev, "serial"));
+							 
+			devnode[j] = &dn[j][0];
+			desc[j] = &ds[j][0];
+			j++;
+		}
+		udev_device_unref (hiddev);
+		if (j == *num)
+			break;  
+	}
+	udev_enumerate_unref (enumerate);
+	udev_unref (udev);
+	*num = j;
+	
+	return TRUE;
+}
+
+int sxf_connect (int connect, const char *devnode)
+{
+	/* Open/Close the given device node */
+	
+	if (connect) {
+		if ((fw_fd = open (devnode, O_RDWR | O_NONBLOCK)) < 0) {
+			error_func ((int *) 1, __func__, "Error opening device node");
+			error_func ((int *) 1, __func__, strerror (errno));
+			return FALSE;
+		}
+	} else { /* Assume we're being asked to close the node that we opened */
+		if (close (fw_fd) < 0) {
+			error_func ((int *) 1, __func__, "Error closing device node");
+			error_func ((int *) 1, __func__, strerror (errno));
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+int sxf_set_filter_pos (unsigned short pos)
+{
+	/* Set the current filter wheel position */
+	
+	unsigned short wait_fw;
+	int ret;
+	char buf[3];
+	
+	wait_fw = 10;  /* Allow time for wheel to get to new position */
+	while (wait_fw--) {
+		buf[0] = 0;
+		buf[1] = (char) pos;
+		buf[2] = 0;
+		if (write (fw_fd, buf, 3) < 0) {
+			error_func ((int *) 1, __func__, "Error setting filter position");
+			error_func ((int *) 1, __func__, strerror (errno));
+			return FALSE;
+		}
+		sleep (1);
+		
+		ret = read (fw_fd, buf, 2);
+		if (ret < 0 && ret != EAGAIN) {
+			error_func ((int *) 1, __func__, "Error reading filter position");
+			error_func ((int *) 1, __func__, strerror (errno));
+			return FALSE;
+		}
+		if (buf[0] == pos) /* 0 if FW moving; otherwise buf[0] is filter pos. */
+			return TRUE;
+	}
+	
+	error_func ((int *) 1, __func__, "Timeout waiting for filter position");
+	return FALSE;
+}
+
+unsigned short sxf_get_filter_pos (void)
+{
+	/* Return the current filter wheel position */
+	
+	struct timespec length;
+	unsigned short wait_fd;
+	int ret;
+	char buf[3];
+	
+	buf[0] = 0;
+	buf[1] = 0;
+	buf[2] = 0;
+	
+	if (write (fw_fd, buf, 3) < 0) {
+		error_func ((int *) 1, __func__, "Error requesting filter position");
+		error_func ((int *) 1, __func__, strerror (errno));
+		return 0;
+	}
+	
+	/* Wait for multiples of 1 ms */
+	
+	length.tv_nsec = 1e+06;
+	length.tv_sec = 0;
+	wait_fd = 10;
+	while (wait_fd--) {
+		nanosleep (&length, NULL);
+		ret = read (fw_fd, buf, 2);
+		if (ret < 0 && ret != EAGAIN) {
+			error_func ((int *) 1, __func__, "Error reading filter position");
+			error_func ((int *) 1, __func__, strerror (errno));
+			return 0;
+		}
+		if (buf[0] > 0) /* 0 if FW moving; otherwise buf[0] is filter position*/
+			return (unsigned short) buf[0];
+	}
+	
+	error_func ((int *) 1, __func__, "Timeout waiting for filter position");
+	return 0;
+}
+
+#endif /* HAVE_SX_FILTERWHEEL */
+
+void sx_error_func (void (*err_func) (int *err, const char *func, char *msg ))
+{
+	/* Set the error function callback */
+	
+	error_func = err_func;
+}
+
+

@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Main header file for GoQat.                                                */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -34,8 +34,12 @@
 #define HAVE_QSI 1
 #endif
 
+#ifdef HAVE_LIBUDEV
+#define HAVE_SX_FILTERWHEEL 1
+#endif
+
 #ifdef HAVE_LIBUSB
-#define HAVE_SX 1
+#define HAVE_SX_CAM 1
 #endif
 
 #ifdef HAVE_LIBUNICAP
@@ -62,9 +66,9 @@
 
 #define CCD_PAGE 0               /* UI notebook pages                         */
 #define AUG_PAGE 1
-#define FOC_PAGE 2
-#define FIL_PAGE 3
-#define GEM_PAGE 4
+#define TEL_PAGE 2
+#define FOC_PAGE 3
+#define FIL_PAGE 4
 #define TAS_PAGE 5
 #define NO_PAGE  999             /* Set to any value > no. notebook pages.    */
 #define TSK_PAGE 1000            /* String is from task list,not notebook page*/
@@ -93,11 +97,15 @@
 #define MOV_MAX 21600.0
 #define MOV_DEF 1.0
 
-#define MAX_FILTERS 8            /* Maximum number of filters in wheel        */
-#define MAX_CAMERAS 128          /* Maximum number of cameras                 */
+#define MAX_DEVICES 128          /* Maximum number of devices                 */
+                                 /* (cameras, filter wheels etc)              */
+                                 
+#define MAX_VIDITEMS 50          /* Maximum no. video standards/inputs        */
 
 #define NUMTPARAMS 10            /* Number of task params (%1, %2 etc)        */
 #define SIZETPARAMS 128          /* Storage (gchar) for each task parameter   */
+
+#define MCSL 80         /* Maximum configuration string length for R_config_s */
 
 								 /* Writing to log                            */
 #define L_print(string, args...) WriteLog(g_strdup_printf(string, ##args))
@@ -113,14 +121,15 @@ enum CamType {                   /* Camera/image data ID's                    */
     VID                          /* Video data captured via live view window  */
 };
 
-enum CamDevice {                 /* Camera/imaging devices                    */
-    NO_CAM,
+enum HWDevice {                  /* Hardware device types                     */
+    NO_DEV,
 	QSI, 
 	SX,
 	SX_GH,
 	OTHER, 
 	UNICAP, 
-	V4L
+	V4L,
+	INTERNAL
 };
 
 enum ZoomType {                  /* Possible autoguider canvas zoom modes     */
@@ -211,6 +220,7 @@ enum CheckBox {				     /* Application check boxes/toggle buttons    */
 	RCS_OPEN_COMMS_LINK, 
 	RCS_OPEN_CCD_LINK, 
 	RCS_OPEN_AUTOG_LINK,
+	RCS_OPEN_FILTER_LINK,
 	RCS_OPEN_FOCUS_LINK,
 	RCS_OPEN_PARPORT,
 	RCS_PEC_ON,
@@ -224,21 +234,24 @@ enum CheckBox {				     /* Application check boxes/toggle buttons    */
 };
 
 struct main_menu {               /* State of various main menu items          */
-	gchar telescope_port[32];
+	gchar telescope_port[MCSL];
 	gboolean OpenTelPort;
 	gboolean Gemini;
-	gchar autoguider_port[32];
+	gchar autoguider_port[MCSL];
 	gboolean OpenAutogPort;
-	gchar focus_port[32];
+	gchar filterwheel_port[MCSL];
+	gboolean OpenFilterwheelPort;
+	gchar focus_port[MCSL];
 	gboolean OpenFocusPort;
 	gboolean OpenParPort;
-	gchar ccd_camera[32];
+	gchar ccd_camera[MCSL];
 	gboolean OpenCCDCam;
 	gboolean FullFrame;
-	gchar debayer[32];
-	gchar aug_camera[32];
-	gchar greyscale[32];
-	gchar focuser[32];
+	gchar debayer[MCSL];
+	gchar aug_camera[MCSL];
+	gchar greyscale[MCSL];
+	gchar filterwheel[MCSL];
+	gchar focuser[MCSL];
 	gboolean PEC;
 	gboolean Precess;
 	gboolean UTC;
@@ -247,6 +260,17 @@ struct main_menu {               /* State of various main menu items          */
 };
 
 struct main_menu menu;           /* State of various main menu items          */
+
+struct device_selection {        /* Info. for devices selected via menu       */
+	const char *id[MAX_DEVICES];    /* Serial no. or other identifier         */
+	const char *desc[MAX_DEVICES];  /* Device description                     */
+	char lid[MAX_DEVICES][256];     /* Local copy of serial/identifier        */
+	char ldesc[MAX_DEVICES][256];   /* Local copy of device description       */
+	gshort *idx;/* The index of the selected device in the id and desc arrays */
+	gint num;                       /* Number of devices found                */
+};
+
+struct device_selection ds;
 
 struct exposure_data {           /* Camera exposure data                      */
     gdouble req_len;             /* Requested length of exposure (s)          */
@@ -346,10 +370,10 @@ struct canvas {                  /* Image display canvas features             */
 };	
 
 struct dark_frame {              /* Dark frame data                           */
-	 /* dvadr is 16-bit greyscale data to be used as a dark frame.  It points
+	 /* dk161 is 16-bit greyscale data to be used as a dark frame.  It points
 	  * to allocated memory.
 	  */
-	gushort *dvadr;              /* Dark exposure (16 bit grey)               */
+	gushort *dk161;              /* Dark exposure (16 bit grey)               */
 	gushort num;                 /* Number of exposures for average dark frame*/
 	gboolean Capture;            /* Set flag to capture dark exposure         */	
 	gboolean Subtract;           /* TRUE to subtract dark frame               */
@@ -383,6 +407,7 @@ struct autog_config {            /* Autoguider configuration data             */
 
 struct autog_params {            /* Autoguider parameters                     */
 	struct autog_config s;       /* Autoguider configuration                  */
+	gushort worm_pos;            /* Telescope drive RA worm position          */
 	gboolean Write;              /* TRUE writes guide star posn. data to file */
 	gboolean Worm;               /* TRUE writes RA worm pos. as well as above */
 	gboolean Guide;				 /* Set flag if autoguiding is active         */
@@ -401,31 +426,58 @@ struct SAO_DS9 {                 /* DS9 image display data                    */
     FILE *stream;                /* File pipe stream for DS9 process          */
 	gchar *window;               /* DS9 window name                           */
 	gchar *display;              /* Path for image file for display in DS9    */
+	gboolean Invert_h;           /* Invert DS9 -> camera h coordinate mapping */
+	gboolean Invert_v;           /* Invert DS9 -> camera h coordinate mapping */
 };
-
-struct V4L_buffers {             /* Video buffers for V4L autog. image capture*/
-	gint pixfmt;
-	gint num;
+                                 /* Video data, mostly for V4L autoguider     */
+struct video_data {              /*  image capture, but some Unicap stuff too */  
+	struct {
+		gint selected;           /* Selected item                             */
+		gint num;                /* Total number of available items           */
+		guint64 id[MAX_VIDITEMS];/* IDs of available items                    */
+		gchar name[MAX_VIDITEMS][128];/* Names of available items             */
+	} vid_std;                   /* Video standards                           */
+	struct {
+		gint selected;
+		gint num;
+		gchar name[MAX_VIDITEMS][128];
+	} vid_input;                 /* Video inputs                              */
 	struct {
 		void *start;
 		size_t length;
-	} *buffers;
+	} *buffers;                  /* Video buffers                             */
+	struct {
+		GStaticMutex mutex;
+		gint size;
+		guchar *buffer[2];
+		guchar *alloc;
+	} fifo;                      /* FIFO for buffered V4L frames              */
+	gushort byte_incr;           /* Number of bytes per pixel                 */
+	gushort byte_offset;         /* Offset to first 'Y' data in image         */
+	gint type;                   /* Type of data: 1-2 byte grey, 3 byte colour*/             
+	gint pixfmt;                 /* Selected pixel format (fourcc)            */
+	gint width;                  /* Image width                               */
+	gint height;                 /* Image height                              */
+	gint size;                   /* Image size (bytes)                        */
+	gint bufnum;                 /* Number of video buffers / buffer number   */
+	guint frames_tot;            /* Total number of frames received           */
+	guint frames_drop;           /* Total number of frames dropped            */
+	gfloat fps;                  /* Frames per second                         */
+	gchar card[128];             /* Card/device name                          */
+	gboolean HasVideoStandard;   /* TRUE if the device can set video standards*/
 };
 
 struct cam_img {                 /* Camera/image data                         */
 	#ifdef HAVE_UNICAP
-	unicap_handle_t u_handle;    /* Unicap video data (autoguider)            */
-	unicap_device_t u_device;    /* Unicap video data                         */
-	unicap_format_t u_format;    /* Unicap video data                         */
-	unicap_format_t u_format_spec;/* Unicap video data                        */
-    unicap_property_t u_property; /* Unicap video data                        */
-	unicap_data_buffer_t u_buffer;/* Unicap video data                        */
-	unicap_data_buffer_t *u_returned_buffer; /* Unicap video data             */
+	unicap_handle_t ucp_handle;  /* Unicap video data (autoguider)            */
+	unicap_device_t ucp_device;  /* Unicap video data                         */
+	unicap_format_t ucp_format;  /* Unicap video data                         */
+	unicap_format_t ucp_format_spec;/* Unicap video data                      */
     GtkWidget *ugtk_display;     /* Unicap video data                         */
 	GtkWidget *ugtk_window;      /* Unicap video data                         */
 	gboolean Record;             /* TRUE if recording video stream to disk    */
 	#endif
-	struct V4L_buffers vid_buf;  /* V4L2 video buffer data                    */
+	struct video_data vid_dat;  /* Mostly V4L2 video data                     */
 	struct ccd_capability cam_cap;    /* CCD camera capability (see ccd.h)    */	
 	struct ccd_state state;      /* CCD camera state and status               */
 	struct exposure_data exd;    /* Camera exposure data                      */
@@ -447,49 +499,67 @@ struct cam_img {                 /* Camera/image data                         */
 	 /* Function to be called to get state of this camera                     */
 	int (*get_state) (struct ccd_state *state, gboolean AllSettings, ...);
 	GtkWidget *aug_window;       /* Pointer to autoguider image window        */
-	 /* vadr is raw 16-bit greyscale data from the main CCD or autoguider
-	  * camera.  However, note that only the eight least-significant bits may be
-	  * used for some autoguider camera data.  It points to allocated memory.
-	  * bvadr is raw 16-bit debayered data derived from vadr in RGB format.  It 
-	  * points to allocated memory.
-	  * For CCD camera data, disp_16_1 is the (possibly) manipulated 16-bit 
-	  * greyscale data for display, derived from vadr.  It points to allocated 
-	  * memory.
-	  * For autoguider camera data, disp_16_1 stores a copy of the (possibly)
-	  * manipulated data in full 16-bit precision - the images are
-	  * actually displayed on the canvas in 8-bit precision using disp_8_3
-	  * (see below).
-	  * disp_16_3 is the (possibly) manipulated debayered 16-bit colour data for
-	  * display, derived from bvadr.  It points to allocated memory.
-	  */
-	gushort *vadr;               /* Raw 16-bit grey image data (CCD or Autog) */
-	gushort *bvadr;              /* Raw 16-bit debayered image data (CCD)     */
-	gushort *disp_16_1;          /* Manipulated 16-bit grey data for display  */
-	gushort *disp_16_3;          /* Manipulated 16-bit RGB data for display   */
+	/*                     
+	 * CCD camera as main camera:
+	 * 
+	 * r161  -   RAW greyscale data up to 16-bit depth.  This is displayed in 
+	 *           DS9 unless FullFrame is TRUE, but it is always saved as the 
+	 *           named FITS file if requested, irrespective of the FullFrame 
+	 *           setting.
+	 * db163 -   A debayered version of r161 in RGB format up to 16-bit depth.  
+	 *           This is displayed in DS9 unless FullFrame is TRUE, but it is 
+	 *           always saved as the named FITS file if requested, irrespective 
+	 *           of the FullFrame setting.  (In practice, for a colour image, 
+	 *           this is saved as three separate FITS files representing the R, 
+	 *           G and B components).
+	 * ff161 -   A full frame version of r161.  If r161 is a subframe, then 
+	 *           r161 is embedded in ff161 if FullFrame is TRUE.  In this case,
+	 *           ff161 is displayed in DS9 (via an intermediate FITS file) 
+	 *           rather than r161.
+	 * ff163 -   A full frame version of db163 containing db163 embedded in it
+	 *           (if db163 is a subframe) and displayed in DS9 via an 
+	 *           intermediate FITS file instead of db163, if FullFrame is TRUE.
+	 * 
+	 * CCD camera as autoguider camera:
+	 * 
+	 * r161  -   RAW greyscale data up to 16-bit depth.  This is not saved as a 
+	 *           named FITS file.
+	 * ff161 -   A full frame version of r161 that may have been dark 
+	 *           subtracted or had values below the specified background level 
+	 *           set to zero.  This is not saved as a named FITS file.
+	 * 
+	 * Other autoguider devices (webcams, frame-grabbers etc):
+	 * 
+	 * r083  -   8-bit image data containing up to 3 bytes per pixel, obtained
+	 *           from the device driver/library (and hence may not be truly 
+	 *           raw).  This is not saved as a named FITS file.
+	 * ff161 -   A full frame version of r083 that has been converted to 16-bit
+	 *           greyscale and may have been dark subtracted or had values below
+	 *           the specified background level set to zero.  This is not saved 
+	 *           as a named FITS file.
+	 * 
+	 * All autoguider devices:
+	 * 
+	 * disp083 - 8-bit image data containing 3 bytes per pixel.  This is a 
+	 *           greyscale conversion of ff161, with each group of three bytes 
+	 *           the same value.  This is required for plotting on the image 
+	 *           canvas which only accepts images in RGB format.  For CCD 
+	 *           cameras used as autoguider cameras, disp083 may be gamma 
+	 *           corrected in addition to any modifications already in ff161.
+	 *           This greyscale data is saved as the named FITS file if 
+	 *           requested.
+	 */
+	gushort *r161;               /* Raw 16-bit grey image data                */
+	gushort *db163;              /* 16-bit debayered RGB image data           */
+	gushort *ff161;              /* Full frame (possibly modified) 16-bit grey*/
+	gushort *ff163;              /* Full frame 16-bit debayered RGB data      */
 	enum CamType id;             /* Identifier for this data structure        */
 	gshort devnum;               /* Device number in list of possible devices */
 	gint fd;                     /* File descriptor for driver file           */
-	enum CamDevice device;       /* Type of camera or video input device      */
+	enum HWDevice device;        /* Type of camera or video input device      */
 	gint bayer_pattern;          /* The bayer pattern (see debayer_get_tile)  */
-	 /* idp is the current image data pointer for raw autoguider camera images
-	  * from V4L devices or grabbed from video cameras and may point to raw data
-	  * in various formats.  For V4L devices, idp is a pointer into the buffer 
-	  * area.  The convert_to_grey routine derives RGB data from it (if not 
-	  * already RGB format) and greyscale data is obtained from the RGB.  idp 
-	  * does not have memory allocated by GoQat associated with it.
-	  */
-	guchar *idp;                 /* Image data pointer for autoguider camera  */
-	 /* rgb is autoguider camera data in three bytes-per-pixel RGB format.  The
-	  * RGB data is obtained directly from the autoguider camera or from idp via
-	  * the convert_to_grey routine if the raw data is not already in RGB 
-	  * format.  It points to allocated memory.
-	  */
-	guchar *rgb;                 /* 8-bit RGB colour data for autoguider cam. */
-	 /* disp_8_3 is the (possibly) manipulated three bytes-per-pixel data 
-	  * derived from rgb in greyscale format, i.e. each of the three bytes per 
-	  * pixel has the same value.  It points to allocated memory.
-	  */
-	guchar *disp_8_3;            /* Manipulated 8-bit RGB (grey) display data */
+	guchar *r083;                /* Raw data for (non-CCD) autoguider devices */
+	guchar *disp083;             /* Manipulated 8-bit RGB (grey) display data */
 	gboolean Open;               /* Set flag if camera open                   */
 	gboolean Expose;             /* Set flag if CCD/autog exposure in progress*/
 	gboolean Debayer;            /* Set flag to debayer the raw data          */
@@ -498,6 +568,7 @@ struct cam_img {                 /* Camera/image data                         */
 	gboolean AutoSave;           /* Flag to indicate if image to be autosaved */
 	gboolean SavePeriodic;       /* Flag to indicate image periodically saved */
 	gboolean FileSaved;          /* Flag to indicate current image is saved   */
+	gboolean Display;            /* Set flag to display image                 */
 	gboolean Beep;               /* Set flag to beep at end of exposure       */
 	gboolean Error;              /* Set flag to indicate an error condition in*/
 	                             /*  cases where it is not possible to do this*/
@@ -540,7 +611,7 @@ extern void set_range_minmaxstep (enum Range range, gdouble min, gdouble max,
 								  gdouble step, gushort dp);
 extern void set_range_value (enum Range range, gboolean Sensitive, 
 							 gdouble value);
-extern void ui_set_aug_window_controls (enum CamDevice dev, gboolean Binning);
+extern void ui_set_aug_window_controls (enum HWDevice dev, gboolean Binning);
 extern void set_elapsed_time (guint elapsed);
 extern void ui_set_augcanv_rect_colour (gchar *colour);
 extern void set_fits_data (struct cam_img *img, struct timeval *time, 
@@ -551,6 +622,7 @@ extern void get_autog_guide_params (void);
 extern void get_autog_movespeed (gboolean *CenterSpeed, gfloat *speed);
 extern void set_autog_sensitive (gboolean sensitive, gboolean autogopened);
 extern void set_autog_calibrate_done (void);
+extern gboolean ui_control_action (gchar *cmd, gchar *token);
 extern gboolean ui_show_augcanv_image (void);
 extern void ui_show_augcanv_rect (gboolean Show);
 extern void ui_set_augcanv_rect_colour (gchar *colour);
@@ -577,16 +649,17 @@ extern gboolean save_file (struct cam_img *img, enum Colour colour,
 extern void file_saved (struct cam_img *img, gboolean saved);
 extern void ui_show_aug_window (void);
 extern void ui_hide_aug_window (void);
-extern void select_device (struct cam_img *img, gint num);
+extern void select_device (void);
 extern void get_ccd_image_params (struct exposure_data *exd);
 extern void set_camera_state (struct cam_img *img);
-extern gboolean set_filter (enum CamType type, gchar *filter, gint *fo_diff);
+extern gboolean get_V4L_settings (gchar *device);
+extern gboolean set_filter (gboolean ForceInternal,gchar *filter,gint *fo_diff);
 extern gboolean get_apply_filter_offset (void);
-extern void apply_filter_focus_offset (enum CamType type, gint offset);
+extern void apply_filter_focus_offset (gint offset);
 extern void set_ccd_deftemp (void);
 extern gboolean show_camera_status (gboolean show);
-extern gchar *get_filter_info (struct cam_img *img, gint pos, gchar *filter,
-	                           gint *offset);
+extern gboolean get_filter_info (struct cam_img *img, gchar *filter, gint *pos, 
+	                             gint *offset);
 extern void check_focuser_temp (void);
 extern void save_PEC_guide_speed (gfloat GuideSpeed);
 extern void save_RA_worm_pos (gushort WormPos);
@@ -628,7 +701,7 @@ GtkWidget *xml_get_widget (GtkBuilder *xml, const gchar *name);
 #define GOQAT_CCDCAM
 
 extern void ccdcam_init (void);
-extern gboolean ccdcam_get_cameras (gint *num);
+extern gboolean ccdcam_get_cameras (void);
 extern gboolean ccdcam_open (void);
 extern gboolean ccdcam_close (void);
 extern void ccdcam_set_exposure_data (struct exposure_data *exd);
@@ -636,7 +709,8 @@ extern gboolean ccdcam_start_exposure (void);
 extern gboolean ccdcam_cancel_exposure (void);
 extern gboolean ccdcam_interrupt_exposure (void);
 extern gboolean ccdcam_image_ready (void);
-extern gboolean ccdcam_capture_exposure (void);
+extern gboolean ccdcam_download_image (void);
+extern gboolean ccdcam_process_image (void);
 extern gboolean ccdcam_debayer (void);
 extern gboolean ccdcam_set_temperature (gboolean *AtTemperature);
 extern void ccdcam_set_fast_readspeed (gboolean Set);
@@ -661,18 +735,22 @@ extern gboolean augcam_close (void);
 extern gboolean augcam_start_exposure (void);
 extern gboolean augcam_image_ready (void);
 extern gboolean augcam_capture_exposure (void);
+extern gboolean augcam_process_image (void);
 extern void augcam_set_camera_binning (gushort h_bin, gushort v_bin);
 extern gboolean augcam_set_vidval (enum Range range, gdouble value);
 extern gboolean augcam_write_starpos_time (void);
-extern gboolean augcam_write_starpos (gushort WormPos);
+extern gboolean augcam_write_starpos (void);
 extern void augcam_read_dark_frame (void);
 extern void augcam_flush_dark_frame (void);
 #ifdef HAVE_UNICAP
 extern void augcam_unicap_new_frame_cb (unicap_event_t event, 
 		  unicap_handle_t handle, unicap_data_buffer_t *buffer, gpointer *data);
 #endif
-#ifdef HAVE_SX
-extern gboolean augcam_get_sx_cameras (int *num);
+#ifdef HAVE_LIBV4L2
+gboolean augcam_grab_v4l_buffer (void);
+#endif
+#ifdef HAVE_SX_CAM
+extern gboolean augcam_get_sx_cameras (void);
 extern struct sx_cam *augcam_get_sx_cam_struct (void);
 #endif
 extern struct cam_img *get_aug_image_struct (void);
@@ -729,6 +807,7 @@ extern void loop_ccd_autofocus (gboolean Start, gdouble LHSlope,
 								gdouble exp_len, gint box);
 extern void loop_ccd_temps (gboolean display, guint period);
 extern void loop_autog_open (gboolean Open);
+extern void loop_autog_restart (void);
 extern void loop_autog_calibrate (gboolean Calibrate);
 extern void loop_autog_exposure_wait (gboolean Wait, enum MotionDirection dirn);
 extern void loop_autog_guide (gboolean guide);
@@ -737,7 +816,7 @@ extern void loop_autog_DS9 (void);
 extern void loop_focus_open (gboolean Open);
 extern void loop_focus_stop (void);
 extern gboolean loop_focus_is_focusing (void);
-extern void loop_focus_apply_filter_offset (enum CamType type, gint offset);
+extern void loop_focus_apply_filter_offset (gint offset);
 extern void loop_focus_apply_temp_comp (gint pos);
 extern void loop_focus_check_done (void);
 extern void loop_LiveView_open (gboolean open);
@@ -770,8 +849,8 @@ extern guint loop_elapsed_since_first_iteration (void);
 extern void telescope_init (void);
 extern gboolean telescope_open_comms_port (void);
 extern void telescope_close_comms_port (void);
-extern gboolean telescope_open_autog_port (void);
-extern void telescope_close_autog_port (void);
+extern gboolean telescope_open_guide_port (void);
+extern void telescope_close_guide_port (void);
 #ifdef HAVE_LIBPARAPIN
 extern gboolean telescope_open_parallel_port (void);
 #endif
@@ -838,14 +917,31 @@ extern gint s_read (gint file, gchar string[], gint bytes);
 extern gint s_write (gint file, gchar string[], gint bytes);
 	
 #endif /* GOQAT_SERIAL */
+
+/* filter wheels */
+
+#ifndef GOQAT_FILTER
+#define GOQAT_FILTER
+
+extern void filter_init (void);
+extern void filter_set_device (enum HWDevice dev);
+extern gboolean filter_get_filterwheels (void);
+extern gshort *get_filter_devnumptr (void);
+extern gboolean filter_open_comms_port (void);
+extern gboolean filter_close_comms_port (void);
+extern gboolean filter_is_open (void);
+extern gboolean filter_set_filter_pos (gushort pos);
+extern gushort filter_get_filter_pos (void);
+
+#endif /* GOQAT_FILTER */
 	
 /* focussing */
 	
 #ifndef GOQAT_FOCUS
 #define GOQAT_FOCUS
 	
-extern gboolean focus_open_focus_port (void);
-extern void focus_close_focus_port (void);
+extern gboolean focus_open_comms_port (void);
+extern void focus_close_comms_port (void);
 extern gboolean focus_is_moving (void);
 extern void focus_store_temp_and_pos (void);
 extern void focus_get_temp_diff_pos (gdouble *temp_diff, gint *pos);

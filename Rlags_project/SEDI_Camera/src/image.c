@@ -5,7 +5,7 @@
 /* also handles all the communication with DS9 via the XPA mechanism, and     */
 /* contains the generic Grace plotting routines.                              */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -31,9 +31,9 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <locale.h>
-#include <string.h>
 #include <math.h>
 #ifdef HAVE_LIBGRACE_NP
 #include <grace_np.h>
@@ -199,6 +199,9 @@ gboolean xpa_display_image (struct cam_img *img, enum Colour colour)
 	gchar *ds9_id, *ds9_cmd;
 	static gdouble DS9_zoom = 0.0, DS9_panx = 0.0, DS9_pany = 0.0;
 	
+	if (!img->Display)
+		return TRUE;
+	
 	/* Store the current zoom and pan */
     
 	ds9_id = (img->id == CCD ? (gchar *) DS9_CCD : (gchar *) DS9_AUG);
@@ -208,8 +211,9 @@ gboolean xpa_display_image (struct cam_img *img, enum Colour colour)
 		if (messages[i] == NULL) {
 			DS9_zoom = strtod (bufs[i], (gchar **) NULL);
 			g_free (bufs[i]);
-		} else
+		} else {
 			L_print ("{r}XPA error: %s (%s)\n", messages[i], names[i]);
+		}
 		if (names[i])
 			g_free (names[i]);
 		if (messages[i])
@@ -222,8 +226,9 @@ gboolean xpa_display_image (struct cam_img *img, enum Colour colour)
 			DS9_panx = strtod (bufs[i], &pany);
 			DS9_pany = strtod (++pany, (gchar **) NULL);
 			g_free (bufs[i]);
-		} else
+		} else {
 			L_print ("{r}XPA error: %s (%s)\n", messages[i], names[i]);
+		}
 		if (names[i])
 			g_free (names[i]);
 		if (messages[i])
@@ -234,7 +239,7 @@ gboolean xpa_display_image (struct cam_img *img, enum Colour colour)
 	
 	if (!xpa_check_ds9_open (img))
 		return FALSE;
-	
+		
 	/* Create new frame if required */
 	
 	switch (colour) {
@@ -328,6 +333,7 @@ gboolean xpa_display_image (struct cam_img *img, enum Colour colour)
          */
 														  
 		if (DS9NewFrame) {
+			setlocale (LC_NUMERIC, "C");
 			if (img->FullFrame) {
 				if (DS9_zoom == 0.0) /* Pan and zoom not initialised yet */
 					ds9_cmd = g_strdup_printf ("pan to %d %d", 
@@ -354,6 +360,7 @@ gboolean xpa_display_image (struct cam_img *img, enum Colour colour)
 				g_free (ds9_cmd);
 			}			
 			
+			setlocale (LC_NUMERIC, "");
 			DS9NewFrame = FALSE;
 		}
 	} else {
@@ -363,7 +370,10 @@ gboolean xpa_display_image (struct cam_img *img, enum Colour colour)
 	
 	return TRUE;
 	#else
-		return show_error (__func__, "GoQat was compiled without xpa support "
+	if (!img->Display)
+		return TRUE;
+		
+	return show_error (__func__, "GoQat was compiled without xpa support "
 						                              "- can't display image!");
 	#endif
 }
@@ -397,10 +407,12 @@ gboolean xpa_get_rect_coords (gfloat *x, gfloat *y, gfloat *w, gfloat *h)
 			box = g_strstr_len (bufs[i], lens[i], "box(");/* First defined*/
 			if (box == NULL)                              /*  box         */
 				goto no_region;
-			*x = strtod (box+4, &endy);
-        	*y = strtod (++endy, &endw);
-			*w = strtod (++endw, &endh);	
+			setlocale (LC_NUMERIC, "C");  /* DS9 always returns box coords    */
+			*x = strtod (box+4, &endy);   /*  with dots as decimal separator  */
+        	*y = strtod (++endy, &endw);  /*  irrespective of locale, so need */
+			*w = strtod (++endw, &endh);  /*  to force "C" locale here        */	
 			*h = strtod (++endh, (gchar **) NULL);
+			setlocale (LC_NUMERIC, "");
 			g_free (bufs[i]);
 		} else
 			L_print ("{r}XPA error: %s (%s)\n", messages[i], names[i]);
@@ -575,7 +587,7 @@ gboolean image_calc_hist_and_flux (void)
 	
 	for (v = vc1, i = 1; v <= vc2; v++, i += 4)
 		for (h = hc1, j = 1; h <= hc2; h++, j += 4) {		
-			val = aug->disp_16_1[aug->exd.h_pix * v + h];
+			val = aug->ff161[aug->exd.h_pix * v + h];
 			val = MAX ((gint) val - (aug->rect.stdev[GREY].median +
 				  (gushort)(aug->imdisp.stdev * aug->rect.stdev[GREY].val)), 0);
 			cvpHFlux->coords[j] += val;
@@ -791,14 +803,14 @@ void image_get_stats (struct cam_img *img, enum ColsPix c)
 		for (i = 0; i < totpix; i++) {
 			col = i%img->exd.h_pix;
 			row = i / img->exd.h_pix;		                     /* Minimum */
-			img->img.min[GREY].val = MIN (img->img.min[GREY].val, img->vadr[i]);
-			if (img->vadr[i] > img->img.max[GREY].val) {  /* Max. and location*/
-				img->img.max[GREY].val = img->vadr[i];
+			img->img.min[GREY].val = MIN (img->img.min[GREY].val, img->r161[i]);
+			if (img->r161[i] > img->img.max[GREY].val) {  /* Max. and location*/
+				img->img.max[GREY].val = img->r161[i];
 				img->img.max[GREY].h = col;
 				img->img.max[GREY].v = row;
 			}
-			img->img.mean[GREY].val += img->vadr[i];
-			++img->img.mode[GREY].hist[img->vadr[i]];            /* Histogram */
+			img->img.mean[GREY].val += img->r161[i];
+			++img->img.mode[GREY].hist[img->r161[i]];            /* Histogram */
 		}
 		img->img.mean[GREY].val /= totpix;                       /* Mean */
 		img->img.mode[GREY].peakcount = 0;
@@ -837,9 +849,9 @@ void image_get_stats (struct cam_img *img, enum ColsPix c)
 			row = i / img->exd.h_pix;
 			for (j = 0; j < c; j++) {
 				img->img.min[j].val = MIN (img->img.min[j].val, 
-										                 img->bvadr[i * 3 + j]);
+										                 img->db163[i * 3 + j]);
 				img->img.max[j].val = MAX (img->img.max[j].val, 
-										                 img->bvadr[i * 3 + j]);
+										                 img->db163[i * 3 + j]);
 			}
 		}
 	}
@@ -857,26 +869,26 @@ gboolean image_embed_data (struct cam_img *img)
 	gushort m, n, h, v;
 	guint i, k;
 	
-	if (img->vadr == NULL)
+	if (img->r161 == NULL)
 		return FALSE;
-	if (img->disp_16_1 == NULL)
+	if (img->ff161 == NULL)
 		return FALSE;
 	
 	i = img->cam_cap.max_h * img->cam_cap.max_v;
 	while (i)
-		img->disp_16_1[--i] = img->img.min[GREY].val;
+		img->ff161[--i] = img->img.min[GREY].val;
 
 	k = img->exd.h_top_l + img->exd.v_top_l * img->cam_cap.max_h;
 	for (v = 0; v < img->exd.v_pix * img->exd.v_bin; v += img->exd.v_bin)
     	for (m = 0; m < img->exd.v_bin; m++) {
       		for (h = 0; h < img->exd.h_pix*img->exd.h_bin; h += img->exd.h_bin){
         		for (n = 0; n < img->exd.h_bin; n++) {
-					val = img->vadr[img->exd.h_pix * 
+					val = img->r161[img->exd.h_pix * 
 					                   v / img->exd.v_bin + h / img->exd.h_bin];
 
 					/* Set the image pixel data */	
 
-					img->disp_16_1[k++] = val;
+					img->ff161[k++] = val;
 				}
 			}
 			k += img->cam_cap.max_h - img->exd.h_pix * img->exd.h_bin;
@@ -1169,13 +1181,13 @@ gboolean image_save_as_fits (struct cam_img *img, gchar *savefile,
 					 k = numpix - img->cam_cap.max_h;
 					 k >= 0; k -= img->cam_cap.max_h)
 					for (j = k; j < (k + img->cam_cap.max_h); j++)
-						data[i++] = GINT16_TO_BE (img->disp_16_1[j] - OFFSET);
+						data[i++] = GINT16_TO_BE (img->ff161[j] - OFFSET);
 			} else {
 				for (i = HEAD_LEN / sizeof (gshort),
 					 k = numpix - img->exd.h_pix;
 					 k >= 0; k -= img->exd.h_pix)
 					for (j = k; j < (k + img->exd.h_pix); j++)
-						data[i++] = GINT16_TO_BE (img->vadr[j] - OFFSET);
+						data[i++] = GINT16_TO_BE (img->r161[j] - OFFSET);
 			}
 		} else {
 			if (display && img->FullFrame) {
@@ -1184,14 +1196,14 @@ gboolean image_save_as_fits (struct cam_img *img, gchar *savefile,
 					 k >= 0; k -= img->cam_cap.max_h)
 					for (j = k; j < (k + img->cam_cap.max_h); j++)
 						data[i++] = GINT16_TO_BE (
-									   img->disp_16_3[colour + j * 3] - OFFSET);
+									       img->ff163[colour + j * 3] - OFFSET);
 			} else {
 				for (i = HEAD_LEN / sizeof (gshort),
 					 k = numpix - img->exd.h_pix;
 					 k >= 0; k -= img->exd.h_pix)
 					for (j = k; j < (k + img->exd.h_pix); j++)
 						data[i++] = GINT16_TO_BE (
-										img->bvadr[colour + j * 3] - OFFSET);
+									   	   img->db163[colour + j * 3] - OFFSET);
 			}
 		}
 	} else if (img->id == AUG) {
@@ -1201,13 +1213,13 @@ gboolean image_save_as_fits (struct cam_img *img, gchar *savefile,
 			 k >= 0; k -= img->exd.h_pix)
 			for (j = k; j < (k + img->exd.h_pix); j++)
 				data[i++] = GINT16_TO_BE (
-								   img->disp_8_3[j * bytes_per_pixel] - OFFSET);
+								    img->disp083[j * bytes_per_pixel] - OFFSET);
 	} else if (img->id == VID) {
 		for (i = HEAD_LEN / sizeof (gshort),
 			 k = numpix - img->exd.h_pix; 
 		     k >= 0; k -= img->exd.h_pix)
 			for (j = k; j < (k + img->exd.h_pix); j++)
-				data[i++] = GINT16_TO_BE (img->vadr[j] - OFFSET);
+				data[i++] = GINT16_TO_BE (img->r161[j] - OFFSET);
 	}
 	
 	/* Fill any remaining space with zeros */

@@ -3,7 +3,7 @@
 /*                                                                            */
 /* All the routines for interfacing with the CCD camera are contained in here.*/
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -41,7 +41,7 @@
 #ifdef HAVE_QSI
 #include "qsi.h"
 #endif
-#ifdef HAVE_SX
+#ifdef HAVE_SX_CAM
 #include "sx.h"
 #endif
 
@@ -55,7 +55,7 @@ static struct cam_img ccd_cam_obj, *ccd;
 /******************************************************************************/
 
 void ccdcam_init (void);
-gboolean ccdcam_get_cameras (gint *num);
+gboolean ccdcam_get_cameras (void);
 gboolean ccdcam_open (void);
 static gboolean ccdcam_get_cap (void);
 gboolean ccdcam_close (void);
@@ -64,7 +64,8 @@ gboolean ccdcam_start_exposure (void);
 gboolean ccdcam_cancel_exposure (void);
 gboolean ccdcam_interrupt_exposure (void);
 gboolean ccdcam_image_ready (void);
-gboolean ccdcam_capture_exposure (void);
+gboolean ccdcam_download_image (void);
+gboolean ccdcam_process_image (void);
 gboolean ccdcam_debayer (void);
 gboolean ccdcam_set_temperature (gboolean *AtTemperature);
 void ccdcam_set_fast_readspeed (gboolean Set);
@@ -105,7 +106,7 @@ struct cam_img *get_ccd_image_struct (void);
 
 void ccdcam_init (void)
 {
-	static gboolean first_pass = TRUE;
+	static gboolean FirstPass = TRUE;
 	
 	/* Initialise CCD camera data to sensible values */
 
@@ -130,36 +131,43 @@ void ccdcam_init (void)
 	ccd->ds9.display = NULL;
 	ccd->set_state = NULL;
 	ccd->get_state = NULL;
-	ccd->vadr = NULL;
-	ccd->bvadr = NULL;
-	ccd->disp_16_1 = NULL;
-	ccd->disp_16_3 = NULL;
+	ccd->r161 = NULL;
+	ccd->db163 = NULL;
+	ccd->ff161 = NULL;
+	ccd->ff163 = NULL;
 	ccd->id = CCD;
 	ccd->devnum = -1;
 	ccd->fd = 0;
 	ccd->bayer_pattern = 0;
 	ccd->Open = FALSE;
 	ccd->Expose = FALSE;
-	ccd->Debayer = FALSE;
-	ccd->FullFrame = FALSE;
-	ccd->FastFocus = FALSE;
-	ccd->AutoSave = FALSE;
-	ccd->SavePeriodic = FALSE;
 	ccd->FileSaved = TRUE;
+	ccd->Display = TRUE;
 	ccd->Error = FALSE;
 	
-	if (first_pass) {
-		ccd->device = NO_CAM;
-		first_pass = FALSE;
+	if (FirstPass) {
+		/* Initialise some values for the first pass through this routine, but
+		 * don't reset them if the camera is closed and the same or another one 
+		 * is (re)opened during the same invocation of GoQat.  (They are reset
+		 * if GoQat is restarted).
+		 * 
+		 * These values must match their initial settings in the glade interface
+		 * file.  They are set by the user in the GUI and are not read from
+		 * the configuration file at start-up.
+		 */
+		ccd->FastFocus = FALSE;
+		ccd->AutoSave = FALSE;
+		ccd->SavePeriodic = FALSE;
+		
+		FirstPass = FALSE;
 	}
 }
 
-gboolean ccdcam_get_cameras (gint *num)
+gboolean ccdcam_get_cameras (void)
 {
-	/* List the available CCD cameras */
+	/* Fill the device selection structure with a list of detected cameras */
 	
 	gint i;
-	const char *serial[MAX_CAMERAS], *desc[MAX_CAMERAS];
 	
 	switch (ccd->device) {
 		#ifdef HAVE_QSI
@@ -168,7 +176,7 @@ gboolean ccdcam_get_cameras (gint *num)
 		    qsi_error_func (ccdcam_qsi_error_func);
 			break;
 		#endif
-		#ifdef HAVE_SX
+		#ifdef HAVE_SX_CAM
 		case SX:
 			camera_get_cameras = sx_get_cameras;
 		    sx_error_func (ccdcam_sx_error_func);
@@ -181,15 +189,24 @@ gboolean ccdcam_get_cameras (gint *num)
 			break;
 	}
 	
-	*num = MAX_CAMERAS;
-	if (!camera_get_cameras (serial, desc, num))
+	ds.num = MAX_DEVICES;
+	if (!camera_get_cameras (ds.id, ds.desc, &ds.num))
 		return show_error (__func__, "Error searching for cameras!");
-	if (*num > 0) {
-		for (i = 0; i < *num; i++)
-			L_print ("Found camera %d: %s, %s\n", i, desc[i], serial[i]);
-	} else
+	if (!ds.num) {
 	    L_print ("{o}Didn't find any cameras - are permissions "
 	             "set correctly?\n");
+		return FALSE;
+	}
+	/* Need to store local copy after calling camera_get_cameras or the values
+	 * returned from the QSI cameras may 'disappear' if an attempt is made to
+	 * use them elsewhere.
+	 */
+	for (i = 0; i < ds.num; i++) {
+		strncpy (ds.lid[i], ds.id[i], 255);
+		ds.id[i] = ds.lid[i];
+		strncpy (ds.ldesc[i], ds.desc[i], 255);
+		ds.desc[i] = ds.ldesc[i];
+	}
 	
 	return TRUE;
 }
@@ -200,7 +217,6 @@ gboolean ccdcam_open (void)
 
 	gint num;
 	gchar *err;
-	const char *serial[MAX_CAMERAS], *desc[MAX_CAMERAS];
 	
 	if (ccd->Open)  /* return if already open */
 		return TRUE;
@@ -234,7 +250,7 @@ gboolean ccdcam_open (void)
 		    qsi_error_func (ccdcam_qsi_error_func);
 			break;
 		#endif
-		#ifdef HAVE_SX
+		#ifdef HAVE_SX_CAM
 		case SX:
 			
 			strcpy (ccd->cam_cap.camera_manf, "SX");
@@ -262,36 +278,35 @@ gboolean ccdcam_open (void)
 		    sx_error_func (ccdcam_sx_error_func);
 			break;
 		#endif
-		case NO_CAM:
-			return show_error (__func__, "No ccd camera selected");
-			break;
 		default:
 			return show_error (__func__, "Unknown camera device");
 	}
 	
-	num = MAX_CAMERAS;
-	if (!camera_get_cameras (serial, desc, &num))
+	num = MAX_DEVICES;
+	if (!camera_get_cameras (ds.id, ds.desc, &num))
 		return show_error (__func__, "Error searching for cameras!");
 	if (num == 0) {
 	    L_print ("{o}Didn't find any cameras - are permissions "
 	             "set correctly?\n");
 		return FALSE;
 	} else if (num == 1) {
-		if (!camera_connect (TRUE, serial[0]))
-			return show_error (__func__, "Unable to connect to camera!");
+		if (!camera_connect (TRUE, ds.id[0]))
+			return show_error (__func__, "Unable to connect to camera - are "
+			                             "permissions set correctly?\n");
 		ccd->devnum = 0;
 	} else if (num > 1 && ccd->devnum == -1) {
-		L_print ("{r}Found more than one camera!  Please select the one you "
-				 "want from the 'Cameras' menu\n");
+		L_print ("{o}Found more than one camera!  Please select the one you "
+				 "want via the 'Cameras' menu\n");
 	    return FALSE;
     } else if (num > 1 && ccd->devnum < num) {
-		if (!camera_connect (TRUE, serial[ccd->devnum]))
-			return show_error (__func__, "Unable to connect to camera!");
+		if (!camera_connect (TRUE, ds.id[ccd->devnum]))
+			return show_error (__func__, "Unable to connect to camera - are "
+			                             "permissions set correctly?\n");
 	} else
-		return show_error (__func__, "Error selecting camera!");
+		return show_error (__func__, "Error opening camera!");
 	
 	if (ccd->device == SX)  /* Have to set SX camera description manually */
-		strncpy (ccd->cam_cap.camera_desc, desc[ccd->devnum], 256);
+		strncpy (ccd->cam_cap.camera_desc, ds.desc[ccd->devnum], 256);
 		
 	/* Get the selected camera's capabilities */
 	
@@ -306,25 +321,25 @@ gboolean ccdcam_open (void)
 	
 	/* Allocate storage for image data */
 	
-	if (!(ccd->vadr = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
+	if (!(ccd->r161 = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
 		                              ccd->cam_cap.max_v * sizeof (gushort)))) {
 		err = "Unable to allocate buffer memory";
 		goto open_err;
 	}
 	
-	if (!(ccd->bvadr = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
+	if (!(ccd->db163 = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
 		                          ccd->cam_cap.max_v * 3 * sizeof (gushort)))) {
 		err = "Unable to allocate buffer memory";
 		goto open_err;
 	}
 	
-    if (!(ccd->disp_16_1 = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
+    if (!(ccd->ff161 = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
 		                              ccd->cam_cap.max_v * sizeof (gushort)))) {
 		err = "Unable to allocate buffer memory";
 		goto open_err;
 	}
 	
-    if (!(ccd->disp_16_3 = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
+    if (!(ccd->ff163 = (gushort *) g_malloc0 (ccd->cam_cap.max_h * 
 		                          ccd->cam_cap.max_v * 3 * sizeof (gushort)))) {
 		err = "Unable to allocate buffer memory";
 		goto open_err;
@@ -355,8 +370,7 @@ static gboolean ccdcam_get_cap (void)
 		L_print ("Found %s\n", ccd->cam_cap.camera_name);
 		L_print ("Manufacturer: %s\n", ccd->cam_cap.camera_manf);
 		L_print ("Description: %s\n", ccd->cam_cap.camera_desc);
-		if (ccd->device == QSI)
-			L_print ("Serial number: %s\n", ccd->cam_cap.camera_snum);
+		L_print ("Serial/Model number: %s\n", ccd->cam_cap.camera_snum);
 		L_print ("Driver information: %s\n", ccd->cam_cap.camera_dinf);
 		if (ccd->device == QSI)
 			L_print ("Full well capacity is... %.2f electrons\n", 
@@ -378,24 +392,28 @@ static gboolean ccdcam_get_cap (void)
 		L_print ("Maximum exposure time is... %.2f s\n", ccd->cam_cap.max_exp);
 		L_print ("Can bin asymmetrically?... %s\n", 
 								        ccd->cam_cap.CanAsymBin ? "Yes" : "No");
+		if (ccd->device == SX) {
+			L_print ("Is interlaced?... %s\n", 
+								      ccd->cam_cap.IsInterlaced ? "Yes" : "No");
+			L_print ("Is colour?... %s\n", 
+								          ccd->cam_cap.IsColour ? "Yes" : "No");
+		}
+		L_print ("Has shutter?... %s\n", 
+								        ccd->cam_cap.HasShutter ? "Yes" : "No");
+		if (ccd->device == QSI)
+			L_print ("Has filter wheel?... %s\n", 
+							        ccd->cam_cap.HasFilterWheel ? "Yes" : "No");
+		L_print ("Can set CCD temperature?... %s\n", 
+							         ccd->cam_cap.CanSetCCDTemp ? "Yes" : "No");
 		if (ccd->device == QSI)
 			L_print ("Can get cooler power?... %s\n", 
 						           ccd->cam_cap.CanGetCoolPower ? "Yes" : "No");
 		L_print ("Can pulse guide?... %s\n", 
 						             ccd->cam_cap.CanPulseGuide ? "Yes" : "No");
-		if (ccd->device == QSI)
-			L_print ("Can set CCD temperature?... %s\n", 
-							         ccd->cam_cap.CanSetCCDTemp ? "Yes" : "No");
 		L_print ("Can abort exposure?... %s\n", 
 								          ccd->cam_cap.CanAbort ? "Yes" : "No");
 		L_print ("Can stop exposure?... %s\n", 
 								           ccd->cam_cap.CanStop ? "Yes" : "No");
-		if (ccd->device == QSI)
-			L_print ("Has filter wheel?... %s\n", 
-							        ccd->cam_cap.HasFilterWheel ? "Yes" : "No");
-		if (ccd->device == QSI)
-			L_print ("Has shutter?... %s\n", 
-								        ccd->cam_cap.HasShutter ? "Yes" : "No");
 		return TRUE;
 	}
 	return FALSE;
@@ -418,7 +436,7 @@ gboolean ccdcam_close (void)
 		    ports[USBCCD].guide_stop = telescope_d_stop;
 			break;
 		#endif
-		#ifdef HAVE_SX
+		#ifdef HAVE_SX_CAM
 		case SX:
 			sx_cancel_exposure ();
 			if (!camera_connect (FALSE, NULL))
@@ -437,24 +455,24 @@ gboolean ccdcam_close (void)
 	
 	/* Free any allocated memory */
 	
-	if (ccd->vadr) {
-		g_free (ccd->vadr);	
-		ccd->vadr = NULL;
+	if (ccd->r161) {
+		g_free (ccd->r161);	
+		ccd->r161 = NULL;
 	}
 	
-	if (ccd->bvadr) {
-		g_free (ccd->bvadr);
-		ccd->bvadr = NULL;
+	if (ccd->db163) {
+		g_free (ccd->db163);
+		ccd->db163 = NULL;
 	}
 	
-	if (ccd->disp_16_1) {
-		g_free (ccd->disp_16_1);
-		ccd->disp_16_1 = NULL;
+	if (ccd->ff161) {
+		g_free (ccd->ff161);
+		ccd->ff161 = NULL;
 	}
 	
-	if (ccd->disp_16_3) {
-		g_free (ccd->disp_16_3);
-		ccd->disp_16_3 = NULL;
+	if (ccd->ff163) {
+		g_free (ccd->ff163);
+		ccd->ff163 = NULL;
 	}
 	
 	if (ccd->img.mode[GREY].hist) {
@@ -537,11 +555,22 @@ void ccdcam_set_exposure_data (struct exposure_data *exd)
 gboolean ccdcam_start_exposure (void)
 {
     /* Set the exposure data in the camera and start the exposure */
+    
+    gushort h, v;
 	
 	if (!ccd->Open) {  /* return if not opened */
 		L_print ("{o}Can't start exposure; CCD camera is not connected!\n");
 		return FALSE;
 	}
+	
+	if (ccd->ds9.Invert_h)
+		h = ccd->cam_cap.max_h - (ccd->exd.h_top_l + ccd->exd.h_pix);
+	else
+		h = ccd->exd.h_top_l;
+	if (ccd->ds9.Invert_v)
+		v = ccd->cam_cap.max_v - (ccd->exd.v_top_l + ccd->exd.v_pix);
+	else
+		v = ccd->exd.v_top_l;
 	
 	switch (ccd->device) {
 		case QSI:
@@ -549,8 +578,8 @@ gboolean ccdcam_start_exposure (void)
 			 * binned coordinates.
 			 */
 			if (!camera_set_imagearraysize (
-									(long) (ccd->exd.h_top_l / ccd->exd.h_bin),
-									(long) (ccd->exd.v_top_l / ccd->exd.v_bin),
+									(long) (h / ccd->exd.h_bin),
+									(long) (v / ccd->exd.v_bin),
 									(long) ccd->exd.h_pix,
 									(long) ccd->exd.v_pix,
 									(long) ccd->exd.h_bin,
@@ -559,8 +588,8 @@ gboolean ccdcam_start_exposure (void)
 			break;
 		case SX:
 			if (!camera_set_imagearraysize (
-									(long) ccd->exd.h_top_l,
-									(long) ccd->exd.v_top_l,
+									(long) h,
+									(long) v,
 									(long) ccd->exd.h_pix,
 									(long) ccd->exd.v_pix,
 									(long) ccd->exd.h_bin,
@@ -637,9 +666,11 @@ gboolean ccdcam_image_ready (void)
 	    return show_error (__func__, "Error checking for downloaded image");
 }	
 
-gboolean ccdcam_capture_exposure (void)
+gboolean ccdcam_download_image (void)
 {
-	/* Get the image data from the driver */
+	/* Get the image data from the driver.  This function is called from outside
+	 * the main thread so must not make gtk calls.
+	 */
 	
 	int h, v, bytes;
 
@@ -666,9 +697,16 @@ gboolean ccdcam_capture_exposure (void)
 	
 	/* Read the data */
 	
-	if (!camera_get_imagearray (ccd->vadr))
+	if (!camera_get_imagearray (ccd->r161))
 		return show_error (__func__, "Failed to read image data from driver");
 		
+	return TRUE;
+}
+
+gboolean ccdcam_process_image (void)
+{
+	/* Do some processing on the image data and tidy up after the exposure */
+	
 	image_get_stats (ccd, C_GREY);
 	
 	/* Optionally embed the image in the full chip area */
@@ -725,9 +763,9 @@ gboolean ccdcam_debayer (void)
 	
 	gint tile;
 	
-	if (!ccd->vadr)
+	if (!ccd->r161)
 		return FALSE;
-	if (ccd->FullFrame && !ccd->disp_16_1)
+	if (ccd->FullFrame && !ccd->ff161)
 		return FALSE;
 	
 	tile = debayer_get_tile (ccd->bayer_pattern, ccd->exd.h_top_l, 
@@ -736,67 +774,67 @@ gboolean ccdcam_debayer (void)
 	switch (ccd->imdisp.debayer) {
 		case DB_SIMP:
 			dc1394_bayer_Simple_uint16 (
-			                            ccd->vadr, ccd->bvadr, 
+			                            ccd->r161, ccd->db163, 
 										ccd->exd.h_pix, ccd->exd.v_pix, 
 										tile, 16);
 		    if (ccd->FullFrame)
 				dc1394_bayer_Simple_uint16 (
-										ccd->disp_16_1, ccd->disp_16_3, 
+										ccd->ff161, ccd->ff163, 
 										ccd->cam_cap.max_h, ccd->cam_cap.max_v,
 										tile, 16);
 			break;
 		case DB_NEAR:
 			dc1394_bayer_NearestNeighbor_uint16 (
-			                            ccd->vadr, ccd->bvadr, 
+			                            ccd->r161, ccd->db163, 
 										ccd->exd.h_pix, ccd->exd.v_pix,
 										tile, 16);
 		    if (ccd->FullFrame)
 				dc1394_bayer_NearestNeighbor_uint16 (
-										ccd->disp_16_1, ccd->disp_16_3, 
+										ccd->ff161, ccd->ff163, 
 										ccd->cam_cap.max_h, ccd->cam_cap.max_v,
 									    tile, 16);
 			break;
 		case DB_BILIN:
 			dc1394_bayer_Bilinear_uint16 (
-			                            ccd->vadr, ccd->bvadr,
+			                            ccd->r161, ccd->db163,
 										ccd->exd.h_pix, ccd->exd.v_pix, 
 										tile, 16);
 		    if (ccd->FullFrame)
 				dc1394_bayer_Bilinear_uint16 (
-										ccd->disp_16_1, ccd->disp_16_3, 
+										ccd->ff161, ccd->ff163, 
 									    ccd->cam_cap.max_h, ccd->cam_cap.max_v,
 									    tile, 16);
 			break;
 		case DB_QUAL:
 			dc1394_bayer_HQLinear_uint16 (
-			                            ccd->vadr, ccd->bvadr, 
+			                            ccd->r161, ccd->db163, 
 										ccd->exd.h_pix, ccd->exd.v_pix, 
 										tile, 16);
 		    if (ccd->FullFrame)
 				dc1394_bayer_HQLinear_uint16 (
-										ccd->disp_16_1, ccd->disp_16_3, 
+										ccd->ff161, ccd->ff163, 
 										ccd->cam_cap.max_h, ccd->cam_cap.max_v,
 										tile, 16);
 			break;
 		case DB_DOWN:
 			dc1394_bayer_Downsample_uint16 (
-			                            ccd->vadr, ccd->bvadr, 
+			                            ccd->r161, ccd->db163, 
 										ccd->exd.h_pix, ccd->exd.v_pix, 
 										tile, 16);
 		    if (ccd->FullFrame)
 				dc1394_bayer_Downsample_uint16 (
-										ccd->disp_16_1, ccd->disp_16_3, 
+										ccd->ff161, ccd->ff163, 
 									    ccd->cam_cap.max_h, ccd->cam_cap.max_v,
 									    tile, 16);
 			break;
 		case DB_GRADS:
 			dc1394_bayer_VNG_uint16 (
-			                            ccd->vadr, ccd->bvadr, 
+			                            ccd->r161, ccd->db163, 
 									    ccd->exd.h_pix, ccd->exd.v_pix, 
 									    tile, 16);
 		    if (ccd->FullFrame)
 				dc1394_bayer_VNG_uint16 (
-										ccd->disp_16_1, ccd->disp_16_3, 
+										ccd->ff161, ccd->ff163, 
 									    ccd->cam_cap.max_h, ccd->cam_cap.max_v,
 										tile, 16);
 			break;
@@ -820,17 +858,20 @@ gboolean ccdcam_set_temperature (gboolean *AtTemperature)
 	 * Return FALSE if there is an error, TRUE otherwise. 
 	 */
 	
-	const gdouble TOL = 20;
+	if (!ccd->Open) {  /* Return if not opened */
+		L_print ("{o}Can't set temperature; CCD camera is not connected!\n");
+		*AtTemperature = FALSE;
+		return FALSE;
+	}
+	
+	if (ccd->state.IgnoreCooling) { /* Ignore cooling; pretend it's OK */
+		*AtTemperature = TRUE;
+		return TRUE;
+	}
 	
 	if (!ccd->cam_cap.CanSetCCDTemp) { /* Can't set CCD temperature, so */
 		*AtTemperature = TRUE;         /*  pretend it's OK              */
 		return TRUE;
-	}
-	
-	if (!ccd->Open) {  /* return if not opened */
-		L_print ("{o}Can't set temperature; CCD camera is not connected!\n");
-		*AtTemperature = FALSE;
-		return FALSE;
 	}
 
 	if (ccd->cam_cap.CanSetCCDTemp) {
@@ -847,9 +888,9 @@ gboolean ccdcam_set_temperature (gboolean *AtTemperature)
 			*AtTemperature = TRUE;
 			return TRUE;
 		}
-		L_print ("Waiting for CCD to reach %5.1fC; now at %5.1fC\n",
-											ccd->exd.ccdtemp, ccd->state.c_ccd);
-		if (ABS (ccd->exd.ccdtemp - ccd->state.c_ccd) <= TOL) {
+		L_print ("Waiting for CCD to reach %5.1f +/- %3.1fC; now at %5.1fC\n",
+						  ccd->exd.ccdtemp, ccd->state.c_tol, ccd->state.c_ccd);
+		if (ABS (ccd->exd.ccdtemp - ccd->state.c_ccd) <= ccd->state.c_tol) {
 			*AtTemperature = TRUE;
 			return TRUE;
 		}
@@ -861,10 +902,6 @@ gboolean ccdcam_set_temperature (gboolean *AtTemperature)
 			*AtTemperature = FALSE;
 			return FALSE;
 		}
-	} else {
-	    L_print ("{o}Cooling control not supported for this camera\n");
-		*AtTemperature = FALSE;
-		return FALSE;
 	}
 	
 	*AtTemperature = FALSE;
@@ -962,7 +999,7 @@ gboolean ccdcam_measure_HFD (gboolean Initialise, gboolean Plot, gint box,
     bg = ccd->img.mode[GREY].peakbin + 4.0 * ccd->img.stdev[GREY].val;
     for (v = 0; v < ccd->exd.v_pix; v++)
 		for (h = 0; h < ccd->exd.h_pix; h++) {
-			val = MAX (ccd->vadr[v * ccd->exd.h_pix + h] - bg, 0);
+			val = MAX (ccd->r161[v * ccd->exd.h_pix + h] - bg, 0);
 			flux_h[h] += val;
 			flux_v[v] += val;
 			totflux += val;
@@ -1016,7 +1053,7 @@ gboolean ccdcam_measure_HFD (gboolean Initialise, gboolean Plot, gint box,
 	
 			/* Divide pixel into 100 each way if hfd <= 10.0 */
 		    pix_split = *hfd > 10.0 ? 1 : 100;
-			f = HFD_row_flux (ccd->vadr+ccd->exd.h_pix*pix_v+pix_h, npix,
+			f = HFD_row_flux (ccd->r161+ccd->exd.h_pix*pix_v+pix_h, npix,
 							  pix_split, (gdouble) pix_h, (gdouble) pix_v, 
 							  (gdouble) ccd->img.mean[GREY].h, 
 				              (gdouble) ccd->img.mean[GREY].v, 

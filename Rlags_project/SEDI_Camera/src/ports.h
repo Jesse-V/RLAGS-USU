@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Header file for I/O port routines.                                         */
 /*                                                                            */
-/* Copyright (C) 2011 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2011 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -28,8 +28,8 @@
 #include <termios.h>
 #include "telescope.h"
 
-#define MAX_PORTS 264            /* Maximum number of ports                   */
-#define BASE_PORTS 8             /* See enum BasePorts below                  */
+#define MAX_PORTS 265            /* Maximum number of ports = 256 + BASE_PORTS*/
+#define BASE_PORTS 9             /* See enum BasePorts below                  */
 #define SER_BUFSIZ 50            /* Maximum size of serial port data buffer   */
 
 /* This enum is for ports selected via the Communications menu, but excluding */
@@ -37,10 +37,11 @@
 /* The /dev/ttyUSB ports are enumerated dynamically.                          */
  
 enum BasePorts {
-	DUMMY = 0,                   /* Dummy port if no others available         */
+	DUMMY = 0,                   /* Dummy port if no others available.        */
 	LPT,                         /* Parallel port managed by Parapin library. */
 	USBAUG,                      /* USB ports for sending guide commands via  */
 	USBCCD,                      /*  autoguider or CCD cameras.               */
+	USBDIR,                      /* Direct USB communications (non-serial).   */
 	TTY0,                        /* Traditional serial ports /dev/ttyS0       */
 	TTY1,                        /*                          /dev/ttyS1       */
 	TTY2,                        /*                          /dev/ttyS2       */
@@ -53,9 +54,10 @@ enum PortState {                 /* Possible serial comms port states         */
 };
 
 enum PortUsers {                 /* Serial port users                         */
-	PU_TEL = 1, 
-	PU_AUTOG = 2,
-	PU_FOCUS = 4
+	PU_TEL = 1,                  /* Telescope controller */
+	PU_AUTOG = 2,                /* Autoguider commands  */
+	PU_FILTER = 4,               /* Filter wheel         */
+	PU_FOCUS = 8                 /* Focuser              */
 };
 
 struct port {                    /* Port data                                 */
@@ -76,11 +78,11 @@ struct port {                    /* Port data                                 */
 	//gint SC1LongExp;           /* SC1 long exposure pin number         (pp) */
 	//gint SC1Pause;             /* SC1 pause interval between exposures (pp) */
 	gchar name[20];              /* Name of port                              */
-	gchar address[6];            /* Base address              (parallel port) */
+	gchar address[80];           /* Base address              (parallel port) */
 };	
   
 struct port ports[MAX_PORTS];
-struct port *tel_comms, *autog_comms;  /* Telescope and autog. ports          */
-struct port *focus_comms;              /* Focuser port                        */
+struct port *tel_comms, *autog_comms;     /* Telescope and autog. ports       */
+struct port * filter_comms, *focus_comms; /* Filter wheel and focuser ports   */
 	
 #endif /* GOQAT_PORTS_H */

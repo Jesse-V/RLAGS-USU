@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Header file for USB interface routines.                                    */
 /*                                                                            */
-/* Copyright (C) 2012 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2012 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -37,7 +37,7 @@ struct uendpoint {                        /* USB endpoint                     */
 	int num;
 };
 
-struct udevice {
+struct usbdevice {
 	struct libusb_device *dev;            /* USB device                       */
 	struct libusb_device_handle *handle;  /* Handle to open device            */
 	struct uendpoint input;               /* Input endpoint                   */
@@ -50,19 +50,21 @@ struct udevice {
 	char *err;                            /* Error message                    */
 };
 
-extern int gqusb_list_devices (int vendor, int pids[], 
+extern void gqusb_init (void);
+extern void gqusb_exit (void);
+extern int gqusb_list_devices (int vendor, int maxdev, int pids[], 
 							   struct libusb_device *devs[]);
-extern int gqusb_open_device (struct udevice *u_dev);
-extern void gqusb_close_device (struct udevice *u_dev);
-extern int gqusb_bulk_read (struct udevice *u_dev, unsigned char *data, 
+extern int gqusb_open_device (struct usbdevice *u_dev);
+extern void gqusb_close_device (struct usbdevice *u_dev);
+extern int gqusb_bulk_read (struct usbdevice *u_dev, unsigned char *data, 
 							int length);
-extern int gqusb_bulk_write (struct udevice *u_dev, unsigned char *data, 
+extern int gqusb_bulk_write (struct usbdevice *u_dev, unsigned char *data, 
 							 int length);
-extern int gqusb_bulk_write_lock (struct udevice *u_dev, unsigned char *data, 
+extern int gqusb_bulk_write_lock (struct usbdevice *u_dev, unsigned char *data, 
 								  int length);
-extern int gqusb_bulk_write_unlock (struct udevice *u_dev, unsigned char *data, 
-							 int length);
-extern int gqusb_bulk_io (struct udevice *u_dev, 
+extern int gqusb_bulk_write_unlock (struct usbdevice *u_dev,unsigned char *data, 
+							        int length);
+extern int gqusb_bulk_io (struct usbdevice *u_dev, 
 						  unsigned char *wdata, int wlength,
 						  unsigned char *rdata, int rlength);
 								

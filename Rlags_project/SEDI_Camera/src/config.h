@@ -29,6 +29,9 @@
 /* Define to 1 if you have libsm. */
 /* #undef HAVE_LIBSM */
 
+/* Define to 1 if you have the `udev' library (-ludev). */
+#define HAVE_LIBUDEV 1
+
 /* Define to 1 if you have the `unicap' library (-lunicap). */
 /* #undef HAVE_LIBUNICAP */
 
@@ -116,7 +119,7 @@
 #define PACKAGE_NAME "GoQat"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GoQat 1.0.2"
+#define PACKAGE_STRING "GoQat 1.0.3"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "goqat"
@@ -125,7 +128,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.2"
+#define PACKAGE_VERSION "1.0.3"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -134,7 +137,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #define _FILE_OFFSET_BITS 64

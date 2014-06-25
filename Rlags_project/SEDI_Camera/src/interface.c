@@ -5,7 +5,7 @@
 /* the UI (e.g. data entry, button presses etc) and display of data on the    */
 /* canvas.                                                                    */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -47,17 +47,20 @@
 #ifdef HAVE_LIBGRACE_NP
 #include <grace_np.h>
 #endif
+#ifdef HAVE_LIBUSB
+#include "gqusb.h"
+#endif
 
 #define GOQAT_INTERFACE
 #include "interface.h"
 
-#ifdef HAVE_SX
+#ifdef HAVE_SX_CAM
 #include <libusb-1.0/libusb.h>
 #endif
 
 #ifndef HAVE_CONFIG_H
-#define PACKAGE "CCD camera interface"
-#define VERSION "1.00"
+#define PACKAGE "GoQat"
+#define VERSION "X.xx"
 #endif
 
 #ifdef HAVE___AUTOGEN_SH
@@ -79,7 +82,7 @@
                                                 /* Default font for canvas    */
 #define FONT "-*-courier-medium-r-normal-*-*-120-*-*-*-*-*"  
 #define MAX_LOG_BUF_MSG 100                     /* Max. messages in log buffer*/
- 
+
                                                 /* Reading config string      */
 #define R_config_d(string1, arg) atoi(ReadCString(string1, "%d", arg))
 #define R_config_f(string1, arg) atof(ReadCString(string1, "%f", arg))
@@ -105,6 +108,8 @@ static GtkBuilder *xml_con = NULL;    /* CCD camera configuration window      */
 #ifdef HAVE_UNICAP
 static GtkBuilder *xml_uni = NULL;    /* Unicap device selection window       */
 #endif
+static GtkBuilder *xml_V4L = NULL;    /* V4L configuration window             */
+static GtkBuilder *xml_fil = NULL;    /* Filter wheel configuration window    */
 static GtkBuilder *xml_fcw = NULL;    /* Focuser configuration window         */
 static GtkBuilder *xml_ppd = NULL;    /* Parallel port settings window        */
 static GtkBuilder *xml_tsk = NULL;    /* Tasks editing window                 */
@@ -149,7 +154,7 @@ static GStaticMutex LogMutex = G_STATIC_MUTEX_INIT; /* Log buffer mutex       */
 static pid_t main_tid;                /* Thread id for main (gtk) thread      */
 static gint MsgNum = 0;               /* Number of next message in log buffer */
 static gchar *LogBuf[MAX_LOG_BUF_MSG];/* Buffer for pending log messages      */
-static gchar font[80];                /* Canvas font                          */
+static gchar font[MCSL];              /* Canvas font                          */
 const gchar *UserDir;                 /* Path to user's home folder           */
 gchar *PrivatePath;                   /* Path to folder for private files     */
 gchar *ConfigFile;                    /* Path to configuration file           */
@@ -160,6 +165,8 @@ static gboolean AFWinConf = FALSE;    /* TRUE if autofocus conf. window conf'd*/
 static gboolean PPWinConf = FALSE;    /* TRUE if parallel port window conf'd  */
 static gboolean EdWinConf = FALSE;    /* TRUE if 'Edit Tasks' window config'd */
 static gboolean CCDConfigWinConf = FALSE; /* TRUE if 'CCD config.' window conf*/
+static gboolean V4LWinConf = FALSE;   /* TRUE if 'V4L config.' window config'd*/
+static gboolean FilWinConf = FALSE;   /* TRUE if 'filter config.' window conf.*/
 static gboolean PBWinConf = FALSE;    /* TRUE if playback window configured   */
 static gboolean PhotWinConf = FALSE;  /* TRUE if 'Photometry' window config'd */
 static gboolean ResetChkState = FALSE;/* TRUE if checkbox state is being reset*/
@@ -214,6 +221,14 @@ gboolean on_wndSXConfig_configure (GtkWidget *widget, GdkEventExpose *event,
                                    gpointer data);
 gboolean on_wndSXConfig_delete (GtkWidget *widget, GdkEventAny *event,
                                 gpointer data);
+gboolean on_wndV4LConfig_configure (GtkWidget *widget, GdkEventExpose *event,
+                                    gpointer data);
+gboolean on_wndV4LConfig_delete (GtkWidget *widget, GdkEventAny *event,
+                                 gpointer data);
+gboolean on_wndFilterConfig_configure (GtkWidget *widget, GdkEventExpose *event,
+                                       gpointer data);
+gboolean on_wndFilterConfig_delete (GtkWidget *widget, GdkEventExpose *event,
+                                    gpointer data);
 gboolean on_trvTasks_button_release (GtkWidget *widget, GdkEventButton *event,
                                      gpointer data);
 #ifdef HAVE_UNICAP
@@ -244,31 +259,40 @@ gboolean on_wndPhotom_delete (GtkWidget *widget, GdkEventAny *event,
 void on_ccdApp_destroy (GtkWidget *widget, gpointer data);
 void on_FileSaveCCD_activate (GtkWidget *widget, gpointer data);
 void on_FileSaveAUG_activate (GtkWidget *widget, gpointer data);
+void on_WriteDebugToLog_activate (GtkWidget *widget, gpointer data);
 void on_WriteLog_activate (GtkWidget *widget, gpointer data);
 void on_ClearLog_activate (GtkWidget *widget, gpointer data);
-void on_CCDConfig_activate (GtkWidget *widget, gpointer data);
-void on_Setting_activate (GtkWidget *widget, gpointer data);
 void on_FileExit_activate (GtkWidget *widget, gpointer data);
-void on_SetCanvasFont_activate (GtkWidget *widget, gpointer data);
-void on_WriteDebugToLog_activate (GtkWidget *widget, gpointer data);
 void on_Communications_activate (GtkWidget *widget, gpointer data);
 void on_TelescopeOpen_activate (GtkWidget *widget, gpointer data);
 void on_GeminiCommands_activate (GtkWidget *widget, gpointer data);
+void on_AutogOpen_activate (GtkWidget *widget, gpointer data);
+void on_FilterWheelOpen_activate (GtkWidget *widget, gpointer data);
+void on_FocusOpen_activate (GtkWidget *widget, gpointer data);
+void on_ParallelPort_activate (GtkWidget *widget, gpointer data);
+void on_ParPortOpen_activate (GtkWidget *widget, gpointer data);
 void on_CCDCamType_activate (GtkWidget *widget, gpointer data);
 void on_CCDSelect_activate (GtkWidget *widget, gpointer data);
 void on_CCDOpen_activate (GtkWidget *widget, gpointer data);
+void on_CCDConfig_activate (GtkWidget *widget, gpointer data);
 void on_FullFrame_activate (GtkWidget *widget, gpointer data);
-void on_AutogOpen_activate (GtkWidget *widget, gpointer data);
-void on_AutogCamType_activate (GtkWidget *widget, gpointer data);
-void on_SXCamSelect_activate (GtkWidget *widget, gpointer data);
 void on_Debayer_activate (GtkWidget *widget, gpointer data);
-void on_PEC_activate (GtkWidget *widget, gpointer data);
+void on_AutogCamType_activate (GtkWidget *widget, gpointer data);
+void on_UnicapDevice_activate (GtkWidget *widget, gpointer data);
+void on_UnicapProperties_activate (GtkWidget *widget, gpointer data);
+void on_V4LProperties_activate (GtkWidget *widget, gpointer data);
+void on_SXCamSelect_activate (GtkWidget *widget, gpointer data);
 void on_Greyscale_activate (GtkWidget *widget, gpointer data);
-void on_ParallelPort_activate (GtkWidget *widget, gpointer data);
-void on_ParPortOpen_activate (GtkWidget *widget, gpointer data);
-void on_FocusOpen_activate (GtkWidget *widget, gpointer data);
+void on_Setting_activate (GtkWidget *widget, gpointer data);
+void on_FilterWheelType_activate (GtkWidget *widget, gpointer data);
+void on_FilterWheelSelect_activate (GtkWidget *widget, gpointer data);
+void on_FiltersConfig_activate (GtkWidget *widget, gpointer data);
+void on_FocuserType_activate (GtkWidget *widget, gpointer data);
+void on_PEC_activate (GtkWidget *widget, gpointer data);
 void on_PrecessCoords_activate (GtkWidget *widget, gpointer data);
 void on_UseUTC_activate (GtkWidget *widget, gpointer data);
+void on_SetCanvasFont_activate (GtkWidget *widget, gpointer data);
+void on_LiveView_activate (GtkWidget *widget, gpointer data);
 void on_Playback_activate (GtkWidget *widget, gpointer data);
 void on_CCDTemps_activate (GtkWidget *widget, gpointer data);
 void on_AutogTrace_activate (GtkWidget *widget, gpointer data);
@@ -279,6 +303,8 @@ void on_btnGetRegion_clicked (GtkButton *button, gpointer data);
 void on_spbBin_value_changed (GtkSpinButton *spin, gpointer data);
 void on_txtExposure_activate (GtkEditable *editable, gpointer data);
 void on_cmbExpType_changed (GtkWidget *widget, gpointer data);
+void on_chkIgnoreCCDCooling_toggled (GtkButton *button, gpointer data);
+void on_chkDisplayCCDImage_toggled (GtkButton *button, gpointer data);
 void on_chkBeepExposure_toggled (GtkButton *button, gpointer data);
 void on_btnStart_clicked (GtkButton *button, gpointer data);
 void on_btnCancel_clicked (GtkButton *button, gpointer data);
@@ -416,9 +442,11 @@ void on_btnPBClose_clicked (GtkButton *button, gpointer data);
 void on_btnSVOK_clicked (GtkButton *button, gpointer data);
 void on_btnDevSelect_clicked (GtkButton *button, gpointer data);
 void on_btnUnicapSelect_clicked (GtkButton *button, gpointer data);
-void on_chkCConfHasCooling_toggled (GtkButton *button, gpointer data);
+void on_btnV4LConfigApply_clicked (GtkButton *button, gpointer data);
+void on_btnV4LConfigClose_clicked (GtkButton *button, gpointer data);
 void on_chkCConfCoolOnConnect_toggled (GtkButton *button, gpointer data);
 void on_btnCConfSetDefTemp_clicked (GtkButton *button, gpointer data);
+void on_btnCConfSetTempTol_clicked (GtkButton *button, gpointer data);
 void on_btnCConfCoolerOn_clicked (GtkButton *button, gpointer data);
 void on_btnCConfCoolerOff_clicked (GtkButton *button, gpointer data);
 void on_optCConfFans_toggled (GtkButton *button, gpointer data);
@@ -443,13 +471,17 @@ void on_cmbCConfWheel_changed (GtkComboBox *combo, gpointer data);
 void on_btnCConfSaveFilterSettings_clicked (GtkButton *button, gpointer data);
 void on_btnCConfRotate_clicked (GtkButton *button, gpointer data);
 void on_chkCConfInvertImage_toggled (GtkButton *button, gpointer data);
+void on_chkCConfInvertDS9h_toggled (GtkButton *button, gpointer data);
+void on_chkCConfInvertDS9v_toggled (GtkButton *button, gpointer data);
 void on_chkCConfDebayer_toggled (GtkButton *button, gpointer data);
 void on_cmbCConfBayerPattern_changed (GtkComboBox *combo, gpointer data);
 void on_btnCConfClose_clicked (GtkButton *button, gpointer data);
 gboolean IsCConfCombo (gpointer key, gpointer value, gpointer data);
-void on_LiveView_activate (GtkWidget *widget, gpointer data);
-void on_UnicapDevice_activate (GtkWidget *widget, gpointer data);
-void on_UnicapProperties_activate (GtkWidget *widget, gpointer data);
+void on_cmbFConfWheel_changed (GtkComboBox *combo, gpointer data);
+void on_btnFConfSaveFilterSettings_clicked (GtkButton *button, gpointer data);
+void on_btnFConfRotate_clicked (GtkButton *button, gpointer data);
+void on_btnFConfClose_clicked (GtkButton *button, gpointer data);
+gboolean IsFConfCombo (gpointer key, gpointer value, gpointer data);
 #ifdef HAVE_UNICAP
 void on_tglLVRecord_toggled (GtkButton *button, gpointer data);
 #endif  /* UNICAP */
@@ -494,6 +526,7 @@ void get_autog_movespeed (gboolean *CenterSpeed, gfloat *speed);
 void set_autog_sensitive (gboolean sensitive, gboolean autogopened);
 void set_autog_calibrate_done (void);
 
+gboolean ui_control_action (gchar *cmd, gchar *token);
 static void canvas_button_press (GtkWidget *widget, GdkEventButton *event,
                                  struct cam_img *img);
 static void canvas_button_release (struct cam_img *img);
@@ -514,7 +547,7 @@ GooCanvasItem *ui_show_augcanv_text (gdouble x, gdouble y, gchar *string,
 void ui_show_augcanv_centroid (gboolean show, gboolean saturated, 
                                gfloat h, gfloat v,
                                gushort x1, gushort x2, gushort y1, gushort y2);
-void ui_set_aug_window_controls (enum CamDevice dev, gboolean Binning);
+void ui_set_aug_window_controls (enum HWDevice dev, gboolean Binning);
                                
 void ui_show_video_frame (guchar *frame, gchar *timestamp, guint num, 
 					      gushort h, gushort v);
@@ -522,6 +555,7 @@ void ui_show_photom_points (gchar *filename, gfloat aperture);
 void set_video_range_adjustment (guint num_frames);
 void set_video_range_value (guint frame_num);
 gushort get_video_framebufsize (void);
+static void ui_show_status_bar_info (void);
 
 static gchar *get_open_filename (GtkWindow *window, gchar *filename);
 static gchar *get_save_filename (GtkWindow *window, gchar *filename);
@@ -533,26 +567,27 @@ static gboolean check_file (gchar *filename, gboolean Overwrite);
 void ui_show_aug_window (void);
 void ui_hide_aug_window (void);
 
-void select_device (struct cam_img *img, gint num);
+void select_device (void);
 void get_ccd_image_params (struct exposure_data *exd);
 void set_camera_state (struct cam_img *img);
-gboolean set_filter (enum CamType type, gchar *filter, gint *fo_diff);
-gboolean get_apply_filter_offset (void);
-void apply_filter_focus_offset (enum CamType type, gint offset);
 void set_ccd_deftemp (void);
 gboolean show_camera_status (gboolean show);
-gchar *get_filter_info (struct cam_img *img, gint pos, gchar *filter,
-	                    gint *offset);
+gboolean get_V4L_settings (gchar *device);
+gboolean set_filter (gboolean ForceInternal, gchar *filter, gint *fo_diff);
+gboolean get_filter_info (struct cam_img *img, gchar *filter, gint *pos, 
+	                      gint *offset);
+gboolean get_apply_filter_offset (void);
+void apply_filter_focus_offset (gint offset);
 void check_focuser_temp (void);
 
-static void ui_show_status_bar_info (void);
 static void select_entry_region (const gchar *name);
 static void common_keyboard_shortcuts (GdkEventKey *event);
 static void comms_menus_update_ports (void);
 static void comms_ports_set_active (GtkWidget *widget, gpointer data);
 static void comms_ports_activate_cb (GtkWidget* widget, gpointer data);
-static void comms_ports_set_sensitive (GtkWidget *widget, gpointer data);
 static void comms_menus_remove_ports (GtkWidget *widget, gpointer data);
+static void widget_set_sensitive (GtkWidget *widget, gpointer data);
+static void widget_set_insensitive (GtkWidget *widget, gpointer data);
 static void restore_config_data (void);
 static void save_config_data (void);
 static void restore_watch_file (void);
@@ -819,8 +854,8 @@ gboolean on_wndImage_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndImage_delete (GtkWidget *widget, GdkEventAny *event,
                              gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 
 	if (!gtk_toggle_button_get_active (
@@ -925,8 +960,8 @@ write_info:
 gboolean on_wndSetting_delete (GtkWidget *widget, GdkEventAny *event,
                                gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_set, "btnCloseSetting"));
@@ -983,8 +1018,8 @@ gboolean on_wndParallelPort_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndParallelPort_delete (GtkWidget *widget, GdkEventAny *event,
                                     gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_ppd, "btnPPClose"));
@@ -1045,8 +1080,8 @@ gboolean on_wndEditTasks_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndEditTasks_delete (GtkWidget *widget, GdkEventAny *event,
                                  gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_tsk, "btnTCloseWindow"));
@@ -1236,23 +1271,30 @@ gboolean on_wndQSIConfig_configure (GtkWidget *widget, GdkEventExpose *event,
 		
         cmbCConfCameraGain = create_text_combo_box (
                       GTK_TABLE (xml_get_widget (xml_con, "tblQSIConfig")),
-                      1, 2, 18, 19, cmbCConfCameraGain, "ListCCDCameraGain",
+                      1, 2, 16, 17, cmbCConfCameraGain, "ListCCDCameraGain",
                       R_config_d (CCDConfigKey (CCDConfigOwner, 
                       "CameraGain"), -1) + 1, 
                       (GCallback) on_cmbCConfCameraGain_changed);
         cmbCConfReadoutSpeed = create_text_combo_box (
                       GTK_TABLE (xml_get_widget (xml_con, "tblQSIConfig")),
-                      1, 2, 19, 20, cmbCConfReadoutSpeed, "ListCCDReadoutSpeed",
+                      1, 2, 17, 18, cmbCConfReadoutSpeed, "ListCCDReadoutSpeed",
                       R_config_d (CCDConfigKey (CCDConfigOwner, 
                       "ReadoutSpeed"), -1) + 1, 
                       (GCallback) on_cmbCConfReadoutSpeed_changed);
         cmbCConfAntiBlooming = create_text_combo_box (
                       GTK_TABLE (xml_get_widget (xml_con, "tblQSIConfig")),
-                      1, 2, 20, 21, cmbCConfAntiBlooming, "ListCCDAntiBlooming",
+                      1, 2, 18, 19, cmbCConfAntiBlooming, "ListCCDAntiBlooming",
                       R_config_d (CCDConfigKey (CCDConfigOwner, 
                       "AntiBloom"), -1) + 1, 
                       (GCallback) on_cmbCConfAntiBlooming_changed);
 		
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON 
+		  (xml_get_widget (xml_con, "chkCConfInvertDS9h")),
+		  R_config_d (CCDConfigKey (CCDConfigOwner, "InvertDS9h"), FALSE));			  
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON 
+		  (xml_get_widget (xml_con, "chkCConfInvertDS9v")),
+		  R_config_d (CCDConfigKey (CCDConfigOwner, "InvertDS9v"), FALSE));	
+		  		  
 		CCDConfigWinConf = TRUE;
 	}
 	return FALSE;
@@ -1261,8 +1303,8 @@ gboolean on_wndQSIConfig_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndQSIConfig_delete (GtkWidget *widget, GdkEventAny *event,
                                  gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_con, "btnCConfClose"));
@@ -1275,8 +1317,9 @@ gboolean on_wndSXConfig_configure (GtkWidget *widget, GdkEventExpose *event,
 	/* Configure the CCD Configuration window */
 	
     static GtkComboBox *cmbCConfBayerPattern;
-	gdouble def_temp;
+	gdouble val;
 	gchar *title;
+	gboolean Active;
 	
 	if (!CCDConfigWinConf) {
 		
@@ -1289,21 +1332,47 @@ gboolean on_wndSXConfig_configure (GtkWidget *widget, GdkEventExpose *event,
 		
 		/* Set cooling controls */
 		
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON 
-		  (xml_get_widget (xml_con, "chkCConfHasCooling1")),
-		  R_config_d (CCDConfigKey (CCDConfigOwner, "HasCooling"), FALSE));			  
+		Active = CCDConfigOwner->cam_cap.CanSetCCDTemp;
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "chkCConfCoolOnConnect1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "lblCConfDefTemp1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "txtCConfDefTemp1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "btnCConfSetDefTemp1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "lblCConfTempTol1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "txtCConfTempTol1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "btnCConfSetTempTol1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "btnCConfCoolerOn1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "btnCConfCoolerOff1"), Active);
+		  			  
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON 
 		  (xml_get_widget (xml_con, "chkCConfCoolOnConnect1")),
 		  R_config_d (CCDConfigKey (CCDConfigOwner, "CoolOnConnect"), FALSE));			  
 		
-		def_temp = R_config_f (CCDConfigKey(CCDConfigOwner,"DefTemp"),TPR_DEF);
-		set_entry_float ("txtCConfDefTemp1", def_temp);
+		val = R_config_f (CCDConfigKey(CCDConfigOwner,"DefTemp"),TPR_DEF);
+		set_entry_float ("txtCConfDefTemp1", val);
+		
+		val = R_config_f (CCDConfigKey(CCDConfigOwner,"TempTol"), 1.0);
+		set_entry_float ("txtCConfTempTol1", val);
 		
 		/* Set miscellaneous options */
 		
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON 
 		  (xml_get_widget (xml_con, "chkCConfInvertImage1")),
 		  R_config_d (CCDConfigKey (CCDConfigOwner, "InvertImage"), FALSE));			  
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON 
+		  (xml_get_widget (xml_con, "chkCConfInvertDS9h1")),
+		  R_config_d (CCDConfigKey (CCDConfigOwner, "InvertDS9h"), FALSE));			  
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON 
+		  (xml_get_widget (xml_con, "chkCConfInvertDS9v1")),
+		  R_config_d (CCDConfigKey (CCDConfigOwner, "InvertDS9v"), FALSE));			  
 		
 		/* Set the debayering options */
 		
@@ -1313,12 +1382,19 @@ gboolean on_wndSXConfig_configure (GtkWidget *widget, GdkEventExpose *event,
 		
         cmbCConfBayerPattern = create_text_combo_box (
                       GTK_TABLE (xml_get_widget (xml_con, "tblSXConfig")),
-                      3, 4, 10, 11, cmbCConfBayerPattern,"ListCCDBayerPatterns",
+                      3, 4, 12, 13, cmbCConfBayerPattern,"ListCCDBayerPatterns",
                       R_config_d(CCDConfigKey(CCDConfigOwner,"BayerPattern"),0), 
                       (GCallback) on_cmbCConfBayerPattern_changed);
         g_hash_table_insert (hshCombo, "cmbCConfBayerPattern", 
                              cmbCConfBayerPattern);
 		
+		Active = CCDConfigOwner->cam_cap.IsColour;
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "chkCConfDebayer1"), Active);
+		gtk_widget_set_sensitive (xml_get_widget (
+								  xml_con, "lblCConfPattern1"), Active);
+		gtk_widget_set_sensitive (GTK_WIDGET (cmbCConfBayerPattern), Active);
+								  
 		CCDConfigWinConf = TRUE;
 	}
 	return FALSE;
@@ -1327,11 +1403,163 @@ gboolean on_wndSXConfig_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndSXConfig_delete (GtkWidget *widget, GdkEventAny *event,
                                 gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_con, "btnCConfClose1"));
+	return TRUE;	
+}
+
+gboolean on_wndV4LConfig_configure (GtkWidget *widget, GdkEventExpose *event,
+                                    gpointer data)
+{
+	/* Configure the V4L configuration window */
+	
+	struct cam_img *aug = get_aug_image_struct ();
+	
+	static GtkComboBox *cmbV4LVidStd, *cmbV4LVidInp;
+	gushort i;
+	gchar *str;
+	
+	if (!V4LWinConf) {
+		set_entry_string ("txtV4LConfigDevice", aug->vid_dat.card);
+		
+		/* Create video standard combo box */
+		
+		cmbV4LVidStd = create_text_combo_box (
+						   GTK_TABLE (xml_get_widget (xml_V4L, "tblV4LConfig")),
+						   1, 2, 1, 2, cmbV4LVidStd, "ListDummyComboBox", 
+						   0, NULL);
+		g_hash_table_insert (hshCombo, "cmbV4LVidStd", cmbV4LVidStd);
+		
+		/* Fill combo box with an entry for each standard found */
+		
+		if (!aug->vid_dat.vid_std.num) {
+			gtk_combo_box_append_text (cmbV4LVidStd, "None");
+			gtk_combo_box_set_active (cmbV4LVidStd, 0);
+			aug->vid_dat.HasVideoStandard = FALSE;
+		} else {
+			for (i = 0; i < aug->vid_dat.vid_std.num; i++) {
+				str = g_strdup_printf ("%s", aug->vid_dat.vid_std.name[i]);
+				gtk_combo_box_append_text (cmbV4LVidStd, str);
+				g_free (str);
+			}
+			gtk_combo_box_set_active (cmbV4LVidStd, 
+			                          aug->vid_dat.vid_std.selected);
+			aug->vid_dat.HasVideoStandard = TRUE;
+		}
+		
+		/* Create video input combo box */
+		
+		cmbV4LVidInp = create_text_combo_box (
+						   GTK_TABLE (xml_get_widget (xml_V4L, "tblV4LConfig")),
+						   1, 2, 2, 3, cmbV4LVidInp, "ListDummyComboBox", 
+						   0, NULL);
+		g_hash_table_insert (hshCombo, "cmbV4LVidInp", cmbV4LVidInp);
+		
+		/* Fill combo box with an entry for each input found */
+		
+		if (!aug->vid_dat.vid_input.num)
+			gtk_combo_box_append_text (cmbV4LVidInp, "None");
+		else {
+			for (i = 0; i < aug->vid_dat.vid_input.num; i++) {
+				str = g_strdup_printf ("%s", aug->vid_dat.vid_input.name[i]);
+				gtk_combo_box_append_text (cmbV4LVidInp, str);
+				g_free (str);
+			}
+		}
+		gtk_combo_box_set_active(cmbV4LVidInp, aug->vid_dat.vid_input.selected);
+		
+		/* Set width, height, fps */
+		
+		set_entry_int ("txtV4LConfigWidth", aug->vid_dat.width);
+		set_entry_int ("txtV4LConfigHeight", aug->vid_dat.height);
+		set_entry_float ("txtV4LConfigFps", aug->vid_dat.fps);
+
+		V4LWinConf = TRUE;
+	}
+	return FALSE;
+}
+
+gboolean on_wndV4LConfig_delete (GtkWidget *widget, GdkEventAny *event,
+                                 gpointer data)
+{
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
+ 	 */
+	
+	gtk_widget_activate (xml_get_widget (xml_V4L, "btnV4LConfigClose"));
+	return TRUE;	
+}
+
+gboolean on_wndFilterConfig_configure (GtkWidget *widget, GdkEventExpose *event,
+                                       gpointer data)
+{
+	/* Configure the filter wheel configuration window */
+	
+    static GtkComboBox *cmbFConfFil[9];
+	static GtkComboBox *cmbFConfWheel, *cmbFConfSetFilter;
+	gushort i;
+    static gchar *FConfFil_name[9] = {
+                                "cmbFConfFil0", "cmbFConfFil1", "cmbFConfFil2", 
+                                "cmbFConfFil3", "cmbFConfFil4", "cmbFConfFil5", 
+                                "cmbFConfFil6", "cmbFConfFil7", "cmbFConfFil8"};
+	
+	if (!FilWinConf) {
+		
+        /* Create and fill filter wheel combo boxes */
+        
+        for (i = 0; i < 9; i++) {  /* Filter for given wheel position */
+            cmbFConfFil[i] = create_text_combo_box (
+                        GTK_TABLE (xml_get_widget (xml_fil, "tblFilterConfig")),
+                        1, 2, 3 + i, 4 + i, cmbFConfFil[i], 
+                        "ListCCDFilterTypes", 0, NULL);
+            g_hash_table_insert (hshCombo, FConfFil_name[i], cmbFConfFil[i]);
+        }
+        
+        cmbFConfSetFilter = create_text_combo_box ( /* Rotate to this filter */
+                        GTK_TABLE (xml_get_widget (xml_fil, "tblFilterConfig")),
+                        2, 3, 15, 16, cmbFConfSetFilter, 
+                        "ListCCDFilterTypes", 0, NULL);
+        g_hash_table_insert (hshCombo, "cmbFConfSetFilter", cmbFConfSetFilter);
+            
+		/* Create, fill and activate the active filter wheel number combo box.
+         * This causes the filter wheel combo boxes for each filter position to 
+         * be restored to their previous values for that filter wheel via the 
+         * on_cmbFConfWheel_changed callback when the filter wheel number combo 
+         * box is activated.
+		 */
+		
+        cmbFConfWheel = create_text_combo_box (
+                        GTK_TABLE (xml_get_widget (xml_fil, "tblFilterConfig")),
+                        1, 2, 1, 2, cmbFConfWheel, "ListCCDFilterWheels",
+                        R_config_d ("FilterWheel/ActiveWheel", 1) -1, 
+                        (GCallback) on_cmbFConfWheel_changed);
+                           
+		FilWinConf = TRUE;
+	}
+	
+	/* Disable position zero for SX filterwheels - they start at position 1 */
+	
+	if (!(strcmp (menu.filterwheel, "filterwheel_sx"))) {
+		gtk_widget_set_sensitive (
+		                 g_hash_table_lookup (hshCombo, "cmbFConfFil0"), FALSE);
+		gtk_widget_set_sensitive (
+		                 xml_get_widget (xml_fil, "txtFConfFoc0"), FALSE);
+	}
+	
+	return FALSE;
+}
+
+gboolean on_wndFilterConfig_delete (GtkWidget *widget, GdkEventExpose *event,
+                                    gpointer data)
+{
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
+ 	 */
+	
+	gtk_widget_activate (xml_get_widget (xml_fil, "btnFConfClose"));
 	return TRUE;	
 }
 
@@ -1399,7 +1627,8 @@ gboolean on_wndLiveView_configure (GtkWidget *widget, GdkEventExpose *event,
 		
 		/* Pack the display widget into the scrolled window */
 		
-		aug->ugtk_display =unicapgtk_video_display_new_by_handle(aug->u_handle);
+		aug->ugtk_display = unicapgtk_video_display_new_by_handle (
+		                                                       aug->ucp_handle);
 		gtk_scrolled_window_add_with_viewport (
 					        GTK_SCROLLED_WINDOW (scwWindow), aug->ugtk_display);
 		
@@ -1419,7 +1648,7 @@ gboolean on_wndLiveView_configure (GtkWidget *widget, GdkEventExpose *event,
 		/* Set the specified display format */
 		
 		if (!SUCCESS (unicapgtk_video_display_set_format 
-				 (UNICAPGTK_VIDEO_DISPLAY (aug->ugtk_display), &aug->u_format)))
+			   (UNICAPGTK_VIDEO_DISPLAY (aug->ugtk_display), &aug->ucp_format)))
 			goto config_error;
 		
 		/* Start the display */
@@ -1476,8 +1705,8 @@ gboolean on_wndLiveView_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndLiveView_delete (GtkWidget *widget, GdkEventAny *event,
                                 gpointer data)	
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_lvw, "btnLVClose"));
@@ -1560,8 +1789,8 @@ gboolean on_wndPlayback_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndPlayback_delete (GtkWidget *widget, GdkEventAny *event,
                                 gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_pbw, "btnPBClose"));
@@ -1683,8 +1912,8 @@ gboolean on_wndPhotom_configure (GtkWidget *widget, GdkEventExpose *event,
 gboolean on_wndPhotom_delete (GtkWidget *widget, GdkEventAny *event,
                                 gpointer data)
 {
-	/* Don't ever want the user to close this window via the window menu, so 
-	 * always return TRUE.
+	/* Close window in a controlled fashion if the user tries to close this 
+	 * window via the window menu.
  	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_pht, "btnPhotClose"));
@@ -1720,6 +1949,13 @@ void on_FileSaveAUG_activate (GtkWidget *widget, gpointer data)
 	save_file (aug, GREY, FALSE);
 }
 
+void on_WriteDebugToLog_activate (GtkWidget *widget, gpointer data)
+{
+	/* Toggle writing of debug messages to the log window */
+	
+	Debug = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
+}
+
 void on_WriteLog_activate (GtkWidget *widget, gpointer data)
 {
 	/* Write the current content of the log window to a file */
@@ -1745,6 +1981,381 @@ void on_ClearLog_activate (GtkWidget *widget, gpointer data)
 	gtk_text_buffer_get_iter_at_offset (txtLogBuffer, &start, 0);
 	gtk_text_buffer_get_iter_at_offset (txtLogBuffer, &end, -1);
 	gtk_text_buffer_delete (txtLogBuffer, &start, &end);
+}
+
+void on_FileExit_activate (GtkWidget *widget, gpointer data)
+{
+	/* Close the application unless the user elects not to */
+	
+	if (!query_file_not_saved ())
+		loop_stop_loop ();
+}
+
+void on_Communications_activate (GtkWidget *widget, gpointer data)
+{
+	/* Rebuild submenus with current /dev/ttyUSB ports */
+	
+	comms_menus_update_ports ();
+}
+
+void on_TelescopeOpen_activate (GtkWidget *widget, gpointer data)
+{
+	/* Open/close the telescope link */
+	
+	struct cam_img *aug = get_aug_image_struct ();
+	
+	gboolean Open;
+	
+	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
+	menu.OpenTelPort = Open;
+	
+	/* Set sensitive/insensitive any menu items that depend on the telescope
+	 * link state.
+	 */
+	
+	gtk_widget_set_sensitive (xml_get_widget (
+                                   xml_app, "telescope_link"), !Open);
+    if (Open)
+		gtk_widget_set_sensitive (xml_get_widget (
+								   xml_app, "gemini_commands"), FALSE);
+	else {
+		if (!aug->Open)
+			gtk_widget_set_sensitive (xml_get_widget (
+								   xml_app, "gemini_commands"), TRUE);
+	}
+	if (GeminiCmds)
+		gtk_widget_set_sensitive (xml_get_widget (
+								   xml_app, "periodic_error_correction"), Open);
+	
+	/* If this routine is being called to reset the visual appearance of the
+	 * button to the correct state, then return.
+	 */
+	
+	if (ResetChkState) {
+		ResetChkState = FALSE;
+		return;
+	}
+	
+	/* Always attempt to close link; then reopen if we're supposed to be 
+	 * opening it.
+	 */
+	
+	telescope_close_comms_port ();
+
+	if (Open) 
+		if (!telescope_open_comms_port ())
+			reset_checkbox_state (RCS_OPEN_COMMS_LINK, FALSE);
+}
+
+void on_GeminiCommands_activate (GtkWidget *widget, gpointer data)
+{
+	/* Toggle flag for using Losmandy Gemini commands */
+	
+	menu.Gemini =  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (widget));
+	GeminiCmds = menu.Gemini;
+	gtk_widget_set_sensitive (xml_get_widget (xml_app, "tblGemini"),GeminiCmds);
+}
+
+void on_AutogOpen_activate (GtkWidget *widget, gpointer data)
+{
+	/* Open/close the guide signal comms link */
+	
+	gboolean Open;
+	
+	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
+	menu.OpenAutogPort = Open;
+	
+	/* Set sensitive/insensitive any menu items that depend on the autoguider
+	 * link state.
+	 */
+	
+	gtk_widget_set_sensitive (xml_get_widget (xml_app,"autoguider_link"),!Open);
+	
+	/* If this routine is being called to reset the visual appearance of the
+	 * button to the correct state, then return.
+	 */
+	
+	if (ResetChkState) {
+		ResetChkState = FALSE;
+		return;
+	}
+
+	/* Always attempt to close link; then reopen if we're supposed to be 
+	 * opening it.
+	 */
+	
+	telescope_close_guide_port ();
+	
+	if (Open) {
+		if (!telescope_open_guide_port ())
+			reset_checkbox_state (RCS_OPEN_AUTOG_LINK, FALSE);
+	}
+}
+
+void on_FilterWheelOpen_activate (GtkWidget *widget, gpointer data)
+{
+	/* Open/close filterwheel link */
+	
+	gboolean Open;
+	
+	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
+	menu.OpenFilterwheelPort = Open;
+		
+	/* Set sensitive/insensitive any menu items that depend on the filter wheel
+	 * link state.
+	 */
+	
+	/* Filter wheel comms options permanently greyed out at present because
+	 * there is only one valid option for each filterwheel type and that is
+	 * selected automatically.
+	 */
+	//gtk_widget_set_sensitive (xml_get_widget (
+	//                                 xml_app, "filter_wheel_link"), !Open);
+	if (Open)
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			       xml_app, "filterwheel_menu")), widget_set_insensitive, NULL);
+	else
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			       xml_app, "filterwheel_menu")), widget_set_sensitive, NULL);
+	if (menu.OpenCCDCam)
+		gtk_widget_set_sensitive (xml_get_widget (
+		           xml_app, "filterwheel_int"), FALSE);
+	gtk_widget_set_sensitive (xml_get_widget (
+									   xml_app, "select_filter_wheel"),  !Open);
+	
+	/* If this routine is being called to reset the visual appearance of the
+	 * button to the correct state, then return.
+	 */
+	
+	if (ResetChkState) {
+		ResetChkState = FALSE;
+		return;
+	}
+
+	/* Now open the port */
+	
+	if (Open) {
+		if (!filter_open_comms_port ())
+			reset_checkbox_state (RCS_OPEN_FILTER_LINK, FALSE);
+	} else {
+		if (!filter_close_comms_port ())
+			reset_checkbox_state (RCS_OPEN_FILTER_LINK, TRUE);
+	}
+}
+
+void on_FocusOpen_activate (GtkWidget *widget, gpointer data)
+{
+	/* Open/close the focuser link */
+	
+	struct focus f;
+	gboolean Open;
+	
+	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
+	menu.OpenFocusPort = Open;
+		
+	loop_focus_open (Open);
+	
+	/* Set sensitive/insensitive any menu items that depend on the focuser
+	 * link state.
+	 */
+	
+	gtk_widget_set_sensitive (xml_get_widget (xml_app, "focuser_link"), !Open);
+	if (Open)
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			           xml_app, "focuser_menu")), widget_set_insensitive, NULL);
+	else
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			           xml_app, "focuser_menu")), widget_set_sensitive, NULL);
+	gtk_widget_set_sensitive (xml_get_widget (xml_app, "tblFocus"),      Open);
+	if (!Open)
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (xml_get_widget (
+							               xml_app, "chkFocusTempComp")),FALSE);																		  
+	
+	/* If this routine is being called to reset the visual appearance of the
+	 * button to the correct state, then return.
+	 */
+	
+	if (ResetChkState) {
+		ResetChkState = FALSE;
+		return;
+	}
+
+	/* Always attempt to close link; then reopen if we're supposed to be 
+	 * opening it.
+	 */
+	
+	focus_close_comms_port ();
+	
+	if (Open) {
+		if (!focus_open_comms_port ())
+			reset_checkbox_state (RCS_OPEN_FOCUS_LINK, FALSE);
+		else {
+		    if (!strcmp (menu.focuser, "focuser_robofocus")) {
+				f.cmd = FC_VERSION;
+				focus_comms->focus (&f);
+				if (f.version >= 3.0)
+					f.cmd = FC_MAX_TRAVEL_GET | FC_CUR_POS_GET | 
+				            FC_BACKLASH_GET | FC_MOTOR_GET | FC_TEMP_GET;
+				else
+					f.cmd = FC_MAX_TRAVEL_GET | FC_CUR_POS_GET | 
+				            FC_BACKLASH_GET;
+				focus_comms->focus (&f);
+				if (!f.Error) {
+					set_entry_int ("txtFocusMaxTravel", f.max_travel);
+					set_entry_int ("txtFocusCurrentPos", f.cur_pos);
+					set_entry_int ("txtFocusBacklashSteps", f.backlash_steps);
+					gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+										  xml_get_widget (xml_app, 
+									     "optFocusBacklashIn")), f.BacklashIn);
+					gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+										  xml_get_widget (xml_app, 
+										 "optFocusBacklashOut")),!f.BacklashIn);
+					if (f.version >= 3.0) {
+						set_entry_int ("txtFocusStepSize", f.step_size);
+						set_entry_int ("txtFocusStepPause", f.step_pause);
+						set_entry_int ("txtFocusDutyCycle", f.duty_cycle);
+						set_entry_float ("txtFocusTemperature", f.temp);
+					} else
+					    L_print ("{o}Can read motor configuration and "
+								 "temperature only for Robofocus version 3\n");
+				} else
+				    L_print ("{r}Error reading focuser configuration\n");
+			} else {
+				/* Some other focuser */
+			}
+		}
+	}
+}
+
+void on_ParallelPort_activate (GtkWidget *widget, gpointer data)
+{
+	/* Open the parallel port settings dialog box */
+
+	if (xml_ppd != NULL) {  /* Present window if it's already open */
+		gtk_window_present (GTK_WINDOW (xml_get_widget 
+		                                         (xml_ppd, "wndParallelPort")));
+		return;
+	}
+	
+	gchar *objects[] = {"wndParallelPort", NULL};
+	xml_ppd = xml_load_new (xml_ppd, GLADE_INTERFACE, objects);
+}
+
+void on_ParPortOpen_activate (GtkWidget *widget, gpointer data)
+{
+	#ifdef HAVE_LIBPARAPIN
+	/* Open/close the parallel port */
+	
+	gboolean Open;
+	
+	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
+	menu.OpenParPort = Open;
+	
+	/* Set sensitive/insensitive any dependent menu items */
+	
+	gtk_widget_set_sensitive (xml_get_widget (xml_app, "parallel_port"), !Open);
+	
+	/* If this routine is being called to reset the visual appearance of the
+	 * button to the correct state, then return.
+	 */
+	
+	if (ResetChkState) {
+		ResetChkState = FALSE;
+		return;
+	}
+	
+	if (Open) {
+		if (!telescope_open_parallel_port ())
+			reset_checkbox_state (RCS_OPEN_PARPORT, FALSE);
+	} else {
+		if (!telescope_close_parallel_port ())
+			reset_checkbox_state (RCS_OPEN_PARPORT, TRUE);
+	}
+	#endif
+}
+
+void on_CCDCamType_activate (GtkWidget *widget, gpointer data)
+{
+	/* Set the CCD camera type.  Any menu item that calls this function
+	 * is available only if GoQat was compiled with the supporting libraries for
+	 * the corresponding hardware already installed.
+	 */
+	
+	struct cam_img *ccd = get_ccd_image_struct ();
+	
+	const gchar *name;
+	
+	if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
+		return;
+		
+	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
+	
+	if (!(strcmp (name, "ccd_qsi"))) {
+		ccd->device = QSI;
+	} else if (!(strcmp (name, "ccd_sx"))) {
+		ccd->device = SX;
+	} else 
+	    L_print ("{r}%s: Unknown CCD camera type: "
+				 " %s\n", __func__, name);
+	
+	strcpy (menu.ccd_camera, name);
+}
+
+void on_CCDSelect_activate (GtkWidget *widget, gpointer data)
+{
+	/* Search for connected cameras and ask the user to choose one */
+	
+	if (ccdcam_get_cameras ()) {
+		ds.idx = &(get_ccd_image_struct ())->devnum;
+		select_device ();
+	}
+}
+
+void on_CCDOpen_activate (GtkWidget *widget, gpointer data)
+{
+	/* Open the selected CCD camera */
+	
+	menu.OpenCCDCam = gtk_check_menu_item_get_active (
+												  GTK_CHECK_MENU_ITEM (widget)); 
+	
+	/* Set sensitive/insensitive any menu items that depend on the CCD camera
+	 * state.
+	 */
+	
+	if (menu.OpenCCDCam)
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			        xml_app, "ccd_camera_menu")), widget_set_insensitive, NULL);
+	else
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			        xml_app, "ccd_camera_menu")), widget_set_sensitive, NULL);
+	gtk_widget_set_sensitive (xml_get_widget (
+							 xml_app, "select_ccd_camera"), !menu.OpenCCDCam);
+	gtk_widget_set_sensitive (xml_get_widget (
+							 xml_app, "configure_ccd_camera"), menu.OpenCCDCam);
+	gtk_widget_set_sensitive (xml_get_widget (
+							 xml_app, "tblCCD"), menu.OpenCCDCam);
+	
+	if (!strcmp (menu.filterwheel, "filterwheel_int")) {						 
+		if (menu.OpenCCDCam)
+			gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			       xml_app, "filterwheel_menu")), widget_set_insensitive, NULL);
+		else
+			gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			       xml_app, "filterwheel_menu")), widget_set_sensitive, NULL);
+	} else
+		gtk_widget_set_sensitive (xml_get_widget (
+							     xml_app, "filterwheel_int"), !menu.OpenCCDCam);
+	
+	/* If this routine is being called to reset the visual appearance of the
+	 * button to the correct state, then return.
+	 */
+	
+	if (ResetChkState) {
+		ResetChkState = FALSE;
+		return;
+	}
+	
+	loop_ccd_open (menu.OpenCCDCam);
 }
 
 void on_CCDConfig_activate (GtkWidget *widget, gpointer data)
@@ -1793,6 +2404,227 @@ void on_CCDConfig_activate (GtkWidget *widget, gpointer data)
 	
 	CCDConfigOwner = img;
 	CCDConfigWin = xml_get_widget (xml_con, window);
+}
+
+void on_FullFrame_activate (GtkWidget *widget, gpointer data)
+{
+	/* Toggle the option to display CCD camera data embedded in the full frame
+	 * chip area.
+	 */
+	
+	struct cam_img *ccd = get_ccd_image_struct ();
+	
+	menu.FullFrame=gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (widget));
+	gtk_widget_set_sensitive (xml_get_widget (xml_app, "btnGetRegion"),
+	                                                            menu.FullFrame);
+	ccd->FullFrame = menu.FullFrame;
+}
+
+void on_Debayer_activate (GtkWidget *widget, gpointer data)
+{
+	/* Set flag for debayering.  The names below must match the names in the
+	 * Glade interface file.
+	 */
+	
+	struct cam_img *ccd = get_ccd_image_struct ();
+		
+	const gchar *name;
+	
+	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
+	if (!(strcmp (name, "simple")))
+		ccd->imdisp.debayer = DB_SIMP;
+	else if (!(strcmp (name, "nearest")))
+		ccd->imdisp.debayer = DB_NEAR;
+	else if (!(strcmp (name, "bilinear")))
+		ccd->imdisp.debayer = DB_BILIN;	
+	else if (!(strcmp (name, "quality")))
+		ccd->imdisp.debayer = DB_QUAL;	
+	/*else if (!(strcmp (name, "downsample")))
+		ccd->imdisp.debayer = DB_DOWN;	*/
+	else if (!(strcmp (name, "gradients")))
+		ccd->imdisp.debayer = DB_GRADS;	
+	else
+		msg ("Warning - Invalid option for debayer method!");	
+
+	strcpy (menu.debayer, name);
+	
+	/* Debayer and redisplay the image (the ccdcam_debayer routine checks to 
+	 * see whether any image data actually exists before attempting to debayer
+	 * it).
+	 */
+	
+	if (ccd->Debayer && ccd->exd.h_bin == 1 && ccd->exd.v_bin == 1) {
+		if (ccdcam_debayer ())
+			loop_ccd_display_image ();
+	}
+}
+
+void on_AutogCamType_activate (GtkWidget *widget, gpointer data)
+{
+	/* Set the autoguider camera type.  Any menu item that calls this function
+	 * is available only if GoQat was compiled with the supporting libraries for
+	 * the corresponding hardware already installed.
+	 */
+	
+	struct cam_img *aug = get_aug_image_struct ();
+		
+	const gchar *name;
+	
+	if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
+		return;
+		
+	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
+	aug->device = OTHER;
+	
+	#ifdef HAVE_LIBUNICAP
+	if (!strcmp (name, "unicap")) {
+		aug->device = UNICAP;
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "greyscale_conversion"), TRUE); 
+	}
+	gtk_widget_set_sensitive (xml_get_widget (
+		                      xml_app, "unicap_device"), 
+		                      aug->device == UNICAP ? TRUE : FALSE);
+	#endif /* HAVE_LIBUNICAP */
+    #ifdef HAVE_LIBV4L2
+	if (!strcmp (name, "V4L_(/dev/video0)") ||
+		!strcmp (name, "V4L_(/dev/video1)") ||
+		!strcmp (name, "V4L_(/dev/video2)") ||
+		!strcmp (name, "V4L_(/dev/video3)")) {
+		aug->device = V4L;
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "greyscale_conversion"), TRUE); 
+	}
+	gtk_widget_set_sensitive (xml_get_widget (
+		                      xml_app, "v4l_properties"), 
+		                      aug->device == V4L ? TRUE : FALSE);
+    #endif
+    #ifdef HAVE_SX_CAM
+	if (!strcmp (name, "SX")) {
+		aug->device = SX;
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "greyscale_conversion"), FALSE); 
+	}
+	gtk_widget_set_sensitive (xml_get_widget (
+		                      xml_app, "select_sx_camera"), 
+		                      aug->device == SX ? TRUE : FALSE);
+	if (!strcmp (name, "SX_GuideHead")) {
+		aug->device = SX_GH;
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "greyscale_conversion"), FALSE);
+	} 
+	/* Don't 'un-grey' the autoguider sx camera selection menu because in 
+	 * this case we're using the guide head attached to the CCD camera.
+	 */
+	#endif /* HAVE_SX_CAM */
+	
+	if (aug->device == OTHER)
+	    L_print ("{r}%s: Unknown autoguider camera type\n", __func__);
+	
+	strcpy (menu.aug_camera, name);
+}
+
+void on_UnicapDevice_activate (GtkWidget *widget, gpointer data)
+{
+	/* Let the user select the desired unicap device and format */
+	
+	#ifdef HAVE_UNICAP /* Prevents "can't find signal handler" message if here*/
+	GtkWidget *device_selection, *format_selection;
+	GtkWidget *hbxHbox;
+	
+	/* Open the selection window */
+	
+	gchar *objects[] = {"wndUnicapSelect", NULL};
+	xml_uni = xml_load_new (xml_uni, GLADE_INTERFACE, objects);
+	
+	/* Add an hbox and pack in the device and format selection widgets */
+	
+	hbxHbox = gtk_hbox_new (FALSE, 10);
+	gtk_container_add (GTK_CONTAINER (xml_get_widget (
+										 xml_uni, "vbxUnicapSelect")), hbxHbox);
+	format_selection = unicapgtk_video_format_selection_new ();
+	device_selection = unicapgtk_device_selection_new (TRUE);
+    gtk_box_pack_start (GTK_BOX (hbxHbox), device_selection, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (hbxHbox), format_selection, TRUE, TRUE, 0);
+	unicapgtk_device_selection_rescan (
+							     UNICAPGTK_DEVICE_SELECTION (device_selection));
+	
+	/* Connect signal handlers and show the window contents */
+	
+    g_signal_connect (G_OBJECT (device_selection),
+					  "unicapgtk_device_selection_changed",
+                      G_CALLBACK (unicap_device_change_cb), format_selection);	
+	gtk_combo_box_set_active (GTK_COMBO_BOX (device_selection), 0);
+    g_signal_connect (G_OBJECT (format_selection),
+                      "unicapgtk_video_format_changed",
+                      G_CALLBACK (unicap_format_change_cb), NULL);	
+	gtk_widget_show_all (xml_get_widget (xml_uni, "wndUnicapSelect"));
+	#endif
+}
+
+void on_UnicapProperties_activate (GtkWidget *widget, gpointer data)
+{
+	/* Display the Unicap properties dialog */
+	
+	#ifdef HAVE_UNICAP /* Prevents "can't find signal handler" message if here*/
+	struct cam_img *aug = get_aug_image_struct ();
+	
+	GtkWidget *property_dialog;
+	
+	property_dialog = unicapgtk_property_dialog_new ();
+	unicapgtk_property_dialog_set_handle (
+				  UNICAPGTK_PROPERTY_DIALOG (property_dialog), aug->ucp_handle);
+	#endif
+}
+
+void on_V4LProperties_activate (GtkWidget *widget, gpointer data)
+{
+	/* Display the V4L properties dialog */
+
+	if (xml_V4L) {
+		gtk_window_present (GTK_WINDOW (xml_get_widget (
+		                                             xml_V4L, "wndV4LConfig")));
+	} else {
+		gchar *objects[] = {"wndV4LConfig", NULL};
+		xml_V4L = xml_load_new (xml_V4L, GLADE_INTERFACE, objects);
+	}
+}
+
+void on_SXCamSelect_activate (GtkWidget *widget, gpointer data)
+{
+	/* Select an sx camera to use as an autoguider */
+	
+	#ifdef HAVE_SX_CAM /* Prevents "can't find signal handler" message if here*/
+	if (augcam_get_sx_cameras ()) {
+		ds.idx = &(get_aug_image_struct ())->devnum;
+		select_device ();
+	}
+	#endif
+}
+
+void on_Greyscale_activate (GtkWidget *widget, gpointer data)
+{
+	/* Set flag for greyscale conversion.  The names below must match the
+	 * names in the Glade gtkbuilder file.
+	 */
+	
+	struct cam_img *aug = get_aug_image_struct ();
+		
+	const gchar *name;
+	
+	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
+	if (!(strcmp (name, "luminance")))
+		aug->imdisp.greyscale = LUMIN;
+	else if (!(strcmp (name, "desaturate")))
+		aug->imdisp.greyscale = DESAT;
+	else if (!(strcmp (name, "maximum")))
+		aug->imdisp.greyscale = MAXIM;
+	else if (!(strcmp (name, "mono")))
+		aug->imdisp.greyscale = MONO;	
+	else
+		msg ("Warning - Invalid option for greyscale setting!");	
+
+	strcpy (menu.greyscale, name);
 }
 
 void on_Setting_activate (GtkWidget *widget, gpointer data)
@@ -1853,8 +2685,8 @@ void on_Setting_activate (GtkWidget *widget, gpointer data)
 	/* Populate each list store row with settings data */
 	
 	s = (struct autog_config *) g_malloc0 (sizeof(struct autog_config));	
-	s->Telescope = (gchar *) g_malloc0 (80 * sizeof (gchar));
-	s->Instrument = (gchar *) g_malloc0 (80 * sizeof (gchar));	
+	s->Telescope = (gchar *) g_malloc0 (MCSL * sizeof (gchar));
+	s->Instrument = (gchar *) g_malloc0 (MCSL * sizeof (gchar));	
 
 	while (TRUE) {
 		
@@ -1941,217 +2773,85 @@ void on_Setting_activate (GtkWidget *widget, gpointer data)
 	}
 }
 
-void on_FileExit_activate (GtkWidget *widget, gpointer data)
+void on_FilterWheelType_activate (GtkWidget *widget, gpointer data)
 {
-	/* Close the application unless the user elects not to */
-	
-	if (!query_file_not_saved ())
-		loop_stop_loop ();
-}
-
-void on_SetCanvasFont_activate (GtkWidget *widget, gpointer data)
-{
-	/* Display the font selection dialog */
-	
-	GtkWidget *dlgFontSelection;
-	
-    gchar *objects[] = {"dlgFontSelection", NULL};
-    xml_font = xml_load_new (xml_font, GLADE_INTERFACE, objects);
-	
-	dlgFontSelection = xml_get_widget (xml_font, "dlgFontSelection");
-	gtk_font_selection_dialog_set_preview_text (GTK_FONT_SELECTION_DIALOG 
-	                     (dlgFontSelection), "Histogram Flux Scale 0123456789");
-}
-
-void on_WriteDebugToLog_activate (GtkWidget *widget, gpointer data)
-{
-	/* Toggle writing of debug messages to the log window */
-	
-	Debug = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
-}
-
-void on_Communications_activate (GtkWidget *widget, gpointer data)
-{
-	/* Rebuild submenus with current /dev/ttyUSB ports */
-	
-	comms_menus_update_ports ();
-}
-
-void on_TelescopeOpen_activate (GtkWidget *widget, gpointer data)
-{
-	/* Open/close the telescope link */
-	
-	struct cam_img *aug = get_aug_image_struct ();
-	
-	gboolean Open;
-	
-	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
-	menu.OpenTelPort = Open;
-	
-	/* Set sensitive/insensitive any menu items that depend on the telescope
-	 * link state.
-	 */
-	
-	gtk_widget_set_sensitive (xml_get_widget (
-                                   xml_app, "telescope_link"), !Open);
-    if (Open)
-		gtk_widget_set_sensitive (xml_get_widget (
-								   xml_app, "gemini_commands"), FALSE);
-	else {
-		if (!aug->Open)
-			gtk_widget_set_sensitive (xml_get_widget (
-								   xml_app, "gemini_commands"), TRUE);
-	}
-	if (GeminiCmds)
-		gtk_widget_set_sensitive (xml_get_widget (
-								   xml_app, "periodic_error_correction"), Open);
-	
-	/* If this routine is being called to reset the visual appearance of the
-	 * button to the correct state, then return.
-	 */
-	
-	if (ResetChkState) {
-		ResetChkState = FALSE;
-		return;
-	}
-	
-	/* Always attempt to close link; then reopen if we're supposed to be 
-	 * opening it.
-	 */
-	
-	telescope_close_comms_port ();
-
-	if (Open) 
-		if (!telescope_open_comms_port ())
-			reset_checkbox_state (RCS_OPEN_COMMS_LINK, FALSE);
-}
-
-void on_GeminiCommands_activate (GtkWidget *widget, gpointer data)
-{
-	/* Toggle flag for using Losmandy Gemini commands */
-	
-	menu.Gemini =  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (widget));
-	GeminiCmds = menu.Gemini;
-	gtk_widget_set_sensitive (xml_get_widget (xml_app, "tblGemini"),GeminiCmds);
-}
-
-void on_CCDCamType_activate (GtkWidget *widget, gpointer data)
-{
-	/* Set the CCD camera type.  Any menu item that calls this function
-	 * is available only if GoQat was compiled with the supporting libraries for
-	 * the corresponding hardware already installed.
-	 */
-	
-	struct cam_img *ccd = get_ccd_image_struct ();
+	/* Set selected filter wheel type to be active device */
 	
 	const gchar *name;
 	
 	if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
 		return;
-		
+	
 	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
 	
-	if (!(strcmp (name, "ccd_qsi"))) {
-		ccd->device = QSI;
-	} else if (!(strcmp (name, "ccd_sx"))) {
-		ccd->device = SX;
-	} else if (ccd->device != NO_CAM)
-	    L_print ("{r}%s: Unknown CCD camera type: "
+	if (!(strcmp (name, "filterwheel_int"))) {
+		filter_set_device (INTERNAL);
+		/* Set filter wheel selection and configuration insensitive */
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "select_filter_wheel"), FALSE);
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "configure_filters"), FALSE);
+		/* Set filter wheel comms to "Via CCD camera" */
+		strcpy (menu.filterwheel_port, "w_CCDCam");
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			 xml_app, "filter_wheel_link_menu")), comms_ports_set_active, NULL);
+	} else if (!(strcmp (name, "filterwheel_sx"))) {
+		filter_set_device (SX);
+		/* Set filter wheel selection and configuration sensitive */
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "select_filter_wheel"), TRUE);
+		gtk_widget_set_sensitive (xml_get_widget (
+		                          xml_app, "configure_filters"), TRUE);
+		/* Set filter wheel comms to "USB direct" */
+		strcpy (menu.filterwheel_port, "w_USBdirect");
+		gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			 xml_app, "filter_wheel_link_menu")), comms_ports_set_active, NULL);
+	} else 
+	    L_print ("{r}%s: Unknown filter wheel type: "
 				 " %s\n", __func__, name);
 	
-	strcpy (menu.ccd_camera, name);
+	strcpy (menu.filterwheel, name);
 }
 
-void on_CCDSelect_activate (GtkWidget *widget, gpointer data)
+void on_FilterWheelSelect_activate (GtkWidget *widget, gpointer data)
 {
-	/* Search for connected cameras and ask the user to choose one */
+	/* Search for connected filter wheels and ask the user to choose one */
 	
-	gint num;
-	
-	if (ccdcam_get_cameras (&num))
-		select_device (get_ccd_image_struct (), num);
+	if (filter_get_filterwheels ()) {
+		ds.idx = get_filter_devnumptr ();
+		select_device ();
+	}
 }
 
-void on_CCDOpen_activate (GtkWidget *widget, gpointer data)
+void on_FiltersConfig_activate (GtkWidget *widget, gpointer data)
 {
-	/* Open the selected CCD camera */
-	
-	menu.OpenCCDCam = gtk_check_menu_item_get_active (
-												  GTK_CHECK_MENU_ITEM (widget)); 
-	
-	/* Set sensitive/insensitive any menu items that depend on the CCD camera
-	 * state.
+	/* Open (or show) the filters configuration window.  Note that for QSI
+	 * cameras, filter configuration is managed by the CCD camera 
+	 * configuration window.
 	 */
+	 
+	/* Present window if it is already open; otherwise open it */
 	
-	gtk_widget_set_sensitive (xml_get_widget (
-						     xml_app, "ccd_camera"), !menu.OpenCCDCam);
-	gtk_widget_set_sensitive (xml_get_widget (
-							 xml_app, "select_ccd_camera"), !menu.OpenCCDCam);
-	gtk_widget_set_sensitive (xml_get_widget (
-							 xml_app, "configure_ccd_camera"), menu.OpenCCDCam);
-	gtk_widget_set_sensitive (xml_get_widget (
-							 xml_app, "tblCCD"), menu.OpenCCDCam);
+	if (xml_fil) {
+		gtk_window_present (GTK_WINDOW (xml_get_widget (
+		                                          xml_fil, "wndFilterConfig")));
+	} else {
+		gchar *objects[] = {"wndFilterConfig", NULL};
+		xml_fil = xml_load_new (xml_fil, GLADE_INTERFACE, objects);
+	}
+}
+
+void on_FocuserType_activate (GtkWidget *widget, gpointer data)
+{
+	/* Set selected focuser type to be active device */
 	
-	/* If this routine is being called to reset the visual appearance of the
-	 * button to the correct state, then return.
-	 */
+	const gchar *name;
 	
-	if (ResetChkState) {
-		ResetChkState = FALSE;
+	if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
 		return;
-	}
 	
-	loop_ccd_open (menu.OpenCCDCam);
-}
-
-void on_FullFrame_activate (GtkWidget *widget, gpointer data)
-{
-	/* Toggle the option to display CCD camera data embedded in the full frame
-	 * chip area.
-	 */
-	
-	struct cam_img *ccd = get_ccd_image_struct ();
-	
-	menu.FullFrame=gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (widget));
-	gtk_widget_set_sensitive (xml_get_widget (xml_app, "btnGetRegion"),
-	                                                            menu.FullFrame);
-	ccd->FullFrame = menu.FullFrame;
-}
-
-void on_AutogOpen_activate (GtkWidget *widget, gpointer data)
-{
-	/* Open/close the autoguider link */
-	
-	gboolean Open;
-	
-	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
-	menu.OpenAutogPort = Open;
-	
-	/* Set sensitive/insensitive any menu items that depend on the autoguider
-	 * link state.
-	 */
-	
-	gtk_widget_set_sensitive (xml_get_widget (xml_app,"autoguider_link"),!Open);
-	
-	/* If this routine is being called to reset the visual appearance of the
-	 * button to the correct state, then return.
-	 */
-	
-	if (ResetChkState) {
-		ResetChkState = FALSE;
-		return;
-	}
-
-	/* Always attempt to close link; then reopen if we're supposed to be 
-	 * opening it.
-	 */
-	
-	telescope_close_autog_port ();
-	
-	if (Open) {
-		if (!telescope_open_autog_port ())
-			reset_checkbox_state (RCS_OPEN_AUTOG_LINK, FALSE);
-	}
+	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
+	strcpy (menu.focuser, name);
 }
 
 void on_PEC_activate (GtkWidget *widget, gpointer data)
@@ -2185,267 +2885,6 @@ void on_PEC_activate (GtkWidget *widget, gpointer data)
 		warn_PEC_guidespeed (TRUE);
 }
 
-void on_AutogCamType_activate (GtkWidget *widget, gpointer data)
-{
-	/* Set the autoguider camera type.  Any menu item that calls this function
-	 * is available only if GoQat was compiled with the supporting libraries for
-	 * the corresponding hardware already installed.
-	 */
-	
-	struct cam_img *aug = get_aug_image_struct ();
-		
-	const gchar *name;
-	
-	if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
-		return;
-		
-	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
-	
-	gtk_widget_set_sensitive (xml_get_widget (
-							  xml_app, "greyscale_conversion"), FALSE);
-	#ifdef HAVE_LIBUNICAP
-	if (!strcmp (name, "unicap")) {
-		aug->device = UNICAP;
-		/* Set the unicap device selection menu sensitive/insensitive */
-		gtk_widget_set_sensitive (xml_get_widget (xml_app, "unicap_device"),
-					              gtk_check_menu_item_get_active (
-							      GTK_CHECK_MENU_ITEM (widget)));
-	} else 
-	#endif /* HAVE_LIBUNICAP */
-    #ifdef HAVE_LIBV4L2
-	if (!strcmp (name, "V4L_(/dev/video0)") ||
-		!strcmp (name, "V4L_(/dev/video1)") ||
-		!strcmp (name, "V4L_(/dev/video2)") ||
-		!strcmp (name, "V4L_(/dev/video3)")) {
-		aug->device = V4L;
-		gtk_widget_set_sensitive (xml_get_widget (
-								  xml_app, "greyscale_conversion"), TRUE);
-	} else
-    #endif
-    #ifdef HAVE_SX
-	if (!strcmp (name, "SX")) {
-		aug->device = SX;
-		/* Set the sx camera selection menu sensitive/insensitive */
-		gtk_widget_set_sensitive (xml_get_widget (xml_app, "select_sx_camera"),
-					              gtk_check_menu_item_get_active (
-							      GTK_CHECK_MENU_ITEM (widget)));
-	} else if (!strcmp (name, "SX_GuideHead")) {
-		aug->device = SX_GH;
-		/* Don't 'un-grey' the autoguider sx camera selection menu because in 
-		 * this case we're using the guide head attached to the CCD camera.
-		 */
-	} else
-	#endif /* HAVE_SX */
-    if (aug->device != NO_CAM)
-	    L_print ("{r}%s: Unknown autoguider camera type: "
-				 " %s\n", __func__, name);
-	
-	strcpy (menu.aug_camera, name);
-}
-
-void on_Debayer_activate (GtkWidget *widget, gpointer data)
-{
-	/* Set flag for debayering.  The names below must match the names in the
-	 * Glade interface file.
-	 */
-	
-	struct cam_img *ccd = get_ccd_image_struct ();
-		
-	const gchar *name;
-	
-	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
-	if (!(strcmp (name, "simple")))
-		ccd->imdisp.debayer = DB_SIMP;
-	else if (!(strcmp (name, "nearest")))
-		ccd->imdisp.debayer = DB_NEAR;
-	else if (!(strcmp (name, "bilinear")))
-		ccd->imdisp.debayer = DB_BILIN;	
-	else if (!(strcmp (name, "quality")))
-		ccd->imdisp.debayer = DB_QUAL;	
-	/*else if (!(strcmp (name, "downsample")))
-		ccd->imdisp.debayer = DB_DOWN;	*/
-	else if (!(strcmp (name, "gradients")))
-		ccd->imdisp.debayer = DB_GRADS;	
-	else
-		msg ("Warning - Invalid option for debayer method!");	
-
-	strcpy (menu.debayer, name);
-	
-	/* Debayer and redisplay the image (the ccdcam_debayer routine checks to 
-	 * see whether any image data actually exists before attempting to debayer
-	 * it).
-	 */
-	
-	if (ccd->Debayer && ccd->exd.h_bin == 1 && ccd->exd.v_bin == 1) {
-		if (ccdcam_debayer ())
-			loop_ccd_display_image ();
-	}
-}
-
-void on_Greyscale_activate (GtkWidget *widget, gpointer data)
-{
-	/* Set flag for greyscale conversion.  The names below must match the
-	 * names in the Glade gtkbuilder file.
-	 */
-	
-	struct cam_img *aug = get_aug_image_struct ();
-		
-	const gchar *name;
-	
-	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
-	if (!(strcmp (name, "luminance")))
-		aug->imdisp.greyscale = LUMIN;
-	else if (!(strcmp (name, "desaturate")))
-		aug->imdisp.greyscale = DESAT;
-	else if (!(strcmp (name, "maximum")))
-		aug->imdisp.greyscale = MAXIM;
-	else if (!(strcmp (name, "mono")))
-		aug->imdisp.greyscale = MONO;	
-	else
-		msg ("Warning - Invalid option for greyscale setting!");	
-
-	strcpy (menu.greyscale, name);
-}
-
-void on_ParallelPort_activate (GtkWidget *widget, gpointer data)
-{
-	/* Open the parallel port settings dialog box */
-
-	if (xml_ppd != NULL) {  /* Present window if it's already open */
-		gtk_window_present (GTK_WINDOW (xml_get_widget 
-		                                         (xml_ppd, "wndParallelPort")));
-		return;
-	}
-	
-	gchar *objects[] = {"wndParallelPort", NULL};
-	xml_ppd = xml_load_new (xml_ppd, GLADE_INTERFACE, objects);
-}
-
-void on_ParPortOpen_activate (GtkWidget *widget, gpointer data)
-{
-	#ifdef HAVE_LIBPARAPIN
-	/* Open/close the parallel port */
-	
-	gboolean Open;
-	
-	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
-	menu.OpenParPort = Open;
-	
-	/* Set sensitive/insensitive any dependent menu items */
-	
-	gtk_widget_set_sensitive (xml_get_widget (xml_app, "parallel_port"), !Open);
-	
-	/* If this routine is being called to reset the visual appearance of the
-	 * button to the correct state, then return.
-	 */
-	
-	if (ResetChkState) {
-		ResetChkState = FALSE;
-		return;
-	}
-	
-	if (Open) {
-		if (!telescope_open_parallel_port ())
-			reset_checkbox_state (RCS_OPEN_PARPORT, FALSE);
-	} else {
-		if (!telescope_close_parallel_port ())
-			reset_checkbox_state (RCS_OPEN_PARPORT, TRUE);
-	}
-	#endif
-}
-
-void on_FocusOpen_activate (GtkWidget *widget, gpointer data)
-{
-	/* Open/close the focuser link */
-	
-	struct focus f;
-	gboolean Open;
-	
-	Open = gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget));
-	menu.OpenFocusPort = Open;
-		
-	loop_focus_open (Open);
-	
-	/* Set sensitive/insensitive any menu items that depend on the focsuer
-	 * link state.
-	 */
-	
-	gtk_widget_set_sensitive (xml_get_widget (xml_app, "focuser_link"), !Open);
-	gtk_widget_set_sensitive (xml_get_widget (xml_app, "focuser"),      !Open);
-	gtk_widget_set_sensitive (xml_get_widget (xml_app, "tblFocus"),      Open);
-	if (!Open)
-		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (xml_get_widget (
-							               xml_app, "chkFocusTempComp")),FALSE);																		  
-	
-	/* If this routine is being called to reset the visual appearance of the
-	 * button to the correct state, then return.
-	 */
-	
-	if (ResetChkState) {
-		ResetChkState = FALSE;
-		return;
-	}
-
-	/* Always attempt to close link; then reopen if we're supposed to be 
-	 * opening it.
-	 */
-	
-	focus_close_focus_port ();
-	
-	if (Open) {
-		if (!focus_open_focus_port ())
-			reset_checkbox_state (RCS_OPEN_FOCUS_LINK, FALSE);
-		else {
-		    if (!strcmp (menu.focuser, "focuser_robofocus")) {
-				f.cmd = FC_VERSION;
-				focus_comms->focus (&f);
-				if (f.version >= 3.0)
-					f.cmd = FC_MAX_TRAVEL_GET | FC_CUR_POS_GET | 
-				            FC_BACKLASH_GET | FC_MOTOR_GET | FC_TEMP_GET;
-				else
-					f.cmd = FC_MAX_TRAVEL_GET | FC_CUR_POS_GET | 
-				            FC_BACKLASH_GET;
-				focus_comms->focus (&f);
-				if (!f.Error) {
-					set_entry_int ("txtFocusMaxTravel", f.max_travel);
-					set_entry_int ("txtFocusCurrentPos", f.cur_pos);
-					set_entry_int ("txtFocusBacklashSteps", f.backlash_steps);
-					gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-										  xml_get_widget (xml_app, 
-									     "optFocusBacklashIn")), f.BacklashIn);
-					gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-										  xml_get_widget (xml_app, 
-										 "optFocusBacklashOut")),!f.BacklashIn);
-					if (f.version >= 3.0) {
-						set_entry_int ("txtFocusStepSize", f.step_size);
-						set_entry_int ("txtFocusStepPause", f.step_pause);
-						set_entry_int ("txtFocusDutyCycle", f.duty_cycle);
-						set_entry_float ("txtFocusTemperature", f.temp);
-					} else
-					    L_print ("{o}Can read motor configuration and "
-								 "temperature only for Robofocus version 3\n");
-				} else
-				    L_print ("{r}Error reading focuser configuration\n");
-			} else {
-				/* Some other focuser */
-			}
-		}
-	}
-}
-
-void on_Focuser_activate (GtkWidget *widget, gpointer data)
-{
-	/* Set selected focuser to be active device */
-	
-	const gchar *name;
-	
-	if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (widget)))
-		return;
-	
-	name = gtk_buildable_get_name (GTK_BUILDABLE (widget));
-	strcpy (menu.focuser, name);
-}
-
 void on_PrecessCoords_activate (GtkWidget *widget, gpointer data)
 {
 	/* Toggle flag for precession of telescope coordinates */
@@ -2459,6 +2898,89 @@ void on_UseUTC_activate (GtkWidget *widget, gpointer data)
 	
 	menu.UTC =  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (widget));
 	UseUTC = menu.UTC;
+}
+
+void on_SetCanvasFont_activate (GtkWidget *widget, gpointer data)
+{
+	/* Display the font selection dialog */
+	
+	GtkWidget *dlgFontSelection;
+	
+    gchar *objects[] = {"dlgFontSelection", NULL};
+    xml_font = xml_load_new (xml_font, GLADE_INTERFACE, objects);
+	
+	dlgFontSelection = xml_get_widget (xml_font, "dlgFontSelection");
+	gtk_font_selection_dialog_set_preview_text (GTK_FONT_SELECTION_DIALOG 
+	                     (dlgFontSelection), "Histogram Flux Scale 0123456789");
+}
+
+void on_LiveView_activate (GtkWidget *widget, gpointer data)
+{
+	/* Open/close the live view window.  Note that the corresponding menu item
+	 * is not shown if the application has been compiled without Unicap
+	 * support.
+	 */
+	
+	#ifdef HAVE_UNICAP /* Prevents "can't find signal handler" message if here*/
+	struct cam_img *aug = get_aug_image_struct ();
+	
+	GtkCheckMenuItem *mnuItem;
+	
+	menu.LiveView = gtk_check_menu_item_get_active (
+												  GTK_CHECK_MENU_ITEM (widget));
+	
+	if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (xml_get_widget (
+	                                               xml_app, "chkAutogOpen")))) {
+		gtk_widget_set_sensitive (xml_get_widget (
+                             xml_app, "autoguider_camera_menu"),!menu.LiveView);
+	
+		if (aug->device == UNICAP) {
+			gtk_widget_set_sensitive (xml_get_widget (
+								      xml_app, "unicap_device"),!menu.LiveView);
+			gtk_widget_set_sensitive (xml_get_widget (
+								  xml_app, "unicap_properties"), menu.LiveView);
+		}
+	}	
+	
+	mnuItem = GTK_CHECK_MENU_ITEM (xml_get_widget (xml_app, "playback"));
+	gtk_widget_set_sensitive (GTK_WIDGET (mnuItem), !menu.LiveView);
+	
+	/* If this routine is being called to reset the visual appearance of the
+	 * button to the correct state, then return.
+	 */
+	 
+	if (ResetChkState) {
+		ResetChkState = FALSE;
+		return;
+	}
+	
+	if (menu.LiveView)
+		switch (aug->device) {
+			case UNICAP:
+				unicap_void_device (&aug->ucp_device);				
+				strcpy (aug->ucp_device.identifier, "NONE");
+			    R_config_s ("Unicap/Device/ID", aug->ucp_device.identifier);
+				unicap_void_format (&aug->ucp_format_spec);
+			    aug->ucp_format_spec.fourcc = R_config_d (
+											   "Unicap/Format/Fourcc", 0);
+			    aug->ucp_format_spec.size.width = R_config_d (
+											   "Unicap/Format/Size/Width", 0);
+			    aug->ucp_format_spec.size.height = R_config_d (
+											   "Unicap/Format/Size/Height", 0);
+			    break;
+			default:
+				L_print ("{r}Error - Can't open Live View unless a Unicap "
+						                             "device is being used!\n");
+			    reset_checkbox_state (RCS_OPEN_LIVEVIEW_WINDOW, FALSE);
+			    return;
+		}
+	else
+		video_close_file ();
+	
+	/* Now open/close LiveView window */
+	
+	loop_LiveView_open (menu.LiveView);
+	#endif
 }
 
 void on_Playback_activate (GtkWidget *widget, gpointer data)
@@ -2580,7 +3102,8 @@ void on_HelpAbout_activate (GtkWidget *widget, gpointer data)
 {
     /* Show the 'About' dialog */
 	
-	gchar *authors[] = {"Edward Simonson", NULL};
+	gchar *authors[] = {"Edward Simonson;", "please see website and code file "
+	                    "headers\nfor full credits and acknowledgements", NULL};
 	gchar *license = 
 	"GoQat is free software; you can redistribute it and/or modify\n"
     "it under the terms of the GNU General Public License as published by\n"
@@ -2599,7 +3122,7 @@ void on_HelpAbout_activate (GtkWidget *widget, gpointer data)
 	                       "name", "GoQat",
 						   "version", VERSION,
 						   "authors", authors,
-						   "copyright", "(c) Edward Simonson, 2009 - 2013",
+						   "copyright", "(c) Edward Simonson, 2009 - 2014",
 						   "license", license,
 	                       NULL);
 }
@@ -2684,6 +3207,27 @@ void on_cmbExpType_changed (GtkWidget *widget, gpointer data)
 	    if (ccd->Open)
 			set_entry_float ("txtExposure", ccd->cam_cap.min_exp);
 	}
+}
+
+void on_chkIgnoreCCDCooling_toggled (GtkButton *button, gpointer data)
+{
+	/* Set flag to ignore cooling state when making an exposure */
+	
+	struct cam_img *ccd = get_ccd_image_struct ();
+		
+	ccd->state.IgnoreCooling = gtk_toggle_button_get_active (
+	                                                GTK_TOGGLE_BUTTON (button));
+	W_config_d ("Misc/IgnoreCCDCooling", ccd->state.IgnoreCooling);
+}
+
+void on_chkDisplayCCDImage_toggled (GtkButton *button, gpointer data)
+{
+	/* Toggle display of the CCD image */
+	
+	struct cam_img *ccd = get_ccd_image_struct ();
+		
+	ccd->Display = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (button));
+	W_config_d ("Misc/DisplayCCDImage", ccd->Display);
 }
 
 void on_chkBeepExposure_toggled (GtkButton *button, gpointer data)
@@ -2802,7 +3346,7 @@ void on_chkAutoSave_toggled (GtkButton *button, gpointer data)
 		return;
 	}
 	
-	img->AutoSave = !img->AutoSave;
+	img->AutoSave = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (button));
 }
 
 void on_chkSaveEvery_toggled (GtkButton *button, gpointer data)
@@ -2816,8 +3360,8 @@ void on_chkSaveEvery_toggled (GtkButton *button, gpointer data)
 	struct cam_img *aug = get_aug_image_struct ();
 
 	get_entry_int ("txtSaveEvery", 1, 3600, 60, FIL_PAGE, &period);
-	aug->SavePeriodic = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON ( 
-									 xml_get_widget (xml_app, "chkSaveEvery")));
+	aug->SavePeriodic = gtk_toggle_button_get_active (
+	                                                GTK_TOGGLE_BUTTON (button));
 	loop_save_periodic (aug->SavePeriodic, (guint) period);
 }
 
@@ -3004,7 +3548,7 @@ void on_btnFntSel_clicked (GtkButton *button, gpointer data)
 	/* Set a new canvas font, if one has been selected */
 	
 	GtkWidget *dlgFontSelection;
-	static gchar oldfont[80];
+	static gchar oldfont[MCSL];
 	const gchar *ButtonName;
 	
 	dlgFontSelection = xml_get_widget (xml_font, "dlgFontSelection");
@@ -3054,8 +3598,12 @@ void on_chkAutogOpen_toggled (GtkButton *button, gpointer data)
 	Open = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (button));
 	
 	if (!menu.LiveView) {
-		gtk_widget_set_sensitive (xml_get_widget (
-                                  xml_app, "autoguider_camera"), !Open);
+		if (Open)
+			gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			 xml_app, "autoguider_camera_menu")), widget_set_insensitive, NULL);
+		else
+			gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			 xml_app, "autoguider_camera_menu")), widget_set_sensitive, NULL);
 	
 		#ifdef HAVE_UNICAP
 		if (aug->device == UNICAP) {
@@ -3065,12 +3613,27 @@ void on_chkAutogOpen_toggled (GtkButton *button, gpointer data)
 								      xml_app, "unicap_properties"), Open);
 		}
 		#endif
+		#ifdef HAVE_LIBV4L2
+		if (aug->device == V4L) {
+			gtk_widget_set_sensitive (xml_get_widget (
+								      xml_app, "v4l_properties"), Open);
+		}
+		#endif
 	}	
 	
-    if (Open)
+	#ifdef HAVE_SX_CAM
+	if (aug->device == SX) {
+		gtk_widget_set_sensitive (xml_get_widget (
+							  xml_app, "select_sx_camera"), !Open);
+		gtk_widget_set_sensitive (xml_get_widget (
+							  xml_app, "configure_sx_camera"), Open);
+	}
+	#endif
+	
+    if (Open) {
 		gtk_widget_set_sensitive (xml_get_widget (
 								  xml_app, "gemini_commands"), FALSE);
-	else {
+	} else {
 		if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (
 			                  xml_get_widget (xml_app, "open_telescope_link"))))
 			gtk_widget_set_sensitive (xml_get_widget (
@@ -3098,15 +3661,15 @@ void on_chkAutogOpen_toggled (GtkButton *button, gpointer data)
 	
 		#ifdef HAVE_UNICAP
 		if (aug->device == UNICAP) {
-			unicap_void_device (&aug->u_device);
-			strcpy (aug->u_device.identifier, "NONE");
-			R_config_s ("Unicap/Device/ID", aug->u_device.identifier);
-			unicap_void_format (&aug->u_format_spec);
-			aug->u_format_spec.fourcc = R_config_d (
+			unicap_void_device (&aug->ucp_device);
+			strcpy (aug->ucp_device.identifier, "NONE");
+			R_config_s ("Unicap/Device/ID", aug->ucp_device.identifier);
+			unicap_void_format (&aug->ucp_format_spec);
+			aug->ucp_format_spec.fourcc = R_config_d (
 											   "Unicap/Format/Fourcc", 0);
-			aug->u_format_spec.size.width = R_config_d (
+			aug->ucp_format_spec.size.width = R_config_d (
 											   "Unicap/Format/Size/Width", 0);
-			aug->u_format_spec.size.height = R_config_d(
+			aug->ucp_format_spec.size.height = R_config_d(
 											   "Unicap/Format/Size/Height", 0);
 		}
 		#endif
@@ -3358,7 +3921,7 @@ void on_btnAutog_pressed (GtkButton *button, gpointer data)
 		else
 			G_print ("{r}on_btnAutog_pressed: Not a valid button name: %s\n", 
 																    ButtonName);
-	} else {          /* Move at guide speed via autoguider port */
+	} else {          /* Move at guide speed via guide signals port */
 		telescope_set_guide_speed (speed);
 		if (!g_ascii_strcasecmp (ButtonName, "btnAutogEast"))
 		   telescope_guide_start (TM_EAST);
@@ -3397,7 +3960,7 @@ void on_btnAutog_released (GtkButton *button, gpointer data)
 		else
 			G_print ("{r}on_btnAutog_pressed: Not a valid button name: %s\n", 
 																    ButtonName);
-	} else {          /* Moving at guide speed via autoguider port */
+	} else {          /* Moving at guide speed via guide signals port */
 		if (!g_ascii_strcasecmp (ButtonName, "btnAutogEast"))
 		   telescope_guide_stop (TM_EAST);
 		else if (!g_ascii_strcasecmp (ButtonName, "btnAutogWest"))
@@ -4253,25 +4816,25 @@ void on_btnGemModelSave_clicked (GtkButton *button, gpointer data)
 	
 	gint val;
 	
-	get_entry_int ("txtGemA", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemA", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/A", val);
-	get_entry_int ("txtGemE", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemE", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/E", val);
-	get_entry_int ("txtGemNP", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemNP", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/NP", val);
-	get_entry_int ("txtGemNE", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemNE", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/NE", val);
-	get_entry_int ("txtGemIH", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemIH", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/IH", val);
-	get_entry_int ("txtGemID", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemID", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/ID", val);
-	get_entry_int ("txtGemFR", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemFR", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/FR", val);
-	get_entry_int ("txtGemFD", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemFD", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/FD", val);
-	get_entry_int ("txtGemCF", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemCF", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/CF", val);
-	get_entry_int ("txtGemTF", -65535, 65535, 0, GEM_PAGE, &val);
+	get_entry_int ("txtGemTF", -65535, 65535, 0, TEL_PAGE, &val);
 	W_config_d ("Gemini/TF", val);
 }
 
@@ -4341,16 +4904,16 @@ void on_btnGemModelWrite_clicked (GtkButton *button, gpointer data)
 	/* Now write parameters */
 	
 	if (ret == GTK_RESPONSE_YES) {
-		get_entry_int ("txtGemA", -65535, 65535, 0, GEM_PAGE, &gm.A);
-		get_entry_int ("txtGemE", -65535, 65535, 0, GEM_PAGE, &gm.E);
-		get_entry_int ("txtGemNP", -65535, 65535, 0, GEM_PAGE, &gm.NP);
-		get_entry_int ("txtGemNE", -65535, 65535, 0, GEM_PAGE, &gm.NE);
-		get_entry_int ("txtGemIH", -65535, 65535, 0, GEM_PAGE, &gm.IH);
-		get_entry_int ("txtGemID", -65535, 65535, 0, GEM_PAGE, &gm.ID);
-		get_entry_int ("txtGemFR", -65535, 65535, 0, GEM_PAGE, &gm.FR);
-		get_entry_int ("txtGemFD", -65535, 65535, 0, GEM_PAGE, &gm.FD);
-		get_entry_int ("txtGemCF", -65535, 65535, 0, GEM_PAGE, &gm.CF);
-		get_entry_int ("txtGemTF", -65535, 65535, 0, GEM_PAGE, &gm.TF);
+		get_entry_int ("txtGemA", -65535, 65535, 0, TEL_PAGE, &gm.A);
+		get_entry_int ("txtGemE", -65535, 65535, 0, TEL_PAGE, &gm.E);
+		get_entry_int ("txtGemNP", -65535, 65535, 0, TEL_PAGE, &gm.NP);
+		get_entry_int ("txtGemNE", -65535, 65535, 0, TEL_PAGE, &gm.NE);
+		get_entry_int ("txtGemIH", -65535, 65535, 0, TEL_PAGE, &gm.IH);
+		get_entry_int ("txtGemID", -65535, 65535, 0, TEL_PAGE, &gm.ID);
+		get_entry_int ("txtGemFR", -65535, 65535, 0, TEL_PAGE, &gm.FR);
+		get_entry_int ("txtGemFD", -65535, 65535, 0, TEL_PAGE, &gm.FD);
+		get_entry_int ("txtGemCF", -65535, 65535, 0, TEL_PAGE, &gm.CF);
+		get_entry_int ("txtGemTF", -65535, 65535, 0, TEL_PAGE, &gm.TF);
 	
 		if (telescope_set_gemini_model (&gm))
 			L_print ("{b}Loaded Gemini model parameters OK\n");
@@ -4718,13 +5281,13 @@ void on_btnTEndWhile_clicked (GtkButton *button, gpointer data)
 
 void on_btnTAugOn_clicked (GtkButton *button, gpointer data)
 {
-	/* Add command to turn on autoguider to task list */
+	/* Add command to turn on autoguider camera to task list */
 	
 	tasks_add_Aug (TRUE);
 }
 void on_btnTAugOff_clicked (GtkButton *button, gpointer data)
 {
-	/* Add command to turn off autoguider to task list */
+	/* Add command to turn off autoguider camera to task list */
 	
 	tasks_add_Aug (FALSE);
 }
@@ -5234,20 +5797,7 @@ void on_btnDevSelect_clicked (GtkButton *button, gpointer data)
 {
 	/* Set the selected device number and close the window */
 	
-	struct cam_img *img;
-	
-	/* Deduce whether we are selecting a CCD camera or an autoguider camera
-	 * depending on the title of the device selection window.  (Rather clumsy,
-	 * but it works).
-	 */
-	 
-	if (!strncmp (gtk_window_get_title (
-			GTK_WINDOW (xml_get_widget (xml_dev, "wndDevSelect"))), "CCD", 3))
-		img = get_ccd_image_struct ();
-	else
-		img = get_aug_image_struct ();
-	
-	img->devnum = (gshort) gtk_combo_box_get_active (
+	*ds.idx = (gshort) gtk_combo_box_get_active (
                                 g_hash_table_lookup (hshCombo, "cmbDevSelect"));
     g_hash_table_remove (hshCombo, "cmbDevSelect");
 	gtk_widget_destroy (xml_get_widget (xml_dev, "wndDevSelect"));
@@ -5262,14 +5812,14 @@ void on_btnUnicapSelect_clicked (GtkButton *button, gpointer data)
 	
 	struct cam_img *aug = get_aug_image_struct ();
 	
-	W_config_s ("Unicap/Device/ID", aug->u_device.identifier);
-	W_config_d ("Unicap/Format/Fourcc", aug->u_format_spec.fourcc);
-	W_config_d ("Unicap/Format/Size/Width", aug->u_format_spec.size.width);
-	W_config_d ("Unicap/Format/Size/Height", aug->u_format_spec.size.height);
+	W_config_s ("Unicap/Device/ID", aug->ucp_device.identifier);
+	W_config_d ("Unicap/Format/Fourcc", aug->ucp_format_spec.fourcc);
+	W_config_d ("Unicap/Format/Size/Width", aug->ucp_format_spec.size.width);
+	W_config_d ("Unicap/Format/Size/Height", aug->ucp_format_spec.size.height);
 	
-	if (aug->u_handle) {
-		unicap_close (aug->u_handle);
-		aug->u_handle = NULL;
+	if (aug->ucp_handle) {
+		unicap_close (aug->ucp_handle);
+		aug->ucp_handle = NULL;
 	}
 	
 	gtk_widget_destroy (xml_get_widget (xml_uni, "wndUnicapSelect"));
@@ -5278,33 +5828,69 @@ void on_btnUnicapSelect_clicked (GtkButton *button, gpointer data)
 	#endif
 }
 
-void on_chkCConfHasCooling_toggled (GtkButton *button, gpointer data)
+void on_btnV4LConfigApply_clicked (GtkButton *button, gpointer data)
 {
-	/* This must be toggled on to specify that active cooling is possible for
-	 * SX cameras.
+	/* Apply V4L settings (save settings to configuration file and re-start
+	 * the camera).
 	 */
-	 
-	gboolean Active;
 	
-	Active = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (button));
-	 
-	CCDConfigOwner->cam_cap.CanSetCCDTemp = Active;
-	CCDConfigOwner->set_state (S_CANCOOL, Active, 0.0, CCDConfigOwner->id);
-		
-	gtk_widget_set_sensitive (xml_get_widget (
-							  xml_con, "chkCConfCoolOnConnect1"), Active);
-	gtk_widget_set_sensitive (xml_get_widget (
-							  xml_con, "lblCConfDefTemp1"), Active);
-	gtk_widget_set_sensitive (xml_get_widget (
-							  xml_con, "txtCConfDefTemp1"), Active);
-	gtk_widget_set_sensitive (xml_get_widget (
-							  xml_con, "btnCConfSetDefTemp1"), Active);
-	gtk_widget_set_sensitive (xml_get_widget (
-							  xml_con, "btnCConfCoolerOn1"), Active);
-	gtk_widget_set_sensitive (xml_get_widget (
-							  xml_con, "btnCConfCoolerOff1"), Active);
+	struct cam_img *aug = get_aug_image_struct ();
+	
+	gdouble fps;
+	gchar key[128];
+	
+	snprintf (key, 128, "V4L/%s/4CC", aug->vid_dat.card);
+	W_config_d (key, aug->vid_dat.pixfmt);
 
-	W_config_d (CCDConfigKey (CCDConfigOwner, "HasCooling"), Active);
+	if (aug->vid_dat.HasVideoStandard) {
+		aug->vid_dat.vid_std.selected = gtk_combo_box_get_active (
+		                        g_hash_table_lookup (hshCombo, "cmbV4LVidStd"));
+		snprintf (key, 128, "V4L/%s/VideoStandard", aug->vid_dat.card);
+		/* Note: the standard is defined as __64 in the v4l2 api and we save
+		 * only the first 32 bits here (i.e. bits 0 to 31), but these cover all
+		 * the common standards.  Bits 32 to 63 are for custom standards that
+		 * we ignore anyway because we don't know how to treat them.
+		 */
+		W_config_d (key, 
+	            (guint) aug->vid_dat.vid_std.id[aug->vid_dat.vid_std.selected]);
+	}
+		                        
+	aug->vid_dat.vid_input.selected = gtk_combo_box_get_active (
+		                        g_hash_table_lookup (hshCombo, "cmbV4LVidInp"));
+	snprintf (key, 128, "V4L/%s/VideoInput", aug->vid_dat.card);
+	W_config_d (key, aug->vid_dat.vid_input.selected);
+		                        
+	get_entry_int ("txtV4LConfigWidth", 1, AUGCANV_H, 640, 
+	               NO_PAGE, &aug->vid_dat.width);
+	snprintf (key, 128, "V4L/%s/Width", aug->vid_dat.card);
+	W_config_d (key, aug->vid_dat.width);
+	               
+	get_entry_int ("txtV4LConfigHeight", 1, AUGCANV_V, 480, 
+	               NO_PAGE, &aug->vid_dat.height);
+	snprintf (key, 128, "V4L/%s/Height", aug->vid_dat.card);
+	W_config_d (key, aug->vid_dat.height);
+	
+	get_entry_float ("txtV4LConfigFps", 1, 500, 15, 
+	               NO_PAGE, &fps);
+	aug->vid_dat.fps = (gfloat) fps;
+	snprintf (key, 128, "V4L/%s/fps", aug->vid_dat.card);
+	W_config_f (key, aug->vid_dat.fps);
+	
+    /* Re-start the camera with the new settings.  They will be read from the
+     * configuration file when the camera is re-opened.
+     */
+          
+    loop_autog_restart ();
+}
+
+void on_btnV4LConfigClose_clicked (GtkButton *button, gpointer data)
+{
+	/* Close the V4L configuration window */
+	
+	gtk_widget_destroy (xml_get_widget (xml_V4L, "wndV4LConfig"));
+	g_object_unref (G_OBJECT (xml_V4L));
+	xml_V4L = NULL;
+	V4LWinConf = FALSE;
 }
 
 void on_chkCConfCoolOnConnect_toggled (GtkButton *button, gpointer data)
@@ -5340,6 +5926,29 @@ void on_btnCConfSetDefTemp_clicked (GtkButton *button, gpointer data)
 	W_config_f (CCDConfigKey (CCDConfigOwner, "DefTemp"), val);
 	if (CCDConfigOwner->id == CCD)
 		set_entry_float ("txtChipTemp", val);
+}
+
+void on_btnCConfSetTempTol_clicked (GtkButton *button, gpointer data)
+{
+	/* Save the value to the configuration database */
+	
+	gdouble val;
+	gchar *entry = NULL;
+	
+	if (!strcmp (gtk_buildable_get_name (GTK_BUILDABLE (button)), 
+														 "btnCConfSetTempTol"))
+		entry = "txtCConfTempTol";
+	else if (!strcmp (gtk_buildable_get_name (GTK_BUILDABLE (button)), 
+														 "btnCConfSetTempTol1"))
+		entry = "txtCConfTempTol1";
+	else {
+		L_print ("{r}Can't find temperature tolerance text box\n");
+		return;
+	}
+														  
+	get_entry_float (entry, 0.0, 9.9, 1.0, NO_PAGE, &val);
+	W_config_f (CCDConfigKey (CCDConfigOwner, "TempTol"), val);
+	(get_ccd_image_struct ())->state.c_tol = val;
 }
 
 void on_btnCConfCoolerOn_clicked (GtkButton *button, gpointer data)
@@ -5573,7 +6182,7 @@ void on_cmbCConfWheel_changed (GtkComboBox *combo, gpointer data)
 	gushort i = 0, j;
 	gfloat fo;
 	gchar *num, *key, **FilterNames, *field;
-	gchar filter[10];
+	gchar filter[MCSL];
 	
 	/* Store filter wheel number */
 	
@@ -5680,11 +6289,11 @@ void on_btnCConfRotate_clicked (GtkButton *button, gpointer data)
 	
 	filter = gtk_combo_box_get_active_text (
                            g_hash_table_lookup (hshCombo, "cmbCConfSetFilter"));
-	set_filter (CCDConfigOwner->id, filter, &offset);
+	set_filter (TRUE, filter, &offset);
 	g_free (filter);
 	if (get_apply_filter_offset ()) {
 		L_print ("{b}Applying filter focus offset of %d steps...\n", offset);
-		loop_focus_apply_filter_offset (CCD, offset);
+		loop_focus_apply_filter_offset (offset);
 	}
 }
 
@@ -5697,9 +6306,29 @@ void on_chkCConfInvertImage_toggled (GtkButton *button, gpointer data)
 	CCDConfigOwner->state.invert = gtk_toggle_button_get_active (
 													GTK_TOGGLE_BUTTON (button));
 	W_config_d (CCDConfigKey (CCDConfigOwner, "InvertImage"),
-				CCDConfigOwner->state.invert);
+				              CCDConfigOwner->state.invert);
 	CCDConfigOwner->set_state (S_INVERT, CCDConfigOwner->state.invert, 
 							   0.0, CCDConfigOwner->id);
+}
+
+void on_chkCConfInvertDS9h_toggled (GtkButton *button, gpointer data)
+{
+	/* Save the setting to the configuration database and set flag */
+	
+	CCDConfigOwner->ds9.Invert_h = gtk_toggle_button_get_active (
+	                                                GTK_TOGGLE_BUTTON (button));
+	W_config_d (CCDConfigKey (CCDConfigOwner, "InvertDS9h"), 
+	                          CCDConfigOwner->ds9.Invert_h);
+}
+
+void on_chkCConfInvertDS9v_toggled (GtkButton *button, gpointer data)
+{
+	/* Save the setting to the configuration database and set flag */
+	
+	CCDConfigOwner->ds9.Invert_v = gtk_toggle_button_get_active (
+	                                                GTK_TOGGLE_BUTTON (button));
+	W_config_d (CCDConfigKey (CCDConfigOwner, "InvertDS9v"), 
+	                          CCDConfigOwner->ds9.Invert_v);
 }
 
 void on_chkCConfDebayer_toggled (GtkButton *button, gpointer data)
@@ -5738,7 +6367,7 @@ void on_cmbCConfBayerPattern_changed (GtkComboBox *combo, gpointer data)
 
 void on_btnCConfClose_clicked (GtkButton *button, gpointer data)
 {
-	/* Close the configuration window */
+	/* Close the CCD camera configuration window */
 	
 	GtkWidget *dlgNoTile;
 	gint ret;
@@ -5771,73 +6400,139 @@ gboolean IsCConfCombo (gpointer key, gpointer value, gpointer data)
     return (!strncmp ((gchar *) key, "cmbCConf", 8));
 }
 
-void on_LiveView_activate (GtkWidget *widget, gpointer data)
+void on_cmbFConfWheel_changed (GtkComboBox *combo, gpointer data)
 {
-	/* Open/close the live view window.  Note that the corresponding menu item
-	 * is not shown if the application has been compiled without Unicap
-	 * support.
+	/* Store the new filter wheel number and recall the filter names/positions
+	 * and focus offsets for that wheel. 
 	 */
 	
-	#ifdef HAVE_UNICAP /* Prevents "can't find signal handler" message if here*/
-	struct cam_img *aug = get_aug_image_struct ();
+    GList *keys = NULL, *current = NULL;
+	gushort i = 0, j;
+	gfloat fo;
+	gchar *num, *key, **FilterNames, *field;
+	gchar filter[MCSL];
 	
-	GtkCheckMenuItem *mnuItem;
+	/* Store filter wheel number */
 	
-	menu.LiveView = gtk_check_menu_item_get_active (
-												  GTK_CHECK_MENU_ITEM (widget));
+	num = gtk_combo_box_get_active_text (combo);
+	W_config_s ("FilterWheel/ActiveWheel", num);
+    
+    /* Load the available filter names from the configuration file */
+    
+    FilterNames = ReadCArray ("ListCCDFilterTypes");
+    
+	/* Iterate over each filter position for this wheel... */
+    
+    keys = g_hash_table_get_keys (hshCombo);
+    for (current = keys; current != NULL; current = current->next) {
+        
+        /* Is this a valid combo box? */
+        
+        if (!strncmp ((gchar *) current->data, "cmbFConfFil", 11)) {
+            
+            /* Get the corresponding filter position from the combo box name */
+            
+            i = (gushort) strtol ((gchar *) current->data + 11, NULL, 10);
+            key = g_strdup_printf ("%s/%s/%d", "FilterWheel", num, i);
+            strcpy (filter, "-");
+            R_config_s (key, filter);  /* Get stored filter for this position */
+            g_free (key);
+        
+            /* Set filter combo box for this position to the corresponding 
+             * filter.
+             */
+		
+            j = 0;
+            while (FilterNames[j]) {
+                if (!strcmp (FilterNames[j++], filter))
+                    gtk_combo_box_set_active (g_hash_table_lookup (
+                                              hshCombo, current->data), j - 1);
+            }
+            
+            /* Get focus offset for this position */
+		
+            key = g_strdup_printf ("%s/%s/FO%d", "FilterWheel", num, i);
+            fo = R_config_d (key, 0);
+		
+            /* Set corresponding entry field to this value */
+		
+            field = g_strdup_printf ("txtFConfFoc%d", i);
+            set_entry_int (field, fo);
+            g_free (field);	
+        }	
+    }
+
+    j = 0;
+    while (FilterNames[j]) {
+        g_free (FilterNames[j++]);
+    }
+    g_list_free (keys);
+	g_free (num);
+}
+
+void on_btnFConfSaveFilterSettings_clicked (GtkButton *button, gpointer data)
+{
+	/* Save the filter and focus offset settings */
 	
-	if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (xml_get_widget (
-	                                               xml_app, "chkAutogOpen")))) {
-		gtk_widget_set_sensitive (xml_get_widget (
-                                  xml_app, "autoguider_camera"),!menu.LiveView);
+    GList *keys = NULL, *current = NULL;
+	gushort ActiveW, i;
+	gint val;
+	gchar *key, *name, *filter;
 	
-		if (aug->device == UNICAP) {
-			gtk_widget_set_sensitive (xml_get_widget (
-								      xml_app, "unicap_device"),!menu.LiveView);
-			gtk_widget_set_sensitive (xml_get_widget (
-								  xml_app, "unicap_properties"), menu.LiveView);
-		}
-	}	
+	ActiveW = R_config_d ("FilterWheel/ActiveWheel",1);
 	
-	mnuItem = GTK_CHECK_MENU_ITEM (xml_get_widget (xml_app, "playback"));
-	gtk_widget_set_sensitive (GTK_WIDGET (mnuItem), !menu.LiveView);
+    keys = g_hash_table_get_keys (hshCombo);
+    for (current = keys; current != NULL; current = current->next) {
+        if (!strncmp ((gchar *) current->data, "cmbFConfFil", 11)) {
+            i = (gushort) strtol ((gchar *) current->data + 11, NULL, 10);
+            key = g_strdup_printf ("%s/%d/%d", "FilterWheel", ActiveW, i);
+            filter = gtk_combo_box_get_active_text (
+                                 g_hash_table_lookup (hshCombo, current->data));
+            W_config_s (key, filter);
+            g_free (filter);
+            g_free (key);
+        
+            key = g_strdup_printf ("%s/%d/FO%d", "FilterWheel", ActiveW, i);
+            name = g_strdup_printf ("txtFConfFoc%d", i);
+            get_entry_int (name, -65535, 65535, 0, NO_PAGE, &val);
+            W_config_d (key, val);
+            g_free (name);
+            g_free (key);
+        }
+    }
+}
+
+void on_btnFConfRotate_clicked (GtkButton *button, gpointer data)
+{
+	/* Set the filter wheel to the given position */
 	
-	/* If this routine is being called to reset the visual appearance of the
-	 * button to the correct state, then return.
-	 */
-	 
-	if (ResetChkState) {
-		ResetChkState = FALSE;
-		return;
+	gint offset;
+	gchar *filter;
+	
+	filter = gtk_combo_box_get_active_text (
+                           g_hash_table_lookup (hshCombo, "cmbFConfSetFilter"));
+	set_filter (FALSE, filter, &offset);
+	g_free (filter);
+	if (get_apply_filter_offset ()) {
+		L_print ("{b}Applying filter focus offset of %d steps...\n", offset);
+		loop_focus_apply_filter_offset (offset);
 	}
+}
+
+void on_btnFConfClose_clicked (GtkButton *button, gpointer data)
+{
+	/* Close the filter wheel configuration window */
 	
-	if (menu.LiveView)
-		switch (aug->device) {
-			case UNICAP:
-				unicap_void_device (&aug->u_device);				
-				strcpy (aug->u_device.identifier, "NONE");
-			    R_config_s ("Unicap/Device/ID", aug->u_device.identifier);
-				unicap_void_format (&aug->u_format_spec);
-			    aug->u_format_spec.fourcc = R_config_d (
-											   "Unicap/Format/Fourcc", 0);
-			    aug->u_format_spec.size.width = R_config_d (
-											   "Unicap/Format/Size/Width", 0);
-			    aug->u_format_spec.size.height = R_config_d (
-											   "Unicap/Format/Size/Height", 0);
-			    break;
-			default:
-				L_print ("{r}Error - Can't open Live View unless a Unicap "
-						                             "device is being used!\n");
-			    reset_checkbox_state (RCS_OPEN_LIVEVIEW_WINDOW, FALSE);
-			    return;
-		}
-	else
-		video_close_file ();
-	
-	/* Now open/close LiveView window */
-	
-	loop_LiveView_open (menu.LiveView);
-	#endif
+    g_hash_table_foreach_remove (hshCombo, IsFConfCombo, NULL);
+	gtk_widget_destroy (xml_get_widget (xml_fil, "wndFilterConfig"));
+	FilWinConf = FALSE;
+	g_object_unref (G_OBJECT (xml_fil));
+	xml_fil = NULL;
+}
+
+gboolean IsFConfCombo (gpointer key, gpointer value, gpointer data)
+{
+    return (!strncmp ((gchar *) key, "cmbFConf", 8));
 }
 
 #ifdef HAVE_UNICAP
@@ -5871,8 +6566,6 @@ void on_tglLVRecord_toggled (GtkButton *button, gpointer data)
 	
 	/* Start recording... */
 	
-	gtk_button_set_use_stock (button, TRUE);
-	
 	aug->Record = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (button));
 	
 	if (aug->Record) {
@@ -5886,10 +6579,22 @@ void on_tglLVRecord_toggled (GtkButton *button, gpointer data)
 		    g_free (dirname);
 			dirname = NULL;
 		}
-		gtk_button_set_label (button, "gtk-media-stop");
+		gtk_label_set_text (
+		                    GTK_LABEL (xml_get_widget (xml_lvw, "lblLVRecord")),
+		                    "Stop");
+		gtk_image_set_from_icon_name (
+		                    GTK_IMAGE (xml_get_widget (xml_lvw, "imgLVRecord")),
+                            "gtk-media-stop",
+                            GTK_ICON_SIZE_BUTTON);
 	} else {
 	    loop_LiveView_record (aug->Record, NULL);
-		gtk_button_set_label (button, "gtk-media-record");
+		gtk_label_set_text (
+		                    GTK_LABEL (xml_get_widget (xml_lvw, "lblLVRecord")),
+		                    "Record");
+		gtk_image_set_from_icon_name (
+		                    GTK_IMAGE (xml_get_widget (xml_lvw, "imgLVRecord")),
+                            "gtk-media-record",
+                            GTK_ICON_SIZE_BUTTON);
     }
 	
 	gtk_widget_set_sensitive (xml_get_widget (xml_lvw, "btnLVClose"), 
@@ -5898,71 +6603,6 @@ void on_tglLVRecord_toggled (GtkButton *button, gpointer data)
 							                                      !aug->Record);
 }
 #endif
-
-void on_UnicapDevice_activate (GtkWidget *widget, gpointer data)
-{
-	/* Let the user select the desired unicap device and format */
-	
-	#ifdef HAVE_UNICAP /* Prevents "can't find signal handler" message if here*/
-	GtkWidget *device_selection, *format_selection;
-	GtkWidget *hbxHbox;
-	
-	/* Open the selection window */
-	
-	gchar *objects[] = {"wndUnicapSelect", NULL};
-	xml_uni = xml_load_new (xml_uni, GLADE_INTERFACE, objects);
-	
-	/* Add an hbox and pack in the device and format selection widgets */
-	
-	hbxHbox = gtk_hbox_new (FALSE, 10);
-	gtk_container_add (GTK_CONTAINER (xml_get_widget (
-										 xml_uni, "vbxUnicapSelect")), hbxHbox);
-	format_selection = unicapgtk_video_format_selection_new ();
-	device_selection = unicapgtk_device_selection_new (TRUE);
-    gtk_box_pack_start (GTK_BOX (hbxHbox), device_selection, TRUE, TRUE, 0);
-    gtk_box_pack_start (GTK_BOX (hbxHbox), format_selection, TRUE, TRUE, 0);
-	unicapgtk_device_selection_rescan (
-							     UNICAPGTK_DEVICE_SELECTION (device_selection));
-	
-	/* Connect signal handlers and show the window contents */
-	
-    g_signal_connect (G_OBJECT (device_selection),
-					  "unicapgtk_device_selection_changed",
-                      G_CALLBACK (unicap_device_change_cb), format_selection);	
-	gtk_combo_box_set_active (GTK_COMBO_BOX (device_selection), 0);
-    g_signal_connect (G_OBJECT (format_selection),
-                      "unicapgtk_video_format_changed",
-                      G_CALLBACK (unicap_format_change_cb), NULL);	
-	gtk_widget_show_all (xml_get_widget (xml_uni, "wndUnicapSelect"));
-	#endif
-}
-
-void on_UnicapProperties_activate (GtkWidget *widget, gpointer data)
-{
-	/* Display the Unicap properties dialog */
-	
-	#ifdef HAVE_UNICAP /* Prevents "can't find signal handler" message if here*/
-	struct cam_img *aug = get_aug_image_struct ();
-	
-	GtkWidget *property_dialog;
-	
-	property_dialog = unicapgtk_property_dialog_new ();
-	unicapgtk_property_dialog_set_handle (
-					UNICAPGTK_PROPERTY_DIALOG (property_dialog), aug->u_handle);
-	#endif
-}
-
-void on_SXCamSelect_activate (GtkWidget *widget, gpointer data)
-{
-	/* Select an sx camera to use as an autoguider */
-	
-	#ifdef HAVE_SX /* Prevents "can't find signal handler" message if here */
-	gint num;
-	
-	if (augcam_get_sx_cameras (&num))
-		select_device (get_aug_image_struct (), (gushort) num);
-	#endif
-}
 
 
 /******************************************************************************/
@@ -6314,27 +6954,31 @@ static GtkEntry *get_entry_widget (const gchar *name)
     /* Check each window in turn for the relevant widget */
 
 	if (xml_app && (entry = xml_get_widget (xml_app, name)))
-			goto got_entry;			
+		goto got_entry;			
 	if (xml_img && (entry = xml_get_widget (xml_img, name)))
-			goto got_entry;
+		goto got_entry;
 	if (xml_ppd && (entry = xml_get_widget (xml_ppd, name)))
-			goto got_entry;
+		goto got_entry;
 	if (xml_set && (entry = xml_get_widget (xml_set, name)))
-			goto got_entry;
+		goto got_entry;
 	if (xml_tsk && (entry = xml_get_widget (xml_tsk, name)))
-			goto got_entry;			
+		goto got_entry;			
 	if (xml_agt && (entry = xml_get_widget (xml_agt, name)))
-			goto got_entry;
+		goto got_entry;
 	if (xml_lvw && (entry = xml_get_widget (xml_lvw, name)))
-			goto got_entry;
+		goto got_entry;
 	if (xml_pbw && (entry = xml_get_widget (xml_pbw, name)))
-			goto got_entry;
+		goto got_entry;
 	if (xml_pht && (entry = xml_get_widget (xml_pht, name)))
-			goto got_entry;
+		goto got_entry;
 	if (xml_con && (entry = xml_get_widget (xml_con, name)))
-			goto got_entry;
+		goto got_entry;
+	if (xml_V4L && (entry = xml_get_widget (xml_V4L, name)))
+		goto got_entry;
+	if (xml_fil && (entry = xml_get_widget (xml_fil, name)))
+		goto got_entry;
 	if (xml_fcw && (entry = xml_get_widget (xml_fcw, name)))
-			goto got_entry;
+		goto got_entry;
 
 	return NULL;
 
@@ -6371,6 +7015,10 @@ static GtkSpinButton *get_spin_widget (const gchar *name)
 	if (xml_pht && (spin = xml_get_widget (xml_pht, name)))
 			goto got_spin;
 	if (xml_con && (spin = xml_get_widget (xml_con, name)))
+			goto got_spin;
+	if (xml_V4L && (spin = xml_get_widget (xml_V4L, name)))
+		goto got_spin;
+	if (xml_fil && (spin = xml_get_widget (xml_fil, name)))
 			goto got_spin;
 	if (xml_fcw && (spin = xml_get_widget (xml_fcw, name)))
 			goto got_spin;
@@ -6703,7 +7351,7 @@ void set_fits_data (struct cam_img *img, struct timeval *time,
 
 void set_autog_on (gboolean on)
 {
-	/* Turn autoguider on/off (called from task list) */
+	/* Turn autoguider camera on/off (called from task list) */
 
 	struct cam_img *aug = get_aug_image_struct ();	
 	
@@ -6720,13 +7368,14 @@ void set_autog_on (gboolean on)
 	/* If the button is already active and we ask it to be set active (and vice-
 	 * versa), the toggled signal never gets emitted, so we have to treat that 
 	 * case here rather than issuing a warning when the instruction to turn the
-	 * autoguider on/off reaches the loop module.
+	 * autoguider camera on/off reaches the loop module.
 	 */
 	
 	button = GTK_TOGGLE_BUTTON (xml_get_widget (xml_app, "chkAutogOpen"));	
 	state = gtk_toggle_button_get_active (button);
 	if (on == state) {
-		L_print ("{o}Warning - autoguider is already %s\n",(on ? "on":"off"));
+		L_print ("{o}Warning - autoguider camera is already %s\n", 
+		                                                     (on ? "on":"off"));
 		tasks_task_done (on ? T_AGN : T_AGF);
 		return;
 	}
@@ -6905,10 +7554,6 @@ void set_autog_sensitive (gboolean sensitive, gboolean autogopened)
 		gtk_widget_set_sensitive (widget, sensitive);
 	}
 	
-	widget = xml_get_widget (xml_app, "configure_sx_camera");
-	if (aug->device == SX)
-		gtk_widget_set_sensitive (widget, sensitive);
-
 	widget = xml_get_widget (xml_app, "chkAutogRemoteTiming");
 	gtk_widget_set_sensitive (widget, sensitive);
 	
@@ -7053,6 +7698,39 @@ void set_autog_calibrate_done (void)
 	 */
 	
 	gtk_widget_activate (xml_get_widget (xml_app, "btnAutogCalibrate"));
+}
+
+gboolean ui_control_action (gchar *cmd, gchar *token)
+{
+	/* Activate/deactivate the given control.
+	 * (Note: text boxes should have their value set to 'token' and then
+	 *  be activated).
+	 */
+	
+	GtkWidget *w = NULL;
+	
+	if (!(w = xml_get_widget (xml_app, cmd)))
+		return FALSE;  /* Widget doesn't exist */
+	
+	/* For now, we just do menu items */
+	
+	if (!strcmp (token, "1")) {
+		if (!strcmp (G_OBJECT_TYPE_NAME (w), "GtkCheckMenuItem")) {
+			if (!gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (w)))
+				gtk_menu_item_activate (GTK_MENU_ITEM (w));
+		} else
+			gtk_menu_item_activate (GTK_MENU_ITEM (w));
+	} else if (!strcmp (token, "0")) {
+		if (!strcmp (G_OBJECT_TYPE_NAME (w), "GtkCheckMenuItem")) {
+			if (gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (w)))
+				gtk_menu_item_activate (GTK_MENU_ITEM (w));
+		}
+	} else {
+		L_print ("{r}Unrecognised command: '%s' for GUI control\n", token); 
+		return FALSE;
+	}
+		
+	return TRUE;
 }
 
 static void canvas_button_press (GtkWidget *widget, GdkEventButton *event, 
@@ -7235,7 +7913,7 @@ gboolean ui_show_augcanv_image (void)
 	
 	static GdkPixbuf *image = NULL;
 	
-	if (!aug->disp_8_3) {
+	if (!aug->disp083) {
 		L_print ("{o}Requested to show autoguider image, but image data "
 		         "unavailable\n");
 		return FALSE;
@@ -7250,7 +7928,7 @@ gboolean ui_show_augcanv_image (void)
 
 	/* Create new pixbuf */
 
-	if (!(image = gdk_pixbuf_new_from_data (aug->disp_8_3,
+	if (!(image = gdk_pixbuf_new_from_data (aug->disp083,
 		                                    GDK_COLORSPACE_RGB, 
 	                                        FALSE,
 	                                        8,
@@ -7330,14 +8008,21 @@ void ui_set_augcanv_rect_full_area (void)
 void ui_set_augcanv_crosshair (gdouble x, gdouble y)
 {
 	/* Draw the autoguider crosshair at (x, y) in window coordinates, rotated
-	 * according to the most recent calibration of the autoguider camera.
+	 * according to the most recent calibration of the autoguider camera.  If
+	 * x is negative, then set x to be the centre of the currently displayed
+	 * autoguider image (if there is one), likewise for y.
 	 */
 	
 	struct cam_img *aug = get_aug_image_struct ();
 	
 	GooCanvasPoints *cvpLine;
 	gdouble rot;
-
+	
+	if (x < 0 && aug->Open)
+		x = aug->exd.h_top_l + aug->exd.h_pix / 2.0;
+	if (y < 0 && aug->Open)
+		y = aug->exd.v_top_l + aug->exd.v_pix / 2.0;
+		
 	rot = aug->autog.s.Uvec_E[1] / aug->autog.s.Uvec_E[0];
 	
 	cvpLine = goo_canvas_points_new (2);  /* x cross-hair... */
@@ -7541,7 +8226,7 @@ void ui_show_augcanv_centroid (gboolean show, gboolean saturated,
 	}
 }
 
-void ui_set_aug_window_controls (enum CamDevice dev, gboolean Binning)
+void ui_set_aug_window_controls (enum HWDevice dev, gboolean Binning)
 {
 	/* A scrappy little function to set the state of various controls on the
 	 * autoguider image window.
@@ -7624,7 +8309,7 @@ void ui_show_video_frame (guchar *frame, gchar *timestamp, guint num,
     
 	/* Create new pixbuf */
 
-	if (!(image = gdk_pixbuf_new_from_data (vid->disp_8_3,
+	if (!(image = gdk_pixbuf_new_from_data (vid->disp083,
 		                                    GDK_COLORSPACE_RGB, 
 	                                        FALSE,
 	                                        8,
@@ -7745,6 +8430,82 @@ gushort get_video_framebufsize (void)
 	 */
 	
 	return R_config_d ("Video/FrameBufSize", 50);
+}
+
+void ui_show_status_bar_info (void)
+{
+	/* Display image information on the status bar.
+	 * Note that we display the pixel values as beginning at (1, 1) in the 
+	 * bottom left corner of the underlying image, even though the canvas
+	 * coordinates begin at (0, 0) in the top left corner of the window.
+	 */
+	
+	struct cam_img *aug = get_aug_image_struct (); 	
+	
+	guint e, w, n, s;
+	gint x = aug->canv.cursor_x;
+	gint y = aug->canv.cursor_y;
+	gint val, i;
+	gfloat ratio;
+	gchar *info;
+	
+	if (aug->Open) {
+		if (x >= aug->exd.h_top_l && (x < aug->exd.h_top_l + aug->exd.h_pix) && 
+			y >= aug->exd.v_top_l && (y < aug->exd.v_top_l + aug->exd.v_pix)) {
+                
+			/* Get the (possibly dark-subtracted and background-adjusted) value 
+			 * in the photocell.
+			 */
+		
+			i =aug->exd.h_pix * (y - aug->exd.v_top_l) + (x - aug->exd.h_top_l);
+			val = aug->r161[i];
+			if (aug->dark.Subtract)
+				val = MAX (val - aug->dark.dk161[i], 0);
+			val = MAX (val - aug->imdisp.black, 0);
+			
+		} else {      /* Cursor lies outside image area */
+            x = aug->exd.h_top_l - 1;
+            y = aug->exd.v_top_l + aug->exd.v_pix;
+			val = 0;
+		}
+	
+		if (aug->autog.Guide)
+			telescope_get_guide_corrs (&e, &w, &n, &s, &ratio);
+		else {
+			e = w = n = s = 0;
+			ratio = 0.0;
+		}
+	
+		info = g_strdup_printf ("(%03i, %03i)   "
+						"Min: %05i,  Max: %05i    Value: %05i    "
+						"Zoom: %3.2f    "
+	                    "N: %04d, S: %04d, E: %04d, W: %04d, R = %5.2f",
+						x - aug->exd.h_top_l + 1, 
+                        aug->exd.v_top_l + aug->exd.v_pix - y,
+						/* If selection rect. lies outside image, make sure */
+						/* min value is less than max value!                */
+						MIN (aug->rect.min[GREY].val, aug->rect.max[GREY].val),
+						aug->rect.max[GREY].val,
+	                    val, aug->canv.zoom,
+	                    n, s, e, w, ratio);
+	
+		set_status_bar (stsImageStatus, info, FALSE);
+ 		g_free (info);
+	
+	} else {
+		info = g_strdup_printf ("(%03i-%03i, %03i-%03i)   "
+								"Min: %05i,  Max: %05i    Value: %05i    "
+								"Zoom: %3.2f    "
+	           		            "N: %04d, S: %04d, E: %04d, W: %04d, R = %5.2f",
+								 0, 0, 0, 0,	
+							  	 0, 0, 0, 1.0,
+								 0, 0, 0, 0, 0.0);
+		
+		set_status_bar (stsImageStatus, info, FALSE);
+ 		g_free (info);		
+	}
+	
+	return;	
 }
 
 static gchar *get_open_filename (GtkWindow *window, gchar *filename)
@@ -8118,18 +8879,20 @@ void ui_show_aug_window (void)
 
 void ui_hide_aug_window (void)
 {
-	/* Hide the autoguider window, if shown */
+	/* Hide the autoguider window, if shown, and close the V4L configuration
+	 * window, if it is open.
+	 */
 	
 	struct cam_img *aug = get_aug_image_struct ();
 	
 	gtk_widget_hide (aug->aug_window);
+	if (xml_V4L)
+		gtk_widget_activate (xml_get_widget (xml_V4L, "btnV4LConfigClose"));
 }
 
-void select_device (struct cam_img *img, gint num)
+void select_device (void)
 {
-	/* Pop up a window asking the user to select a device number from
-	 * zero to 'num' - 1.
-	 */
+	/* Pop up a window asking the user to select an available device */
 	
 	static GtkComboBox *cmbDevSelect;
 	gint i;
@@ -8138,15 +8901,6 @@ void select_device (struct cam_img *img, gint num)
 	gchar *objects[] = {"wndDevSelect", NULL};
 	xml_dev = xml_load_new (xml_dev, GLADE_INTERFACE, objects);
 	
-	gtk_window_set_title (GTK_WINDOW (xml_get_widget (xml_dev, "wndDevSelect")),
-						  img->id == CCD ? "CCD camera" : "Autoguider camera");
-	
-	str = g_strdup_printf ("Found %d devices (see log window)!  Please select "
-						 "the number of the device that you wish to use:", num);
-	gtk_label_set_text (GTK_LABEL (xml_get_widget (
-												xml_dev, "lblDevSelect")), str);
-	g_free (str);
-    
     /* Create device selection combo box */
 	
     cmbDevSelect = create_text_combo_box (
@@ -8155,10 +8909,10 @@ void select_device (struct cam_img *img, gint num)
                       0, NULL);
     g_hash_table_insert (hshCombo, "cmbDevSelect", cmbDevSelect);
 	
-    /* Fill combo box with an integer entry for each device found */
+    /* Fill combo box with an entry for each device found */
     
-	for (i = 0; i < num; i++) {
-		str = g_strdup_printf ("%d", i);
+	for (i = 0; i < ds.num; i++) {
+		str = g_strdup_printf ("%s : %s", ds.desc[i], ds.id[i]);
 	    gtk_combo_box_append_text (cmbDevSelect, str);
 	    g_free (str);
 	}
@@ -8220,18 +8974,10 @@ void set_camera_state (struct cam_img *img)
 	
 	gint i;
 	
-	/* If this value is zero, check the setting (if any) in the configuration
-	 * file.  This enables the user to specify whether or not the camera
-	 * supports cooling if the camera does not return that information itself.
-	 */
-	
-	if (!img->cam_cap.CanSetCCDTemp)
-		img->cam_cap.CanSetCCDTemp = R_config_d (
-									   CCDConfigKey (img, "HasCooling"), FALSE);
-	img->set_state (S_CANCOOL, img->cam_cap.CanSetCCDTemp, 0.0, img->id);
-																		
 	img->state.d_ccd = R_config_f (CCDConfigKey (img, "DefTemp"), TPR_DEF);
 	img->set_state (S_TEMP, 0, img->state.d_ccd, img->id);
+	
+	img->state.c_tol = R_config_f (CCDConfigKey (img, "TempTol"), 0.1);
 	
 	img->state.CoolOnConnect = R_config_d (
 									CCDConfigKey (img, "CoolOnConnect"), FALSE);
@@ -8281,114 +9027,15 @@ void set_camera_state (struct cam_img *img)
 	img->Debayer = R_config_d (CCDConfigKey (img, "Debayer"), 0);
 	i = R_config_d (CCDConfigKey (img, "BayerPattern"), 0);
 	img->bayer_pattern = (i < 3 ? --i : i);
-}
-
-gboolean set_filter (enum CamType type, gchar *filter, gint *fo_diff)
-{
-	/* Set the filter position, based on the given name and the stored
-	 * location of a filter of that name in the filter wheel.  Return the
-	 * difference between the new filter focus offset and the old one as
-	 * fo_diff.
+	
+	if (img->id == CCD)
+		img->state.IgnoreCooling = R_config_d ("Misc/IgnoreCCDCooling", FALSE);	
+	
+	/* The following items aren't really part of the camera state, but this is 
+	 * the best place to set them.
 	 */
-	
-	struct cam_img *img;
-	gint i, off_old, off_new;
-	gchar f[10];
-	gboolean Found = FALSE;
-	
-	*fo_diff = 0;
-	
-	switch (type) {
-		case CCD:
-			img = get_ccd_image_struct ();
-		    break;
-		case AUG:
-			img = get_aug_image_struct ();
-		    break;
-		default:
-			return show_error (__func__, "Unknown camera type!");
-	}
-	
-	/* If filter is NULL, use the currently set filter in the exposure 
-	 * data.
-	 */
-	
-	if (!filter)
-		filter = img->exd.filter;		
-	
-	/* Return if no filter requested */
-	
-	if (!strcmp (filter, "-"))
-		return TRUE;
-	
-	if (img->Open && img->cam_cap.HasFilterWheel) {
-			
-		/* Get the current focus offset */
-		
-		img->get_state (&img->state, FALSE);           /* Gets current filter */
-		get_filter_info (img, img->state.c_filter, f, &off_old); /*Gets offset*/
-		
-		/* Now set the filter position */
-		
-		for (i = 0; i < MAX_FILTERS; i++) {
-			if (!strcmp (filter, get_filter_info (img, i, f, &off_new))) {
-				L_print ("{b}Setting filter wheel to \"%s\" at position %d\n", 
-																	 filter, i);			
-				if (!img->set_state (S_FILTER, i, 0.0))
-					return show_error (__func__, "Error setting filter wheel "
-									                     "to desired position");
-				*fo_diff = off_new - off_old;
-				Found = TRUE;
-				break;
-			}
-		}
-		if (!Found) {
-			L_print ("{o}Can't find \"%s\" in the current filter wheel\n", 
-					                                                    filter);
-			*fo_diff = 0;
-			return FALSE;
-		}
-	} else {
-			L_print ("{o}Can't find filter wheel!\n");
-	}
-
-	return TRUE;
-}
-
-gboolean get_apply_filter_offset (void)
-{
-	/* Return TRUE if the filter focus offset is to be applied */
-	
-	return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (
-			           xml_get_widget (xml_app, "chkFocusApplyFilterOffsets")));
-}
-
-void apply_filter_focus_offset (enum CamType type, gint offset)
-{
-	/* Apply the focus offset corresponding to the selected filter */
-	
-	struct cam_img *img;
-	struct focus f;
-	
-	switch (type) {
-		case CCD:
-			img = get_ccd_image_struct ();
-		    break;
-		case AUG:
-			img = get_aug_image_struct ();
-		    break;
-		default:
-			L_print ("{r}%s: Unknown camera type!\n", __func__);
-			return;
-	}
-	
-	if (img->cam_cap.HasFilterWheel && menu.OpenFocusPort) {
-		f.cmd = FC_MOVE_BY;
-		f.move_by = offset;
-		focus_comms->focus (&f);
-		loop_focus_check_done ();
-    } else
-	    L_print ("{o}Filter wheel or focuser not available\n");
+	img->ds9.Invert_h = R_config_d (CCDConfigKey (img, "InvertDS9h"), 0);
+	img->ds9.Invert_v = R_config_d (CCDConfigKey (img, "InvertDS9v"), 0);
 }
 
 void set_ccd_deftemp (void)
@@ -8461,24 +9108,220 @@ gboolean show_camera_status (gboolean show)
 	return TRUE;
 }
 
-gchar *get_filter_info (struct cam_img *img, gint pos, gchar *filter,
-	                    gint *offset)
+gboolean get_V4L_settings (gchar *device)
 {
-	/* Return the name and focus offset of the filter at the given position */
+	/* Return the V4L settings from the configuration file for the given 
+	 * device.
+	 */
+	 
+	struct cam_img *aug = get_aug_image_struct ();
+	
+	gint val;
+	gchar key[128];
+	
+	snprintf (key, 128, "V4L/%s/4CC", device);
+	if ((aug->vid_dat.pixfmt = R_config_d (key, -1)) == -1)
+		return FALSE;  /* No config. data for this device */
+	
+	snprintf (key, 128, "V4L/%s/VideoStandard", device);
+	if ((val = R_config_d (key, -1)) == -1)
+		aug->vid_dat.HasVideoStandard = FALSE;
+	else {
+		aug->vid_dat.vid_std.id[0] = val;
+		aug->vid_dat.HasVideoStandard = TRUE;
+	}
+
+	snprintf (key, 128, "V4L/%s/VideoInput", device);
+	aug->vid_dat.vid_input.selected = R_config_d (key, 0);	
+	
+	snprintf (key, 128, "V4L/%s/Width", device);
+	aug->vid_dat.width = R_config_d (key, 640);
+	
+	snprintf (key, 128, "V4L/%s/Height", device);
+	aug->vid_dat.height = R_config_d (key, 480);
+
+	snprintf (key, 128, "V4L/%s/fps", device);
+	aug->vid_dat.fps = (gfloat) R_config_f (key, 25);
+	
+	return TRUE;
+}
+
+gboolean set_filter (gboolean ForceInternal, gchar *filter, gint *fo_diff)
+{
+	/* Set the filter position, based on the given name and the stored
+	 * location of a filter of that name in the filter wheel.  Return the
+	 * difference between the new filter focus offset and the old one as
+	 * fo_diff.  If ForceInternal == TRUE, then use the camera's internal
+	 * filter wheel (if there is one) irrespective of menu settings.
+	 */
+	
+	struct cam_img *ccd = get_ccd_image_struct ();
+	gint i, off_old, off_new;
+	gchar f[MCSL];
+	
+	*fo_diff = 0;
+	
+	/* If filter is NULL, use the currently set filter in the exposure 
+	 * data.
+	 */
+	
+	if (!filter)
+		filter = ccd->exd.filter;
+	
+	/* Return if no filter requested */
+	
+	if (!strcmp (filter, "-"))
+		return TRUE;
+	
+	if (ForceInternal || !strcmp (menu.filterwheel, "filterwheel_int")) {
+		if (ccd->Open && ccd->cam_cap.HasFilterWheel) {/* Camera incorporates */
+												       /*  filter wheel       */
+			/* Get the current focus offset */
+			
+			ccd->get_state (&ccd->state, FALSE);  /* Gets current filter pos. */
+			strcpy (f, "-");
+			get_filter_info (ccd, f, (gint *) &ccd->state.c_filter, &off_old);
+			
+			/* Now set the filter position */
+			
+			if (get_filter_info (ccd, filter, &i, &off_new)) {
+				L_print ("{b}Setting filter wheel to \"%s\" at position %d\n", 
+																	 filter, i);	
+				if (!ccd->set_state (S_FILTER, i, 0.0))
+					return show_error (__func__, "Error setting filter wheel "
+														 "to desired position");
+				*fo_diff = off_new - off_old;
+			} else {
+				L_print ("{o}Can't find \"%s\" in the current filter wheel\n", 
+																	    filter);
+				*fo_diff = 0;
+				return FALSE;
+			}
+		} else
+			return show_error (__func__, "CCD camera not open or does not have "
+			                   "internal filter wheel");
+	} else if (filter_is_open ()) {          /* External filter wheel is open */
+	
+		/* Get the current focus offset */
+		
+		i = filter_get_filter_pos ();
+		strcpy (f, "-");
+		get_filter_info (NULL, f, &i, &off_old);
+		
+		/* Now set the filter position */
+		
+		if (get_filter_info (NULL, filter, &i, &off_new)) {
+			L_print ("{b}Setting filter wheel to \"%s\" at position %d\n", 
+																 filter, i);			
+			if (!filter_set_filter_pos (i))
+				return show_error (__func__, "Error setting filter wheel "
+													 "to desired position");
+			*fo_diff = off_new - off_old;
+		} else {
+			L_print ("{o}Can't find \"%s\" in the current filter wheel\n", 
+					                                                    filter);
+			*fo_diff = 0;
+			return FALSE;
+		}
+	} else {
+			L_print ("{o}Can't find filter wheel!\n");
+	}
+
+	return TRUE;
+}
+
+gboolean get_filter_info (struct cam_img *img, gchar *filter, gint *pos, 
+	                      gint *offset)
+{
+	/* If the filter name is "-", return the filter name and focus offset for  
+	 * the given position.  If a filter name is given, return the filter 
+	 * position and focus offset for the given filter name.  
+	 * Do this irrespective of whether or not the filter wheel is actually open.
+	 */
 	
 	gushort wheel;
-	gchar *key;
+	gchar f[MCSL], *key;
 	
-	wheel = R_config_d (CCDConfigKey (img, "Filter/ActiveWheel"), 1);
-	key = g_strdup_printf ("%s/%d/%d", CCDConfigKey (img, "Filter"),wheel, pos);
-	strcpy (filter, "-");
-	R_config_s (key, filter);
-	g_free (key);
-	key = g_strdup_printf ("%s/%d/FO%d", CCDConfigKey(img, "Filter"),wheel,pos);
-	*offset = R_config_d (key, 0);
-	g_free (key);
+	if (img) {  /* Internal CCD camera/autoguider camera filter wheel */
+		if (!strcmp (filter, "-")) { /* Get filter name and offset */
+			wheel = R_config_d (CCDConfigKey (img, "Filter/ActiveWheel"), 1);
+			key = g_strdup_printf ("%s/%d/%d",
+								   CCDConfigKey (img, "Filter"), wheel, *pos);
+			R_config_s (key, filter);
+			g_free (key);
+			if (!strcmp (filter, "-")) /* Filter not defined for given pos. */
+				return FALSE;
+		} else {	                 /* Get filter position and offset */
+			wheel = R_config_d (CCDConfigKey (img, "Filter/ActiveWheel"), 1);
+			*pos = 0;
+			while (TRUE) {
+				key = g_strdup_printf ("%s/%d/%d",
+								   CCDConfigKey (img, "Filter"), wheel, *pos);
+				strcpy (f, "-");
+				R_config_s (key, f);
+				g_free (key);
+				if (!strcmp (filter, f))
+					break;
+				if (!strcmp (f, "-") && *pos > 0) /* Filter not found */
+					return FALSE;
+				*pos += 1;
+			}
+		}
+		key = g_strdup_printf ("%s/%d/FO%d", 
+							   CCDConfigKey (img, "Filter"), wheel, *pos);
+		*offset = R_config_d (key, 0);
+		g_free (key);
+	} else {  /* External filter wheel */
+		if (!strcmp (filter, "-")) { /* Get filter name and offset */
+			wheel = R_config_d ("FilterWheel/ActiveWheel", 1);
+			key = g_strdup_printf ("%s/%d/%d", "FilterWheel", wheel, *pos);
+			R_config_s (key, filter);
+			g_free (key);
+			if (!strcmp (filter, "-")) /* Filter not defined for given pos. */
+				return FALSE;
+		} else {	                 /* Get filter position and offset */
+			wheel = R_config_d ("FilterWheel/ActiveWheel", 1);
+			*pos = 0;
+			while (TRUE) {
+				key = g_strdup_printf ("%s/%d/%d", "FilterWheel", wheel, *pos);
+				strcpy (f, "-");
+				R_config_s (key, f);
+				g_free (key);
+				if (!strcmp (filter, f))
+					break;
+				if (!strcmp (f, "-") && *pos > 0) /* Filter not found */
+					return FALSE;
+				*pos += 1;
+			}
+		}
+		key = g_strdup_printf ("%s/%d/FO%d", "FilterWheel", wheel, *pos);
+		*offset = R_config_d (key, 0);
+		g_free (key);
+	}
+	return TRUE;
+}
+
+gboolean get_apply_filter_offset (void)
+{
+	/* Return TRUE if the filter focus offset is to be applied */
 	
-	return filter;
+	return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (
+			           xml_get_widget (xml_app, "chkFocusApplyFilterOffsets")));
+}
+
+void apply_filter_focus_offset (gint offset)
+{
+	/* Apply the focus offset corresponding to the selected filter */
+	
+	struct focus f;
+	
+	if (menu.OpenFocusPort) {
+		f.cmd = FC_MOVE_BY;
+		f.move_by = offset;
+		focus_comms->focus (&f);
+		loop_focus_check_done ();
+    } else
+	    L_print ("{o}Focuser not available\n");
 }
 
 void check_focuser_temp (void)
@@ -8518,82 +9361,6 @@ void check_focuser_temp (void)
 		}
 	} else
 		L_print ("{r}Error reading focuser temperature\n");
-}
-
-void ui_show_status_bar_info (void)
-{
-	/* Display image information on the status bar.
-	 * Note that we display the pixel values as beginning at (1, 1) in the 
-	 * bottom left corner of the underlying image, even though the canvas
-	 * coordinates begin at (0, 0) in the top left corner of the window.
-	 */
-	
-	struct cam_img *aug = get_aug_image_struct (); 	
-	
-	guint e, w, n, s;
-	gint x = aug->canv.cursor_x;
-	gint y = aug->canv.cursor_y;
-	gint val, i;
-	gfloat ratio;
-	gchar *info;
-	
-	if (aug->Open) {
-		if (x >= aug->exd.h_top_l && (x < aug->exd.h_top_l + aug->exd.h_pix) && 
-			y >= aug->exd.v_top_l && (y < aug->exd.v_top_l + aug->exd.v_pix)) {
-                
-			/* Get the (possibly dark-subtracted and background-adjusted) value 
-			 * in the photocell.
-			 */
-		
-			i =aug->exd.h_pix * (y - aug->exd.v_top_l) + (x - aug->exd.h_top_l);
-			val = aug->vadr[i];
-			if (aug->dark.Subtract)
-				val = MAX (val - aug->dark.dvadr[i], 0);
-			val = MAX (val - aug->imdisp.black, 0);
-			
-		} else {      /* Cursor lies outside image area */
-            x = aug->exd.h_top_l - 1;
-            y = aug->exd.v_top_l + aug->exd.v_pix;
-			val = 0;
-		}
-	
-		if (aug->autog.Guide)
-			telescope_get_guide_corrs (&e, &w, &n, &s, &ratio);
-		else {
-			e = w = n = s = 0;
-			ratio = 0.0;
-		}
-	
-		info = g_strdup_printf ("(%03i, %03i)   "
-						"Min: %05i,  Max: %05i    Value: %05i    "
-						"Zoom: %3.2f    "
-	                    "N: %04d, S: %04d, E: %04d, W: %04d, R = %5.2f",
-						x - aug->exd.h_top_l + 1, 
-                        aug->exd.v_top_l + aug->exd.v_pix - y,
-						/* If selection rect. lies outside image, make sure */
-						/* min value is less than max value!                */
-						MIN (aug->rect.min[GREY].val, aug->rect.max[GREY].val),
-						aug->rect.max[GREY].val,
-	                    val, aug->canv.zoom,
-	                    n, s, e, w, ratio);
-	
-		set_status_bar (stsImageStatus, info, FALSE);
- 		g_free (info);
-	
-	} else {
-		info = g_strdup_printf ("(%03i-%03i, %03i-%03i)   "
-								"Min: %05i,  Max: %05i    Value: %05i    "
-								"Zoom: %3.2f    "
-	           		            "N: %04d, S: %04d, E: %04d, W: %04d, R = %5.2f",
-								 0, 0, 0, 0,	
-							  	 0, 0, 0, 1.0,
-								 0, 0, 0, 0, 0.0);
-		
-		set_status_bar (stsImageStatus, info, FALSE);
- 		g_free (info);		
-	}
-	
-	return;	
 }
 
 static void select_entry_region (const gchar *name)
@@ -8665,24 +9432,28 @@ static void comms_menus_update_ports (void)
 	 
 	GtkWidget *menuitem;
 	gushort i;
-	gchar name[15], t_name[12], a_name[12], f_name[12];
+	gchar name[15], t_name[12], a_name[12], w_name[12], f_name[12];
 	
 	/* Remove existing menu items */
 	
 	gtk_container_foreach (
-				GTK_CONTAINER (xml_get_widget (xml_app, "telescope_link_menu")),
-				comms_menus_remove_ports,
-				NULL);
+			GTK_CONTAINER (xml_get_widget (xml_app, "telescope_link_menu")),
+			comms_menus_remove_ports,
+			NULL);
 	gtk_container_foreach (
-				GTK_CONTAINER (xml_get_widget (xml_app,"autoguider_link_menu")),
-				comms_menus_remove_ports,
-				NULL);
+			GTK_CONTAINER (xml_get_widget (xml_app,"autoguider_link_menu")),
+			comms_menus_remove_ports,
+			NULL);
 	gtk_container_foreach (
-				GTK_CONTAINER (xml_get_widget (xml_app, "focuser_link_menu")),
-				comms_menus_remove_ports,
-				NULL);
+			GTK_CONTAINER (xml_get_widget (xml_app,"filter_wheel_link_menu")),
+			comms_menus_remove_ports,
+			NULL);
+	gtk_container_foreach (
+			GTK_CONTAINER (xml_get_widget (xml_app, "focuser_link_menu")),
+			comms_menus_remove_ports,
+			NULL);
 				
-	/* Add back the unique items for the autoguider ports */
+	/* Add back the unique items for the guide signal ports */
 				
 	menuitem = gtk_menu_item_new_with_label ("Parallel port");
 	gtk_widget_set_name (menuitem, "a_ParallelPort");
@@ -8694,7 +9465,7 @@ static void comms_menus_update_ports (void)
 			gtk_widget_set_sensitive (menuitem, FALSE);
 	gtk_widget_show (menuitem);
 	
-	menuitem = gtk_menu_item_new_with_label ("Use Guide camera");
+	menuitem = gtk_menu_item_new_with_label ("Via autoguider camera");
 	gtk_widget_set_name (menuitem, "a_GuideCam");
 	gtk_menu_shell_append (GTK_MENU_SHELL (
 				   xml_get_widget (xml_app, "autoguider_link_menu")), menuitem);
@@ -8704,7 +9475,7 @@ static void comms_menus_update_ports (void)
 			gtk_widget_set_sensitive (menuitem, FALSE);
 	gtk_widget_show (menuitem);
 	
-	menuitem = gtk_menu_item_new_with_label ("Use CCD camera");
+	menuitem = gtk_menu_item_new_with_label ("Via CCD camera");
 	gtk_widget_set_name (menuitem, "a_CCDCam");
 	gtk_menu_shell_append (GTK_MENU_SHELL (
 				   xml_get_widget (xml_app, "autoguider_link_menu")), menuitem);
@@ -8714,12 +9485,35 @@ static void comms_menus_update_ports (void)
 			gtk_widget_set_sensitive (menuitem, FALSE);
 	gtk_widget_show (menuitem);
 	
+	/* Add back the unique items for the filter wheel ports */
+	
+	menuitem = gtk_menu_item_new_with_label ("Via CCD camera");
+	gtk_widget_set_name (menuitem, "w_CCDCam");
+	gtk_menu_shell_append (GTK_MENU_SHELL (
+				 xml_get_widget (xml_app, "filter_wheel_link_menu")), menuitem);
+	g_signal_connect (menuitem, "activate", 
+					  G_CALLBACK (comms_ports_activate_cb), NULL);
+	if (!strcmp (menu.filterwheel_port, "w_CCDCam"))
+			gtk_widget_set_sensitive (menuitem, FALSE);
+	gtk_widget_show (menuitem);
+	
+	menuitem = gtk_menu_item_new_with_label ("USB direct");
+	gtk_widget_set_name (menuitem, "w_USBdirect");
+	gtk_menu_shell_append (GTK_MENU_SHELL (
+				 xml_get_widget (xml_app, "filter_wheel_link_menu")), menuitem);
+	g_signal_connect (menuitem, "activate", 
+					  G_CALLBACK (comms_ports_activate_cb), NULL);
+	if (!strcmp (menu.filterwheel_port, "w_USBdirect"))
+			gtk_widget_set_sensitive (menuitem, FALSE);
+	gtk_widget_show (menuitem);
+	
 	/* Add four standard serial ports */
 				
 	for (i = 0; i < 4; i++) {
 		sprintf (name, "/dev/ttyS%d", i);
 		sprintf (t_name, "t_ttyS%d", i);
 		sprintf (a_name, "a_ttyS%d", i);
+		sprintf (w_name, "w_ttyS%d", i);
 		sprintf (f_name, "f_ttyS%d", i);
 		 
 		menuitem = gtk_menu_item_new_with_label (name);
@@ -8739,6 +9533,16 @@ static void comms_menus_update_ports (void)
 		g_signal_connect (menuitem, "activate", 
 						  G_CALLBACK (comms_ports_activate_cb), NULL);
 		if (!strcmp (menu.autoguider_port, a_name))
+				gtk_widget_set_sensitive (menuitem, FALSE);
+		gtk_widget_show (menuitem);
+		
+		menuitem = gtk_menu_item_new_with_label (name);
+		gtk_widget_set_name (menuitem, w_name);
+		gtk_menu_shell_append (GTK_MENU_SHELL (
+				xml_get_widget (xml_app, "filter_wheel_link_menu")), menuitem);
+		g_signal_connect (menuitem, "activate", 
+						  G_CALLBACK (comms_ports_activate_cb), NULL);
+		if (!strcmp (menu.filterwheel_port, w_name))
 				gtk_widget_set_sensitive (menuitem, FALSE);
 		gtk_widget_show (menuitem);
 		
@@ -8764,6 +9568,7 @@ static void comms_menus_update_ports (void)
 		sprintf (name, "/dev/ttyUSB%d", i);
 		sprintf (t_name, "t_ttyUSB%d", i);
 		sprintf (a_name, "a_ttyUSB%d", i);
+		sprintf (a_name, "w_ttyUSB%d", i);
 		sprintf (f_name, "f_ttyUSB%d", i);
 		 
 		if (g_file_test (name, G_FILE_TEST_EXISTS)) {
@@ -8773,7 +9578,7 @@ static void comms_menus_update_ports (void)
 			menuitem = gtk_menu_item_new_with_label (name);
 			gtk_widget_set_name (menuitem, t_name);
 			gtk_menu_shell_append (GTK_MENU_SHELL (
-			        xml_get_widget (xml_app, "telescope_link_menu")), menuitem);
+			      xml_get_widget (xml_app, "telescope_link_menu")), menuitem);
 			g_signal_connect (menuitem, "activate", 
 			                  G_CALLBACK (comms_ports_activate_cb), NULL);
 			if (!strcmp (menu.telescope_port, t_name)) {
@@ -8785,7 +9590,7 @@ static void comms_menus_update_ports (void)
 			menuitem = gtk_menu_item_new_with_label (name);
 			gtk_widget_set_name (menuitem, a_name);
 			gtk_menu_shell_append (GTK_MENU_SHELL (
-			        xml_get_widget (xml_app, "autoguider_link_menu")),menuitem);
+			      xml_get_widget (xml_app, "autoguider_link_menu")),menuitem);
 			g_signal_connect (menuitem, "activate", 
 			                  G_CALLBACK (comms_ports_activate_cb), NULL);
 			if (!strcmp (menu.autoguider_port, a_name)) {
@@ -8795,9 +9600,21 @@ static void comms_menus_update_ports (void)
 			gtk_widget_show (menuitem);
 			
 			menuitem = gtk_menu_item_new_with_label (name);
+			gtk_widget_set_name (menuitem, w_name);
+			gtk_menu_shell_append (GTK_MENU_SHELL (
+			      xml_get_widget (xml_app, "filter_wheel_link_menu")),menuitem);
+			g_signal_connect (menuitem, "activate", 
+			                  G_CALLBACK (comms_ports_activate_cb), NULL);
+			if (!strcmp (menu.filterwheel_port, w_name)) {
+				gtk_widget_set_sensitive (menuitem, FALSE);
+				gtk_widget_activate (menuitem);
+			}
+			gtk_widget_show (menuitem);
+			
+			menuitem = gtk_menu_item_new_with_label (name);
 			gtk_widget_set_name (menuitem, f_name);
 			gtk_menu_shell_append (GTK_MENU_SHELL (
-			        xml_get_widget (xml_app, "focuser_link_menu")), menuitem);
+			      xml_get_widget (xml_app, "focuser_link_menu")), menuitem);
 			g_signal_connect (menuitem, "activate", 
 			                  G_CALLBACK (comms_ports_activate_cb), NULL);
 			if (!strcmp (menu.focus_port, f_name)) {
@@ -8817,6 +9634,8 @@ static void comms_ports_set_active (GtkWidget *widget, gpointer data)
 		gtk_menu_item_activate (GTK_MENU_ITEM (widget));
 	else if (!strcmp (gtk_widget_get_name (widget), menu.autoguider_port))
 		gtk_menu_item_activate (GTK_MENU_ITEM (widget));
+	else if (!strcmp (gtk_widget_get_name (widget), menu.filterwheel_port))
+		gtk_menu_item_activate (GTK_MENU_ITEM (widget));
 	else if (!strcmp (gtk_widget_get_name (widget), menu.focus_port))
 		gtk_menu_item_activate (GTK_MENU_ITEM (widget));
 }
@@ -8831,44 +9650,48 @@ static void comms_ports_activate_cb (GtkWidget* widget, gpointer data)
 	const gchar *name;
 	gchar *l;
 	
+	
 	name = gtk_widget_get_name (widget);
 	if (!strncmp (name, "t_", 2)) {
 		strcpy (menu.telescope_port, name);
 		serial_set_comms_port (name);
-		l = g_strdup_printf ("Telescope comms port (%s)", name+2);
+		l = g_strdup_printf ("Telescope comms (%s)", name+2);
 		gtk_menu_item_set_label (GTK_MENU_ITEM (xml_get_widget (
-												xml_app, "telescope_link")), l);
+											xml_app, "telescope_link")), l);
 		g_free (l);
 	} else if (!strncmp (name, "a_", 2)) {
 		strcpy (menu.autoguider_port, name);
 		if (serial_set_comms_port (name))
 			gtk_widget_set_sensitive (
 				xml_get_widget (xml_app, "open_autoguider_link"),
-				autog_comms->pnum <= USBCCD ? FALSE : TRUE);
-		l = g_strdup_printf ("Autoguider comms port (%s)", name+2);
+				autog_comms->pnum <= USBDIR ? FALSE : TRUE);
+		l = g_strdup_printf ("Guide comms (%s)", name+2);
 		gtk_menu_item_set_label (GTK_MENU_ITEM (xml_get_widget (
-												xml_app, "autoguider_link")),l);
+											xml_app, "autoguider_link")),l);
+		g_free (l);
+	} else if (!strncmp (name, "w_", 2)) {
+		strcpy (menu.filterwheel_port, name);
+		if (serial_set_comms_port (name))
+			gtk_widget_set_sensitive (
+				xml_get_widget (xml_app, "open_filter_wheel_link"),
+				filter_comms->pnum <= USBCCD ? FALSE : TRUE);
+		l = g_strdup_printf ("Filter wheel comms (%s)", name+2);
+		gtk_menu_item_set_label (GTK_MENU_ITEM (xml_get_widget (
+											xml_app, "filter_wheel_link")),l);
 		g_free (l);
 	} else if (!strncmp (name, "f_", 2)) {
 		strcpy (menu.focus_port, name);
 		serial_set_comms_port (name);
-		l = g_strdup_printf ("Focuser comms port (%s)", name+2);
+		l = g_strdup_printf ("Focuser comms (%s)", name+2);
 		gtk_menu_item_set_label (GTK_MENU_ITEM (xml_get_widget (
-												xml_app, "focuser_link")), l);
+											xml_app, "focuser_link")), l);
 		g_free (l);
 	} else
 		L_print ("{r}%s: Invalid port name: %s\n", __func__, name);
 	
 	parent = gtk_widget_get_parent (widget);
-	gtk_container_foreach(GTK_CONTAINER(parent),comms_ports_set_sensitive,NULL);
+	gtk_container_foreach (GTK_CONTAINER (parent), widget_set_sensitive, NULL);
 	gtk_widget_set_sensitive (widget, FALSE);
-}
-
-static void comms_ports_set_sensitive (GtkWidget *widget, gpointer data)
-{
-	/* Sensitise the passed menu item */
-
-	gtk_widget_set_sensitive (widget, TRUE);
 }
 
 static void comms_menus_remove_ports (GtkWidget *widget, gpointer data)
@@ -8876,6 +9699,24 @@ static void comms_menus_remove_ports (GtkWidget *widget, gpointer data)
 	/* Remove the passed menu item */
 	
 	gtk_widget_destroy (widget);
+}
+
+static void widget_set_sensitive (GtkWidget *widget, gpointer data)
+{
+	/* Sensitise the passed widget (intended for calling from a 'foreach'
+	 * function).
+	 */
+
+	gtk_widget_set_sensitive (widget, TRUE);
+}
+
+static void widget_set_insensitive (GtkWidget *widget, gpointer data)
+{
+	/* De-sensitise the passed widget (intended for calling from a 'foreach'
+	 * function).
+	 */
+
+	gtk_widget_set_sensitive (widget, FALSE);
 }
 
 static void restore_config_data (void)
@@ -8895,23 +9736,34 @@ static void restore_config_data (void)
 	
 	#ifndef HAVE_QSI
 	gtk_widget_hide (xml_get_widget (xml_app, "ccd_qsi"));
+	gtk_widget_hide (xml_get_widget (xml_app, "filterwheel_int"));
 	#endif
-	#ifndef HAVE_SX
+	#ifndef HAVE_SX_CAM
 	gtk_widget_hide (xml_get_widget (xml_app, "ccd_sx"));
 	gtk_widget_hide (xml_get_widget (xml_app, "SX"));
 	gtk_widget_hide (xml_get_widget (xml_app, "SX_GuideHead"));
 	gtk_widget_hide (xml_get_widget (xml_app, "select_sx_camera"));
 	gtk_widget_hide (xml_get_widget (xml_app, "configure_sx_camera"));
 	#endif
+	#ifndef HAVE_SX_FILTERWHEEL
+	gtk_widget_hide (xml_get_widget (xml_app, "filterwheel_sx"));
+	gtk_widget_hide (xml_get_widget (xml_app, "select_filter_wheel"));
+	gtk_widget_hide (xml_get_widget (xml_app, "configure_filters"));
+	#endif
 	
-	#if !defined (HAVE_QSI) && !defined (HAVE_SX)
-	gtk_widget_set_sensitive (xml_get_widget (
-									   xml_app, "select_ccd_camera"), FALSE);
-	gtk_widget_set_sensitive (xml_get_widget (
-									   xml_app, "open_ccd_link"), FALSE);
-	gtk_widget_set_sensitive (xml_get_widget (
-									   xml_app, "show_full_frame"), FALSE);
-	#endif	
+	#if !defined (HAVE_QSI) && !defined (HAVE_SX_CAM)
+	gtk_widget_hide (xml_get_widget (xml_app, "select_ccd_camera"));
+	gtk_widget_hide (xml_get_widget (xml_app, "open_ccd_link"));
+	gtk_widget_hide (xml_get_widget (xml_app, "configure_ccd_camera"));
+	gtk_widget_hide (xml_get_widget (xml_app, "show_full_frame"));
+	gtk_widget_hide (xml_get_widget (xml_app, "debayer"));
+	#endif
+	
+	#if !defined (HAVE_QSI) && !defined (HAVE_SX_FILTERWHEEL)
+	gtk_widget_hide (xml_get_widget (xml_app, "sep_comms_filterwheel"));
+	gtk_widget_hide (xml_get_widget (xml_app, "filter_wheel_link"));
+	gtk_widget_hide (xml_get_widget (xml_app, "open_filter_wheel_link"));
+	#endif
 	
 	/* Hide the Unicap items if libunicap is not available */
 	
@@ -8929,13 +9781,17 @@ static void restore_config_data (void)
     gtk_widget_hide (xml_get_widget (xml_app, "V4L_(/dev/video1)"));
     gtk_widget_hide (xml_get_widget (xml_app, "V4L_(/dev/video2)"));
     gtk_widget_hide (xml_get_widget (xml_app, "V4L_(/dev/video3)"));
+    gtk_widget_hide (xml_get_widget (xml_app, "v4l_properties"));
+    #endif
+    
+    #if !defined (HAVE_UNICAP) && !defined (HAVE_LIBV4L2)
     gtk_widget_hide (xml_get_widget (xml_app, "greyscale_conversion"));
     #endif
 	
 	/* Hide the Grace items if libgrace is not available */
 	
 	#ifndef HAVE_LIBGRACE_NP
-	gtk_widget_hide (xml_get_widget (xml_app, "sepGrace"));
+	gtk_widget_hide (xml_get_widget (xml_app, "sep_windows_grace"));
 	gtk_widget_hide (xml_get_widget (xml_app, "ccd_temperatures"));
 	gtk_widget_hide (xml_get_widget (xml_app, "autoguider_trace"));
 	#endif
@@ -8943,7 +9799,7 @@ static void restore_config_data (void)
 	/* Hide parallel port items if libparapin is not available */
 	
 	#ifndef HAVE_LIBPARAPIN
-	gtk_widget_hide (xml_get_widget (xml_app, "sepParallelPort"));
+	gtk_widget_hide (xml_get_widget (xml_app, "sep_comms_parallelport"));
 	gtk_widget_hide (xml_get_widget (xml_app, "parallel_port"));
 	gtk_widget_hide (xml_get_widget (xml_app, "open_parallel_port"));
 	//gtk_widget_hide (xml_get_widget (xml_app, "V4L_(/dev/video0)_SC1"));
@@ -8962,6 +9818,7 @@ static void restore_config_data (void)
 	}
 	menu.OpenTelPort = R_config_d ("Menu/Settings/OpenTelescopePort", FALSE);
 	menu.Gemini = R_config_d ("Menu/Settings/UseGeminiCommands", FALSE);
+	
 	strcpy (menu.autoguider_port, "a_ttyS1");
 	R_config_s ("Menu/Settings/AutoguiderPort", menu.autoguider_port);
 	/* Catch error if config. database contains old value without preceding   */
@@ -8972,6 +9829,13 @@ static void restore_config_data (void)
 		g_free (m);
 	}
 	menu.OpenAutogPort = R_config_d("Menu/Settings/OpenAutoguiderPort", FALSE);
+	
+	strcpy (menu.filterwheel_port, "w_ttyS3");
+	R_config_s ("Menu/Settings/FilterwheelPort", menu.filterwheel_port);
+	/* Introduced after version 0.9.7                                         */
+	menu.OpenFilterwheelPort = R_config_d (
+	                                "Menu/Settings/OpenFilterwheelPort", FALSE);
+	
 	strcpy (menu.focus_port, "f_ttyS2");
 	R_config_s ("Menu/Settings/FocusPort", menu.focus_port);
 	/* Catch error if config. database contains old value without preceding   */
@@ -8982,15 +9846,38 @@ static void restore_config_data (void)
 		g_free (m);
 	}
 	menu.OpenFocusPort = R_config_d("Menu/Settings/OpenFocusPort", FALSE);
+	
+	#ifdef HAVE_QSI
 	strcpy (menu.ccd_camera, "ccd_qsi");
+	#elif defined (HAVE_SX_CAM)
+	strcpy (menu.ccd_camera, "ccd_sx");
+	#else
+	strcpy (menu.ccd_camera, "");
+	#endif
 	R_config_s ("Menu/Settings/CCDCamera", menu.ccd_camera);	
 	menu.FullFrame = R_config_d ("Menu/Settings/FullFrame", FALSE);
-	strcpy (menu.aug_camera, "V4L_(/dev/video0)");	
+	#ifdef HAVE_LIBV4L_2
+	strcpy (menu.aug_camera, "V4L_(/dev/video0)");
+	#elif defined (HAVE_SX_CAM)
+	strcpy (menu.aug_camera, "SX");
+	#elif defined (HAVE_UNICAP)
+	strcpy (menu.aug_camera, "unicap");
+	#else
+	strcpy (menu.aug_camera, "");
+	#endif
 	R_config_s ("Menu/Settings/AutoguiderCamera", menu.aug_camera);
 	strcpy (menu.debayer, "simple");
 	R_config_s ("Menu/Settings/Debayer", menu.debayer);
 	strcpy (menu.greyscale, "maximum");
 	R_config_s ("Menu/Settings/Greyscale", menu.greyscale);
+	#ifdef HAVE_QSI
+	strcpy (menu.filterwheel, "filterwheel_int");
+	#elif defined (HAVE_SX_FILTERWHEEL)
+	strcpy (menu.filterwheel, "filterwheel_sx");
+	#else
+	strcpy (menu.filterwheel, "");
+	#endif
+	R_config_s ("Menu/Settings/Filterwheel", menu.filterwheel);
 	strcpy (menu.focuser, "focuser_robofocus");
 	R_config_s ("Menu/Settings/Focuser", menu.focuser);	
 	menu.Precess = R_config_d ("Menu/Settings/Precess", FALSE);
@@ -9002,19 +9889,24 @@ static void restore_config_data (void)
 	if (menu.Gemini)
 		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                       "gemini_commands")));
-	gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
+	if (strcmp (menu.ccd_camera, ""))
+		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                         menu.ccd_camera)));
 	if (menu.FullFrame)
 		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                       "show_full_frame")));
 	gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                            menu.debayer)));
-	gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
+	if (strcmp (menu.aug_camera, ""))
+		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                         menu.aug_camera)));
 	gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                          menu.greyscale)));
 	gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                            menu.focuser)));
+	if (strcmp (menu.filterwheel, ""))
+		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
+	                                                        menu.filterwheel)));
 	if (menu.Precess)
 		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app, 
 	                                                        "precess_coords")));
@@ -9036,6 +9928,8 @@ static void restore_config_data (void)
 	gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
 			xml_app, "autoguider_link_menu")), comms_ports_set_active, NULL);
 	gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
+			xml_app, "filter_wheel_link_menu")), comms_ports_set_active, NULL);
+	gtk_container_foreach (GTK_CONTAINER (xml_get_widget (
 			xml_app, "focuser_link_menu")), comms_ports_set_active, NULL);
 	
 	/* Re-open any previously open ports */
@@ -9046,6 +9940,9 @@ static void restore_config_data (void)
 	if (menu.OpenAutogPort)
 		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app,
 												      "open_autoguider_link")));
+	if (menu.OpenFilterwheelPort)
+		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app,
+												    "open_filter_wheel_link")));
 	if (menu.OpenFocusPort)
 		gtk_menu_item_activate (GTK_MENU_ITEM (xml_get_widget (xml_app,
 												         "open_focuser_link")));
@@ -9058,8 +9955,8 @@ static void restore_config_data (void)
 	gtk_toggle_button_set_active (button, RemoteTiming);	
 	
 	s = (struct autog_config *) g_malloc0 (sizeof (struct autog_config));
-	s->Telescope = (gchar *) g_malloc0 (80 * sizeof (gchar));
-	s->Instrument = (gchar *) g_malloc0 (80 * sizeof (gchar));	
+	s->Telescope = (gchar *) g_malloc0 (MCSL * sizeof (gchar));
+	s->Instrument = (gchar *) g_malloc0 (MCSL * sizeof (gchar));	
 	
 	R_config_s ("LastConfig/Telescope", s->Telescope);
 	R_config_s ("LastConfig/Instrument", s->Instrument);
@@ -9147,11 +10044,17 @@ static void restore_config_data (void)
 		reset_checkbox_state (RCS_OPEN_PARPORT, FALSE);
 	#endif
 	
-	/* CCD camera setup */
+	/* General CCD camera setup */
 	
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
-				                  xml_get_widget (xml_app, "chkBeepExposure")),
-                                  R_config_d ("Misc/Beep", FALSE));
+				               xml_get_widget (xml_app, "chkIgnoreCCDCooling")),
+                               R_config_d ("Misc/IgnoreCCDCooling", FALSE));
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+				               xml_get_widget (xml_app, "chkDisplayCCDImage")),
+                               R_config_d ("Misc/DisplayCCDImage", TRUE));
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (
+				               xml_get_widget (xml_app, "chkBeepExposure")),
+                               R_config_d ("Misc/Beep", FALSE));
 }
 
 static void save_config_data (void)
@@ -9215,6 +10118,8 @@ static void save_config_data (void)
 	W_config_d ("Menu/Settings/UseGeminiCommands", menu.Gemini);
 	W_config_s ("Menu/Settings/AutoguiderPort", menu.autoguider_port);	
 	W_config_d ("Menu/Settings/OpenAutoguiderPort", menu.OpenAutogPort);
+	W_config_s ("Menu/Settings/FilterwheelPort", menu.filterwheel_port);	
+	W_config_d ("Menu/Settings/OpenFilterwheelPort", menu.OpenFilterwheelPort);
 	W_config_s ("Menu/Settings/FocusPort", menu.focus_port);	
 	W_config_d ("Menu/Settings/OpenFocusPort", menu.OpenFocusPort);
 	W_config_d ("Menu/Settings/OpenParPort", menu.OpenParPort);
@@ -9223,6 +10128,7 @@ static void save_config_data (void)
 	W_config_s ("Menu/Settings/Debayer", menu.debayer);
 	W_config_s ("Menu/Settings/AutoguiderCamera", menu.aug_camera);
 	W_config_s ("Menu/Settings/Greyscale", menu.greyscale);
+	W_config_s ("Menu/Settings/Filterwheel", menu.filterwheel);
 	W_config_s ("Menu/Settings/Focuser", menu.focuser);
 	W_config_d ("Menu/Settings/Precess", menu.Precess);
 	W_config_d ("Menu/Settings/UTC", menu.UTC);
@@ -9254,7 +10160,7 @@ static void restore_watch_file (void)
 	gchar *s, *w, *w1;
 	gboolean Active;
 	
-	w = (gchar *) g_malloc0 (1024 * sizeof (gchar));
+	w = (gchar *) g_malloc0 (MCSL * sizeof (gchar));
 	
 	s = g_strconcat ("file://", UserDir, NULL);
 	strcpy (w, s);
@@ -9350,6 +10256,11 @@ void reset_checkbox_state (enum CheckBox chkbox, gboolean active)
 		    break;
 		case RCS_OPEN_AUTOG_LINK:
 			chk = "open_autoguider_link";
+			gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM 
+								 (xml_get_widget (xml_app, chk)), active);
+		    break;
+		case RCS_OPEN_FILTER_LINK:
+			chk = "open_filter_wheel_link";
 			gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM 
 								 (xml_get_widget (xml_app, chk)), active);
 		    break;
@@ -9769,11 +10680,11 @@ static void InitApp (void)
 		/* CCD cameras */
 		#if defined (HAVE_QSI)
 			W_config_s ("Menu/Settings/CCDCamera", "ccd_qsi");
-		#elif defined (HAVE_SX)
+		#elif defined (HAVE_SX_CAM)
 			W_config_s ("Menu/Settings/CCDCamera", "ccd_sx");
 		#endif
 		/* Autoguider cameras */
-		#if defined (HAVE_SX)
+		#if defined (HAVE_SX_CAM)
 			W_config_s ("Menu/Settings/AutoguiderCamera", "SX");
 		#elif defined (HAVE_LIBV4L2)
 			W_config_s ("Menu/Settings/AutoguiderCamera", "V4L_(/dev/video0)");
@@ -9824,7 +10735,7 @@ void WriteLog (char *string)
 	if (MsgNum < MAX_LOG_BUF_MSG)	
 		LogBuf[MsgNum++] = line;
 	else
-		printf ("Lost Message: %s\n", line);
+		printf ("GoQat lost message: %s\n", line);
 	g_static_mutex_unlock (&LogMutex);
 
 	/* If the calling thread is the same as the main thread (i.e. the thread in
@@ -9966,7 +10877,7 @@ static gchar *ReadCString (gchar *string, gchar *fmt, ...)
 	gchar *p;
 	gchar *group, *key;
 	gchar *s1 = NULL;
-	static gchar s2[80];
+	static gchar s2[MCSL];
     
     /* Load configuration data */
     
@@ -9977,15 +10888,19 @@ static gchar *ReadCString (gchar *string, gchar *fmt, ...)
     key = g_strrstr (string, "/")+1;  /* Pointer arithmetic */
     group = g_strndup (string, (key-string-1) / sizeof (gchar));
     
-    if (!(s1 = g_key_file_get_string  (KeyFileData, group, key, NULL)))
+    GError *err = NULL;
+    if (!(s1 = g_key_file_get_string  (KeyFileData, group, key, &err)))
         goto config_error;
         
-    strcpy (s2, s1);
+    strncpy (s2, s1, MCSL);
+    s2[MCSL - 1] = '\0';
     g_free (s1);
     
     return s2;
     
 config_error:
+
+	G_print ("{o}%s\n", err->message);
 
     /* Return passed-in value */
 
@@ -10066,7 +10981,7 @@ static void WriteCString (gchar *string, gchar *val)
 	gchar *group, *key;
     gchar *buffer;
     gsize buflen;
-	
+    
     /* Load configuration data */
     
     if (g_key_file_load_from_file (KeyFileData, ConfigFile,
@@ -10254,17 +11169,18 @@ static void unicap_device_change_cb (UnicapgtkDeviceSelection *selection,
 	 
 	struct cam_img *aug = get_aug_image_struct ();
 
-	unicap_void_device (&aug->u_device);
-	strcpy (aug->u_device.identifier, device_id);
+	unicap_void_device (&aug->ucp_device);
+	strcpy (aug->ucp_device.identifier, device_id);
   
-	if (!SUCCESS(unicap_enumerate_devices(&aug->u_device, &aug->u_device, 0)) ||
-        !SUCCESS (unicap_open (&aug->u_handle, &aug->u_device))) {
+	if (!SUCCESS (unicap_enumerate_devices (
+	                           &aug->ucp_device, &aug->ucp_device, 0)) ||
+        !SUCCESS (unicap_open (&aug->ucp_handle, &aug->ucp_device))) {
 		L_print ("{r}%s: Device '%s' not available!\n", __func__, device_id);
 		return;
      }
  
 	 unicapgtk_video_format_selection_set_handle (
-					  UNICAPGTK_VIDEO_FORMAT_SELECTION (format), aug->u_handle);
+					UNICAPGTK_VIDEO_FORMAT_SELECTION (format), aug->ucp_handle);
 }
 #endif
 
@@ -10276,7 +11192,7 @@ static void unicap_format_change_cb (GtkWidget *ugtk, unicap_format_t *format,
 	   
 	struct cam_img *aug = get_aug_image_struct ();
 	   
-	aug->u_format_spec = *format;
+	aug->ucp_format_spec = *format;
 }
 #endif
 
@@ -10492,23 +11408,31 @@ int main (int argc, char *argv[])
 	struct cam_img *aug;
 	FILE *fp;
 	printf("main");
+	
     /* Initialise gtk */
+
 	g_thread_init (NULL);
     gdk_threads_init ();
 	gdk_threads_enter ();  /* Try to remove this in future release */
     gtk_init (&argc, &argv);
+    
 	/* Get main (gtk) thread id */
+	
 	main_tid = (pid_t) syscall (SYS_gettid);
+	
 	/* Check that the Glade gtkbuilder file is available */
+	
 	if (!(fp = fopen (GLADE_INTERFACE, "rb"))) {
 		L_print ("{r}Error - Can't seem to find the Glade gtkbuilder file!\n");
 		g_error ("main: Can't open %s\n", GLADE_INTERFACE);
 	}
 	fclose (fp);
+	
 	/* Draw the main window and connect its signal handlers.  The adjustment
      * objects for spin buttons aren't children of the spin buttons (in the xml
      * written by Glade), so they have to be pre-loaded separately.
      */
+
     gchar *app_objects[] = {"spbBin_adj",
                             "spbAutogGuideSpeed_adj",
                             "spbAutogMaxShift_adj",
@@ -10521,27 +11445,43 @@ int main (int argc, char *argv[])
                             "ccdApp",
                             NULL};
     xml_app = xml_load_new (xml_app, GLADE_INTERFACE, app_objects);
+	
 	stsAppStatus = GTK_STATUSBAR (xml_get_widget (xml_app, "stsAppStatus"));
 	prgAppBar = GTK_PROGRESS_BAR (xml_get_widget (xml_app, "prgAppBar"));
 	ccdApp = GTK_WINDOW (xml_get_widget (xml_app, "ccdApp"));
+    
     /* Create new configuration data structure */
+    
     KeyFileData = g_key_file_new ();
+    
 	/* Initialise libusb if it's available (needed by SX hardware) */
+	
 	#ifdef HAVE_LIBUSB
-	libusb_init (NULL);
-    libusb_set_debug (NULL, 3);
+	gqusb_init ();
 	#endif
+	
 	/* Initialise the CCD camera and autoguider image structures */
+	
 	ccdcam_init ();
 	augcam_init ();
+		
 	/* Initialise telescope data */
+	
 	telescope_init ();
+	
+	/* Initialise filter wheel data */
+	
+	filter_init ();
+	
 	/* Initialise XPA mechanism for image display via ds9 */
+	
 	xpa_open ();
+	
 	/* Open the image window and connect the signal handlers.  The adjustment
      * objects for sliders aren't children of the sliders (in the xml
      * written by Glade), so they have to be pre-loaded separately.
-     */
+     */	
+    
     gchar *img_objects[] = {"hscBackground_adj",
                             "hscBrightness_adj",
                             "hscContrast_adj",
@@ -10551,47 +11491,78 @@ int main (int argc, char *argv[])
                             NULL};
 	xml_img = xml_load_new (xml_img, GLADE_INTERFACE, img_objects);
     stsImageStatus = GTK_STATUSBAR (xml_get_widget (xml_img, "stsImageStatus"));
+	
 	aug = get_aug_image_struct ();
 	aug->aug_window = xml_get_widget (xml_img, "wndImage");
 	ui_hide_aug_window ();
+	
 	/* Initialise the application */
+	
 	InitApp ();
+
 	/* Restore configuration data */
+	
 	restore_config_data ();
+	
 	ResetChkState = FALSE;
+    
 	/* Initialise the task queue */
+		
 	tasks_init (xml_app);
+	
 	/* Start the event loop */
+	
 	loop_start_loop ();
+	
 	/* Restore the "watch file" settings (must be called after event loop has
 	 * started).
 	 */
+	
 	restore_watch_file ();
+
 	menu.OpenCCDCam = 1;
 	ccdcam_open();
 	loop_ccd_open (menu.OpenCCDCam);
+	
     /* Enter the main gtk loop */
-	gtk_main();
-	/* Close the autoguider link */
-	telescope_close_autog_port ();
-	/* Close the telescope link */
+    
+	gtk_main();   
+	
+	/* Close comms links */
+	
+	telescope_close_guide_port ();
 	telescope_close_comms_port ();
+	filter_close_comms_port ();
+	focus_close_comms_port ();
+	
 	/* Save configuration data */
+	
 	save_config_data ();
+	
 	/* Close the CCD and autoguider cameras if still open */
+	
 	augcam_close ();
 	ccdcam_close ();
+	
 	/* Tidy up libusb */
+	
 	#ifdef HAVE_LIBUSB
-	libusb_exit (NULL);
+	gqusb_exit ();
 	#endif
+	
 	/* Close the XPA mechanism */
+	
 	xpa_close ();
+	
 	/* Close the log file */
+	
 	if (f_log)
 		fclose (f_log);
+	
     /* Free the configuration data structure */
+    
 	g_key_file_free (KeyFileData);
+	
 	gdk_threads_leave ();  /* Try to remove this in future release */
     return 0;
 }

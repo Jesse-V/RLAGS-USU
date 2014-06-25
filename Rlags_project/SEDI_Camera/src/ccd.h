@@ -3,7 +3,7 @@
 /*                                                                            */
 /* Generic CCD camera data structures are defined here.                       */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -37,7 +37,6 @@ enum CamSpeed {                  /* Camera read speed settings                */
 };
 
 enum CamState {                /* Camera state settings    */
-	S_CANCOOL,                 /* User sets this if camera can cool (SX only) */
 	S_FANS,                    /* FanMode                  */
 	S_TEMP,                    /* SetCCDTemperature        */
 	S_COOL,                    /* CoolerOn                 */
@@ -99,10 +98,12 @@ struct ccd_state {               /* CCD camera state                          */
 	double c_amb;                /* Current ambient temperature               */	
 	double d_ccd;                /* Default CCD temperature                   */
 	double c_ccd;                /* Current CCD temperature                   */
+	double c_tol;                /* Permitted tolerance on CCD temperature    */
 	double c_power;              /* Current cooler power                      */
 	char status[10];             /* Camera status                             */
 	int CoolOnConnect;           /* TRUE if cooling to be on when connected   */
 	int CoolState;               /* Current cooler state (TRUE if on)         */
+	int IgnoreCooling;           /* TRUE if cooling state to be ignored       */
 };
 
 #endif /* GOQAT_CCD_H */

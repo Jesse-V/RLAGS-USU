@@ -1,3 +1,59 @@
+2014 April: GoQat version 1.0.3
+
+The following features are added/modified:
+
+* Built-in support for Starlight Xpress filter wheels is now available.  Special
+  thanks to Fredrik Florgård for extensive testing with Starlight Xpress 
+  hardware.
+  
+* GoQat now detects whether Starlight Xpress cameras have set-point cooling or a
+  colour chip automatically.
+  
+* A 'cooling tolerance' value can be specified for Starlight Xpress cameras.  
+  The camera target temperature is considered to have been reached when the
+  actual temperature lies within the tolerance range of the target temperature.
+  
+* The user may choose to ignore camera cooling via a checkbox on the main CCD
+  Camera tab - by default GoQat waits for the target temperature to be reached
+  before making an exposure.
+  
+* The user may choose not to have images displayed in DS9 via a checkbox on the
+  main CCD camera tab - useful for fast sequences of short exposures, or if a
+  different image viewer is being used.  Thanks to Tony Morris and Fredrik 
+  Florgård for this suggestion.
+  
+* It is now possible to adjust the mapping between camera coordinates and DS9
+  coordinates to permit sub-frames to be correctly obtained from the desired
+  part of the camera chip. 
+  
+* There are many internal improvements to the video-for-linux code, increasing
+  the range of image formats that GoQat can recognise and making configuration
+  of frame-grabbers possible.  The user can now set various V4L parameters via 
+  an option on the Cameras menu.  Special thanks to Vincent Hourdin for many
+  helpful comments and suggestions, and coding, debugging and testing.
+  
+The following bugs have been fixed:
+
+* Two long-standing bugs arising as a result of decimal separator problems for
+  locales that use "," rather than "." have been fixed:
+  Transfer of selection rectangle box coordinates from DS9 to GoQat now works 
+  correctly for sub-frames.
+  The pan and zoom can now be restored correctly after each image is loaded into
+  DS9 - no more 'XPA' errors.
+  
+* Images from interlaced Starlight Xpress cameras (for the Lodestar at least)
+  were not de-interlaced properly when the image was the "right way up".  If the
+  user selected to invert the image in the camera configuration dialog, the
+  de-interlacing was correct.
+  
+* For Starlight Xpress cameras, the camera status display on the CCD Camera tab 
+  did not reset to 'Idle' if an exposure was cancelled.
+  
+* In certain circumstances, some QSI cameras "choked" during image download after 
+  a few exposures and no further exposures were possible.  The image download was
+  taking place in the wrong thread - this has been fixed.  Thanks to Robert 
+  Sherwood for reporting this bug.
+
 2013 November: GoQat version 1.0.2
 
 The following features are added/modified:

@@ -4,7 +4,7 @@
 /* All the routines for initialising, writing to and reading from serial      */
 /* ports are contained in this module.                                        */
 /*                                                                            */
-/* Copyright (C) 2011 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2011 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */
@@ -93,9 +93,10 @@ void serial_define_comms_ports (void)
 	
 	/* Set initial values for ports pointers */
 	
-	autog_comms = &ports[DUMMY];
-	tel_comms   = &ports[DUMMY];
-	focus_comms = &ports[DUMMY];
+	autog_comms  = &ports[DUMMY];
+	tel_comms    = &ports[DUMMY];
+	filter_comms = &ports[DUMMY];
+	focus_comms  = &ports[DUMMY];
 }
 
 gboolean serial_set_comms_port (const gchar *name)
@@ -103,7 +104,8 @@ gboolean serial_set_comms_port (const gchar *name)
 	/* Set pointers to the requested comms port.  The passed values of 'name' 
 	 * must match the names in the Glade gtkbuilder file, or as defined in code. 
 	 * For the telescope port this is preceded by "t_", for the autoguider port 
-	 * by "a_" and for the focuser port by "f_".
+	 * by "a_", for the filter wheel port by "w_" and for the focuser port 
+	 * by "f_".
 	 * NOTE: The first three ports aren't actually serial ports, they are the
 	 * parallel port, the USB port used for direct (probably non-serial) 
 	 * guide commands to the autoguider camera and the USB port used for direct 
@@ -128,6 +130,8 @@ gboolean serial_set_comms_port (const gchar *name)
 		if (ccd->device == SX && ccd->Open)
 			L_print ("{o}Please re-open the CCD camera for this option "
 					 "to take effect\n");
+	} else if (!(strcmp (name+2, "USBdirect"))) {
+		pnum = USBDIR;
 	} else if (!(strcmp (name+2, "ttyS0")))
 		pnum = TTY0;
 	else if (!(strcmp (name+2, "ttyS1")))
@@ -145,6 +149,8 @@ gboolean serial_set_comms_port (const gchar *name)
 		tel_comms = &ports[pnum];
 	} else if (!(strncmp (name, "a_", 2))) {
 		autog_comms = &ports[pnum];
+	} else if (!(strncmp (name, "w_", 2))) {
+		filter_comms = &ports[pnum];
 	} else if (!(strncmp (name, "f_", 2))) {
 		focus_comms = &ports[pnum];
 	} else
@@ -161,8 +167,8 @@ gboolean serial_open_port (struct port *p, enum PortUsers user)
 	
 	/* 'open' can block in newer linux kernels if the serial device does not
 	 * indicate it is ready (e.g. with data carrier detect) and some of the 
-	 * devices that we connect may not do that, so we have to open non-blocking 
-	 * here.  We revert to blocking behaviour when the port is 
+	 * devices that we connect to may not do that, so we have to open 
+	 * non-blocking here.  We revert to blocking behaviour when the port is 
 	 * initialised - see port_init.
 	 */
 	  
@@ -262,6 +268,7 @@ gint s_read (gint file, gchar string[], gint bytes)
 
 	if ((file == autog_comms->f && (autog_comms->user & PU_AUTOG)) ||
 	    (file == tel_comms->f && (tel_comms->user & PU_TEL)) ||
+	    (file == filter_comms->f && (filter_comms->user & PU_FILTER)) ||
 	    (file == focus_comms->f && (focus_comms->user & PU_FOCUS))) {
 			
 		/* Poll the serial device to see if there's something to read */
@@ -333,6 +340,9 @@ gint s_write (gint file, gchar string[], gint bytes)
 		return write (file, string, bytes);
 	} else if (file == tel_comms->f && (tel_comms->user & PU_TEL)) {
 		G_print ("s_write: %s written to %s\n", string, tel_comms->name);
+		return write (file, string, bytes);
+	} else if (file == filter_comms->f && (filter_comms->user & PU_FILTER)) {
+		G_print ("s_write: %s written to %s\n", string, filter_comms->name);
 		return write (file, string, bytes);
 	} else if (file == focus_comms->f && (focus_comms->user & PU_FOCUS)) {
 		G_print ("s_write: %s written to %s\n", string, focus_comms->name);

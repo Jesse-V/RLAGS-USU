@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_INIT(GoQat, 1.0.2)
+AC_INIT(GoQat, 1.0.3)
 AC_CONFIG_SRCDIR([src/interface.c])
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([src/config.h:config.h.in])
@@ -39,7 +39,10 @@ PKG_CHECK_MODULES(LIBRAW1394, libraw1394 >= 1.1.0,
                          [echo "******** No raw1394 library - compiling without firewire support!"])
 PKG_CHECK_MODULES(LIBUSB, libusb-1.0 >= 1.0, 
                          [AC_DEFINE([HAVE_LIBUSB], [1], [Define to 1 if you have the `usb' library (-lusb).])], 
-                         [echo "******** No libusb library - compiling without Starlight Xpress support!"])
+                         [echo "******** No libusb library - compiling without Starlight Xpress camera support!"])
+PKG_CHECK_MODULES(LIBUDEV, libudev, 
+                         [AC_DEFINE([HAVE_LIBUDEV], [1], [Define to 1 if you have the `udev' library (-ludev).])], 
+                         [echo "******** No libudev library - compiling without Starlight Xpress filter wheel support!"])
 PKG_CHECK_MODULES(LIBUNICAPGTK, libunicapgtk,
                          [AC_DEFINE([HAVE_LIBUNICAP], [1], [Define to 1 if you have the `unicap' library (-lunicap).])], 
                          [echo "******** No unicapgtk library - compiling without unicap support!"])

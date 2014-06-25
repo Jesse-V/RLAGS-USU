@@ -11,17 +11,9 @@ Guiding
 -------
 *  Hot pixel/column detection so that these features can be ignored when 
    selecting a guide star.
-*  Add a guidestar search routine - telescope searches in small steps around 
-   the central position?
 *  Implement dithering?
-*  Option to begin autoguiding again with guide star in same postion as 
-   previous night (useful if CCD camera has been left attached)?
 *  Save 'Subtract dark exposure' setting? (If autoguiding remotely, dark frame
    would need to be subtracted).
-*  Characterise autoguider response in more detail - e.g. does a guide command
-   of 1000 ms always give twice the shift of 500 ms?  How long does the 
-   telescope take to start/stop moving?  Would need to take many samples to
-   average out effects of periodic error.
    
 Focusing
 --------
@@ -36,14 +28,12 @@ Focusing
 
 Telescope modelling
 -------------------
-*  Offer choice of PEC curves to be automatically loaded depending on location 
-   in sky?
 *  Include an option to dump out all Gemini parameters to a file that can then
    be reloaded e.g. after battery change or cold start.
    
 Video
 -----
-*  Option to convert recorded video to AVI format.
+*  Option to convert recorded video to AVI/SER format.
 *  Split frames into individual fields before performing photometry/astrometry.
 	
 Miscellaneous

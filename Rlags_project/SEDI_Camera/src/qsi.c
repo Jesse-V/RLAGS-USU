@@ -4,7 +4,7 @@
 /* All the routines for interfacing with the QSI API are contained in         */
 /* this module. The C to C++ conversion takes place in qsiapi_c.cpp.          */
 /*                                                                            */
-/* Copyright (C) 2009 - 2013  Edward Simonson                                 */
+/* Copyright (C) 2009 - 2014  Edward Simonson                                 */
 /*                                                                            */
 /* This file is part of GoQat.                                                */
 /*                                                                            */

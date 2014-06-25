@@ -67,9 +67,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_GoQat_OBJECTS = interface.$(OBJEXT) ccdcam.$(OBJEXT) \
 	augcam.$(OBJEXT) image.$(OBJEXT) loop.$(OBJEXT) \
 	telescope.$(OBJEXT) serial.$(OBJEXT) gqusb.$(OBJEXT) \
-	focus.$(OBJEXT) tasks.$(OBJEXT) video.$(OBJEXT) \
-	debayer.$(OBJEXT) sx.$(OBJEXT) qsiapi_c.$(OBJEXT) \
-	qsi.$(OBJEXT)
+	filter.$(OBJEXT) focus.$(OBJEXT) tasks.$(OBJEXT) \
+	video.$(OBJEXT) debayer.$(OBJEXT) sx.$(OBJEXT) \
+	qsiapi_c.$(OBJEXT) qsi.$(OBJEXT)
 GoQat_OBJECTS = $(am_GoQat_OBJECTS)
 GoQat_LDADD = $(LDADD)
 GoQat_DEPENDENCIES =
@@ -101,7 +101,7 @@ AMTAR = $${TAR-tar}
 AUTOCONF = ${SHELL} /home/linaro/Rlags_project/SEDI_Camera/missing --run autoconf
 AUTOHEADER = ${SHELL} /home/linaro/Rlags_project/SEDI_Camera/missing --run autoheader
 AUTOMAKE = ${SHELL} /home/linaro/Rlags_project/SEDI_Camera/missing --run automake-1.11
-AWK = mawk
+AWK = gawk
 BASH = /bin/bash
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -120,22 +120,24 @@ ECHO_T =
 EGREP = /bin/grep -E
 EXEEXT = 
 GREP = /bin/grep
-GTK_CFLAGS = -pthread -I/usr/include/gtk-2.0 -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12  
-GTK_LIBS = -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lglib-2.0  
+GTK_CFLAGS = -pthread -I/usr/include/gtk-2.0 -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz  
+GTK_LIBS = -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfontconfig -lgobject-2.0 -lglib-2.0 -lfreetype  
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LDFLAGS = 
-LIBGOOCANVAS_CFLAGS = -pthread -I/usr/include/gtk-2.0 -I/usr/include/cairo -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/include/goocanvas-1.0  
-LIBGOOCANVAS_LIBS = -lgoocanvas -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lglib-2.0  
+LIBGOOCANVAS_CFLAGS = -pthread -I/usr/include/gtk-2.0 -I/usr/include/cairo -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/goocanvas-1.0  
+LIBGOOCANVAS_LIBS = -lgoocanvas -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfontconfig -lgobject-2.0 -lglib-2.0 -lfreetype  
 LIBGTHREAD_CFLAGS = -pthread -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include  
-LIBGTHREAD_LIBS = -pthread -lgthread-2.0 -lrt -lglib-2.0  
+LIBGTHREAD_LIBS = -pthread -lgthread-2.0 -lglib-2.0  
 LIBOBJS = 
 LIBRAW1394_CFLAGS =  
 LIBRAW1394_LIBS = -lraw1394  
 LIBS = 
+LIBUDEV_CFLAGS =  
+LIBUDEV_LIBS = -ludev  
 LIBUNICAPGTK_CFLAGS = 
 LIBUNICAPGTK_LIBS = 
 LIBUSB_CFLAGS = -I/usr/include/libusb-1.0  
@@ -149,10 +151,10 @@ OBJEXT = o
 PACKAGE = goqat
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = GoQat
-PACKAGE_STRING = GoQat 1.0.2
+PACKAGE_STRING = GoQat 1.0.3
 PACKAGE_TARNAME = goqat
 PACKAGE_URL = 
-PACKAGE_VERSION = 1.0.2
+PACKAGE_VERSION = 1.0.3
 PATH_SEPARATOR = :
 PERL = /usr/bin/perl
 PKG_CONFIG = /usr/bin/pkg-config
@@ -161,7 +163,7 @@ PKG_CONFIG_PATH =
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = 
-VERSION = 1.0.2
+VERSION = 1.0.3
 abs_builddir = /home/linaro/Rlags_project/SEDI_Camera/src
 abs_srcdir = /home/linaro/Rlags_project/SEDI_Camera/src
 abs_top_builddir = /home/linaro/Rlags_project/SEDI_Camera
@@ -214,6 +216,7 @@ GoQat_SOURCES = \
 	telescope.c \
 	serial.c \
 	gqusb.c \
+	filter.c \
 	focus.c \
 	tasks.c \
 	video.c \
@@ -244,10 +247,11 @@ AM_CPPFLAGS = \
 	-DGOQAT_SEXTRACTOR_PARAM=\"${prefix}/share/GoQat/data/goqat_vid_photom_sextractor.param\" \
 	-DGOQAT_SEXTRACTOR_FILTER=\"${prefix}/share/GoQat/data/goqat_vid_photom_sextractor_filter.conv\" \
 	-D_GNU_SOURCE \
-	-pthread -I/usr/include/gtk-2.0 -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12   \
-	-pthread -I/usr/include/gtk-2.0 -I/usr/include/cairo -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12 -I/usr/include/goocanvas-1.0   \
+	-pthread -I/usr/include/gtk-2.0 -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz   \
+	-pthread -I/usr/include/gtk-2.0 -I/usr/include/cairo -I/usr/lib/arm-linux-gnueabihf/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/pango-1.0 -I/usr/include/gio-unix-2.0/ -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/libpng12 -I/usr/include/harfbuzz -I/usr/include/goocanvas-1.0   \
 	 \
 	-I/usr/include/libusb-1.0   \
+	  \
 	  \
 	 \
 	-pthread -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabihf/glib-2.0/include  
@@ -256,13 +260,14 @@ AM_CFLAGS = \
 	-Wall
 
 LDADD = \
-	-lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lglib-2.0   \
-	-lgoocanvas -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfreetype -lfontconfig -lgobject-2.0 -lglib-2.0   \
+	-lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfontconfig -lgobject-2.0 -lglib-2.0 -lfreetype   \
+	-lgoocanvas -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lgio-2.0 -lpangoft2-1.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfontconfig -lgobject-2.0 -lglib-2.0 -lfreetype   \
 	 \
 	-lusb-1.0   \
+	-ludev   \
 	-lraw1394   \
 	 \
-	-pthread -lgthread-2.0 -lrt -lglib-2.0  
+	-pthread -lgthread-2.0 -lglib-2.0  
 
 AM_LDFLAGS = \
 	-export-dynamic
@@ -370,6 +375,7 @@ distclean-compile:
 include ./$(DEPDIR)/augcam.Po
 include ./$(DEPDIR)/ccdcam.Po
 include ./$(DEPDIR)/debayer.Po
+include ./$(DEPDIR)/filter.Po
 include ./$(DEPDIR)/focus.Po
 include ./$(DEPDIR)/gqusb.Po
 include ./$(DEPDIR)/image.Po
