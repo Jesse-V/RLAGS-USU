@@ -5,6 +5,7 @@
 
 #kill all existing GoQat instances
 echo "Killing all GoQat processes..."
+sudo rm -f /root/GoQat/ccd_display.fit
 goInstances=$(ps aux | grep -E "xvfb-run|GoQat" | grep -v grep | awk {'print $2 NL'})
 for instance in $goInstances
 do
@@ -14,5 +15,5 @@ done
 #IFS=$old_IFS     # restore default field separator
 
 #launch a GoQat instance in the background
-#echo "Starting fresh GoQat instance"
-#xvfb-run GoQat &
+echo "Starting fresh GoQat instance"
+su -c "xvfb-run GoQat &"
