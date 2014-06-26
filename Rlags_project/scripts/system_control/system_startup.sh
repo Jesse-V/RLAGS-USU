@@ -31,6 +31,7 @@ else
 fi
 
 echo "End of sanity checks"
+sleep 5 #ensure that everything is fully ready
 echo "Begin scientific capture"
 
 
