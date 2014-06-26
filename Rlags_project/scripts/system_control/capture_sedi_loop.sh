@@ -3,8 +3,8 @@
 cd ~/Rlags_project/scripts/sedi_camera
 echo "SEDI: capture loop started"
 
-#while true
-#do
+while true
+do
 	echo "SEDI: capture cycle started, "$(date)
 
 	#get current time, this will be our working directory
@@ -52,4 +52,4 @@ echo "SEDI: capture loop started"
 	rm -r $dirName
 
 	echo "SEDI: capture cycle ended, "$(date)
-#done
+done
