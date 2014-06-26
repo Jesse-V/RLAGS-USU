@@ -1,0 +1,14 @@
+SDK
+yaaca
+*.o
+*~
+*.log
+*.deb
+*.so
+*.pyc
+*.png
+hacking/*.c
+hacking/*.h
+hacking/*.txt
+hacking/asi_120mm_usb
+
