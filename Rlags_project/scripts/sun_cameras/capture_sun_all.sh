@@ -34,7 +34,9 @@ echo '1-2.1.3.3' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null
 
 #--------------------------------------------------------------------------
 
+(cd ~/Rlags_project/scripts; ./getDataLock.sh) #request mutex on latestData/
 sudo cp sun_cam_*.jpg /home/linaro/latestData/
+(cd ~/Rlags_project/scripts; ./releaseDataLock.sh) #release mutex on latestData/
 
 sudo mv sun_cam_0.jpg sun_cam_0.$time0.jpg
 sudo mv sun_cam_1.jpg sun_cam_1.$time1.jpg

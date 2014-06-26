@@ -1,6 +1,8 @@
 cd ~/control_scripts
 echo -e "\nSystem startup at "$(date)"\n"
+sleep 3
 dmesg | tail -10
+echo -e "\n"
 
 echo "Startup: initializing system..."
 ./initialize_system.sh
@@ -34,14 +36,15 @@ echo "Startup: end of sanity checks"
 sleep 5 #ensure that everything is fully ready
 echo "Startup: beginning scientific capture"
 
+#./capture_sedi_loop.sh &
+#./capture_cameras_loop.sh &
+#imu?
 
+#wait until star/sun images come in, then we have something
+while [ ! -f ~/latestData/star_cam.jpg ];
+do
+        sleep 0.25
+done
 
-#sudo ps aux | grep GoQat | grep -v grep | awk {'print $2'} | xargs sudo kill
-#sudo /home/linaro/Rlags_project/scripts/sedi_camera/start_goqat.sh &
-
-
-
-#------------------------------- SCIENTIFIC CAPTURE ---------------------------
-#nSunCameras=sudo -u linaro sleep 5; /home/linaro/Rlags_project/scripts/system_control/initialize_system.sh
-#sudo -u linaro touch /home/linaro/tempDerp.temp
-#sudo -u linaro touch /home/linaro/tempDerp.temp
+#now that we have some data to transmit, start sending
+./stream_data_bundle.sh &

@@ -1,12 +1,16 @@
 #!/bin/bash
 
 echo "Housekeeping: assembling latest data"
+(cd ~/Rlags_project/scripts; ./getDataLock.sh) #request mutex on latestData/
 
 cd ~/latestData/
 mkdir housekeeping/
 
+#gemeral assembly, grab last bits of logs
 echo $date > housekeeping/timestamp.txt
-cat status.log | tail -75 > housekeeping/latestEvents.txt
+tail -75 status.log > housekeeping/latestEvents.txt
+echo "**************************" >> housekeeping/latestEvents.txt
+sudo tail -50 /root/GoQat/log.txt >> housekeeping/latestEvents.txt
 cp -r sedi/ housekeeping/
 
 echo "Housekeeping: compressing sun/star images"
@@ -24,4 +28,5 @@ cd ..
 
 rm -r housekeeping/
 
+(cd ~/Rlags_project/scripts; ./releaseDataLock.sh) #release mutex on latestData/
 echo "Housekeeping: bundling complete"

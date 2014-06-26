@@ -27,10 +27,9 @@ do
 
 	echo "SEDI: storing camera data"
 
-	#(cd B/C; ./script.sh)
-	#TODO: get lock
+	(cd ~/Rlags_project/scripts; ./getDataLock.sh) #request mutex on latestData/
 	cp $dirName/* ~/latestData/sedi/
-	#TODO: release lock
+	(cd ~/Rlags_project/scripts; ./releaseDataLock.sh) #release mutex on latestData/
 
 	#archive SEDI data
 	cp -r $dirName /media/ssd_0/sedi_camera/
