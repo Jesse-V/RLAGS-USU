@@ -51,4 +51,6 @@ do
 	rm -r $dirName
 
 	echo "SEDI: capture cycle ended, "$(date)
+
+	sleep 2 #leaves time to control-C if need be
 done

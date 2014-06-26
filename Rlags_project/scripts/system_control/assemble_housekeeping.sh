@@ -11,7 +11,23 @@ echo $date > housekeeping/timestamp.txt
 tail -75 status.log > housekeeping/latestEvents.txt
 echo "**************************" >> housekeeping/latestEvents.txt
 sudo tail -50 /root/GoQat/log.txt >> housekeeping/latestEvents.txt
-cp -r sedi/ housekeeping/
+
+#if they exist, truncate SEDI images to save space
+if [ -f ~/latestData/sedi/capture.fit ]; then
+	echo "Housekeeping: truncating SEDI .fit images"
+	cp -r sedi/*.txt housekeeping/ #move all housekeeping data files
+
+	split --bytes=1m -d sedi/calibration_lamp.fit fitPiece
+	mv fitPiece00 housekeeping/calibration_lamp_piece.fit
+
+	split --bytes=1m -d sedi/calibration_nolamp.fit fitPiece
+        mv fitPiece00 housekeeping/calibration_nolamp_piece.fit
+
+	split --bytes=1m -d sedi/capture.fit fitPiece
+        mv fitPiece00 housekeeping/capture_piece.fit
+
+	rm fitPiece*
+fi
 
 echo "Housekeeping: compressing sun/star images"
 
