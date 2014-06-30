@@ -13,7 +13,7 @@ sudo ~/Rlags_project/scripts/drives/mount_drives
 echo "Sys init: initializing GoQat SEDI camera..."
 sudo ~/Rlags_project/scripts/sedi_camera/initialize_goqat.sh
 
-echo "Resetting ~/latestData"
+echo "Sys init: Resetting ~/latestData"
 rm ~/latestData/*.jpg
 rm ~/latestData/*.tar.bz2
 rm -r ~/latestData/sedi

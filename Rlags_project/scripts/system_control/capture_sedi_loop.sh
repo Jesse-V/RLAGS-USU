@@ -3,6 +3,10 @@
 cd ~/Rlags_project/scripts/sedi_camera
 echo "SEDI: capture loop started"
 
+echo "SEDI: initializing SEDI lamp pin"
+echo 87  > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio87/direction
+
 while true
 do
 	echo "SEDI: capture cycle started, "$(date)
@@ -10,14 +14,30 @@ do
 	#get current time, this will be our working directory
 	dirName=$(date +"%d.%H.%M.%S")
 
-	#TODO: turn on calibration lamp
-	#TODO: confirm light is on
+	echo "SEDI: turning lamp on"
+	echo 1 > /sys/class/gpio/gpio87/value
+	pinVal=$(cat /sys/class/gpio/gpio87/value)
+        echo "SEDI: lamp pin is now "$pinVal
+        if [ $pinVal -eq 1 ]
+        then
+                echo "SEDI: notice: lamp pin activated correctly"
+        else
+                echo "SEDI: ERR: lamp pin has incorrect value"
+        fi
 
 	#calibration with lamp
 	sudo ./capture.sh calibration_watchfile calibration_lamp $dirName
 
-	#TODO: turn off lamp
-	#TODO: confirm lamp is off
+	echo "SEDI: turning lamp off"
+        echo 0 > /sys/class/gpio/gpio87/value
+	pinVal=$(cat /sys/class/gpio/gpio87/value)
+        echo "SEDI: lamp pin is now "$pinVal
+	if [ $pinVal -eq 0 ]
+	then
+		echo "SEDI: notice: lamp pin activated correctly"
+	else
+		echo "SEDI: ERR: lamp pin has incorrect value"
+	fi
 
 	#calibration with no lamp
 	sudo ./capture.sh calibration_watchfile calibration_nolamp $dirName
@@ -26,7 +46,6 @@ do
 	sudo ./capture.sh exposure_watchfile capture $dirName
 
 	echo "SEDI: storing camera data"
-
 	(cd ~/Rlags_project/scripts; ./getDataLock.sh) #request mutex on latestData/
 	cp $dirName/* ~/latestData/sedi/
 	(cd ~/Rlags_project/scripts; ./releaseDataLock.sh) #release mutex on latestData/

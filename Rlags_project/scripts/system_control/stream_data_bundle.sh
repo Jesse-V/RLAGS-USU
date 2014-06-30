@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "TODO: THIS NEEDS TO TRANSMIT EVERY 10 MINUTES, NOT CONTINOUSLY, WHOLE SEDI?"
+
 while true
 do
 	cd ~/control_scripts
