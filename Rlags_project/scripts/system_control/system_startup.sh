@@ -10,6 +10,7 @@ echo "Startup: system initialization complete"
 
 echo "Startup: beginning sanity checks"
 
+#sanity check on sun/star cameras
 nSunCameras=$(dmesg | grep -c 'ZWOptical company')
 if [ $nSunCameras -ge 3 ]; then
 	echo "Startup: notice: Counted "$nSunCameras" sun cameras"
@@ -17,6 +18,7 @@ else
 	echo "Startup: ERR: Not enough sun cameras (counted "$nSunCameras")"
 fi
 
+#sanity check on SSDs
 if [ -d /media/ssd_0/sun_cameras ]; then
 	echo "Startup: notice: ssd_0 is mounted, sun_camera directory exists"
 
@@ -30,6 +32,20 @@ if [ -d /media/ssd_0/sun_cameras ]; then
 	rm $file
 else
 	echo "Startup: ERR: ssd_0 improperly mounted or sun_camera directory is missing"
+fi
+
+#sanity check on SEDI camera
+if [ $(dmesg | grep -c 'Starlight Xpress') -ge 1 ]; then
+	echo "Startup: notice: SEDI camera is ready"
+else
+	echo "Startup: ERR: SEDI camera is not found!"
+fi
+
+#sanity check on USB-serial communication cables
+if [ $(dmesg | grep -c 'USB Serial Device converter now attached') -ge 2 ]; then
+        echo "Startup: notice: USB-serial converter is ready"
+else
+        echo "Startup: ERR: USB-serial converters are not found!"
 fi
 
 echo "Startup: end of sanity checks"
