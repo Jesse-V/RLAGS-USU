@@ -12,7 +12,7 @@ echo "Startup: beginning sanity checks"
 
 #sanity check on sun/star cameras
 nSunCameras=$(dmesg | grep -c 'ZWOptical company')
-if [ $nSunCameras -ge 3 ]; then
+if [ $nSunCameras -ge 4 ]; then
 	echo "Startup: notice: Counted "$nSunCameras" sun cameras"
 else
 	echo "Startup: ERR: Not enough sun cameras (counted "$nSunCameras")"
