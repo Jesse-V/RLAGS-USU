@@ -3,9 +3,9 @@
 cd ~/Rlags_project/scripts/sedi_camera
 echo "SEDI: capture loop started"
 
-echo "SEDI: initializing SEDI lamp pin"
-echo 87  > /sys/class/gpio/export
-echo out > /sys/class/gpio/gpio87/direction
+#echo "SEDI: initializing SEDI lamp pin"
+#echo 87  > /sys/class/gpio/export
+#echo out > /sys/class/gpio/gpio87/direction
 
 while true
 do
@@ -15,29 +15,17 @@ do
 	dirName=$(date +"%d.%H.%M.%S")
 
 	echo "SEDI: turning lamp on"
-	echo 1 > /sys/class/gpio/gpio87/value
-	pinVal=$(cat /sys/class/gpio/gpio87/value)
-        echo "SEDI: lamp pin is now "$pinVal
-        if [ $pinVal -eq 1 ]
-        then
-                echo "SEDI: notice: lamp pin activated correctly"
-        else
-                echo "SEDI: ERR: lamp pin has incorrect value"
-        fi
+	#echo 1 > /sys/class/gpio/gpio87/value
+	#pinVal=$(cat /sys/class/gpio/gpio87/value)
+        #echo "SEDI: lamp pin is now "$pinVal
 
 	#calibration with lamp
 	sudo ./capture.sh calibration_watchfile calibration_lamp $dirName
 
 	echo "SEDI: turning lamp off"
-        echo 0 > /sys/class/gpio/gpio87/value
-	pinVal=$(cat /sys/class/gpio/gpio87/value)
-        echo "SEDI: lamp pin is now "$pinVal
-	if [ $pinVal -eq 0 ]
-	then
-		echo "SEDI: notice: lamp pin activated correctly"
-	else
-		echo "SEDI: ERR: lamp pin has incorrect value"
-	fi
+        #echo 0 > /sys/class/gpio/gpio87/value
+	#pinVal=$(cat /sys/class/gpio/gpio87/value)
+        #echo "SEDI: lamp pin is now "$pinVal
 
 	#calibration with no lamp
 	sudo ./capture.sh calibration_watchfile calibration_nolamp $dirName

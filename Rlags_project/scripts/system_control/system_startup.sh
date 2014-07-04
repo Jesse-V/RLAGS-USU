@@ -38,7 +38,7 @@ echo "Startup: beginning scientific capture"
 
 #./capture_sedi_loop.sh &
 #./capture_cameras_loop.sh &
-#imu?
+#./capture_imu_loop.sh &
 
 #wait until star/sun images come in, then we have something
 while [ ! -f ~/latestData/star_cam.jpg ];
