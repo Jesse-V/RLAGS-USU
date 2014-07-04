@@ -14,7 +14,8 @@ echo "Sys init: initializing GoQat SEDI camera..."
 sudo ~/Rlags_project/scripts/sedi_camera/initialize_goqat.sh
 
 echo "Sys init: Resetting ~/latestData"
-rm ~/latestData/*.jpg
-rm ~/latestData/*.tar.bz2
-rm -r ~/latestData/sedi
+rm -f ~/latestData/*.jpg
+rm -f ~/latestData/*.tar.bz2
+rm -f ~/latestData/lock
+rm -r -f ~/latestData/sedi
 mkdir ~/latestData/sedi

@@ -36,9 +36,10 @@ echo "Startup: end of sanity checks"
 sleep 5 #ensure that everything is fully ready
 echo "Startup: beginning scientific capture"
 
-#./capture_sedi_loop.sh &
-#./capture_cameras_loop.sh &
-#./capture_imu_loop.sh &
+#./capture_sedi_loop.sh &	#SEDI camera capturing loop
+#./capture_cameras_loop.sh &	#Sun and star capturing loop
+#./capture_imu_loop.sh &	#IMU querying and archiving
+#./pull_command_loop.sh &	#Wait for commands through the uplink
 
 #wait until star/sun images come in, then we have something
 while [ ! -f ~/latestData/star_cam.jpg ];
@@ -47,4 +48,6 @@ do
 done
 
 #now that we have some data to transmit, start sending
-./stream_data_bundle.sh &
+#./push_bundle_loop.sh &		#begin downlink transmission loop
+
+echo "Startup: startup complete, all systems activated. "$(date)

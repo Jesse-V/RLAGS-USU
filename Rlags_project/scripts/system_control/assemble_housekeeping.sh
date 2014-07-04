@@ -14,23 +14,13 @@ sudo tail -50 /root/GoQat/log.txt >> housekeeping/latestEvents.txt
 
 #if they exist, truncate SEDI images to save space
 if [ -f ~/latestData/sedi/capture.fit ]; then
-	echo "Housekeeping: truncating SEDI .fit images"
+	echo "Housekeeping: preparing SEDI .fit images"
 	cp -r sedi/*.txt housekeeping/ #move all housekeeping data files
 
-	split --bytes=1m -d sedi/calibration_lamp.fit fitPiece
-	mv fitPiece00 housekeeping/calibration_lamp_piece.fit
-
-	split --bytes=1m -d sedi/calibration_nolamp.fit fitPiece
-        mv fitPiece00 housekeeping/calibration_nolamp_piece.fit
-
-	split --bytes=1m -d sedi/capture.fit fitPiece
-        mv fitPiece00 housekeeping/capture_piece.fit
-
-	rm fitPiece*
+	cp sedi/*.fit housekeeping/
 fi
 
 echo "Housekeeping: compressing sun/star images"
-
 convert star_cam.jpg  -resize 640x480 housekeeping/star_cam.jpg
 convert sun_cam_0.jpg -resize 640x480 housekeeping/sun_cam_0.jpg
 convert sun_cam_1.jpg -resize 640x480 housekeeping/sun_cam_1.jpg

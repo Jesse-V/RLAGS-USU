@@ -16,7 +16,6 @@ do
 
 	cd /home/linaro/Rlags_project/scripts/sun_cameras/
 	./capture_sun_all.sh
-	./get_angle.sh > new_angles.txt &
 
 	cd /home/linaro/Rlags_project/scripts/star_camera/
         ./capture_star.sh
