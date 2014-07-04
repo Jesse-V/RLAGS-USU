@@ -11,6 +11,7 @@ fi
 
 echo "SEDI: triggering GoQat camera for "$2", "$(date +"%H:%M:%S")
 cp $1 /home/my_watch
+cp $1 $(pwd)/$3/
 startTime=$(date +"%d.%H.%M.%S")
 startAtt=42 #TODO: get attitude
 
