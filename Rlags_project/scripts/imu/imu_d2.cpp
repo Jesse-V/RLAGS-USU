@@ -195,6 +195,8 @@ int CommandDialog(ComPortHandle comPort, unsigned int command){
       }
       else{
 	/* --------------------------Print Command 0xD2 Numerical Values------------------------------- */
+	//Format: [stabAccelX],[stabAccelY],[stabAccelZ],[angRateX],[angRateY],[angRateZ],[stabMagX],[stabMagY],[stabMagZ],[heading],[timestamp]
+
 	D2_Stab_AAM D2_Data;
         for(i=0;i<3;i++)
 	{
@@ -202,17 +204,9 @@ int CommandDialog(ComPortHandle comPort, unsigned int command){
 		D2_Data.AngRate[i] = Bytes2Float(&response[13 + i*4]);
 		D2_Data.StabMag[i] = Bytes2Float(&response[25 + i*4]);
         }
-	printf("\n\tGyro Stabilized Acceleration, Angular Rate & Magnetometer\n");
-	printf("\t-------------------------------------------------------------------\n");
-	printf("\n\tStab Accel X\t\tStab Accel Y\t\tStab Accel Z\n");
-	printf("\t-------------------------------------------------------------------\n");
-	printf("\t%f (G)\t\t%f (G)\t\t%f (G)\n\n", D2_Data.StabAccel[0], D2_Data.StabAccel[1], D2_Data.StabAccel[2]);
-	printf("\n\tAng Rate X\t\tAng Rate Y\t\tAng Rate Z\n");
-	printf("\t-------------------------------------------------------------------\n");
-	printf("\t%f (deg/sec)\t%f (deg/sec)\t%f (deg/sec)\n\n", (180.0/PI)*D2_Data.AngRate[0], (180.0/PI)*D2_Data.AngRate[1], (180.0/PI)*D2_Data.AngRate[2]);
-	printf("\n\tStab Magneto X\t\tStab Magneto Y\t\tStab Magneto Z\n");
-	printf("\t-------------------------------------------------------------------\n");
-	printf("\t%f (Gauss)\t%f (Gauss)\t%f (Gauss)\n\n", D2_Data.StabMag[0], D2_Data.StabMag[1], D2_Data.StabMag[2]);
+	printf("%f,%f,%f,", D2_Data.StabAccel[0], D2_Data.StabAccel[1], D2_Data.StabAccel[2]);
+	printf("%f,%f,%f,", (180.0/PI)*D2_Data.AngRate[0], (180.0/PI)*D2_Data.AngRate[1], (180.0/PI)*D2_Data.AngRate[2]);
+	printf("%f,%f,%f,", D2_Data.StabMag[0], D2_Data.StabMag[1], D2_Data.StabMag[2]);
 
 	float north;
 	if(D2_Data.StabMag[1] > 0) {
@@ -236,10 +230,8 @@ int CommandDialog(ComPortHandle comPort, unsigned int command){
 	D2_Data.timer = Bytes2Ulong(&response[37]);
 	float sec;
 	sec = (float) (D2_Data.timer/262144.0);
-	printf("\n\t-------------------------------------------------------------------");
-	printf("\n\tHeading: %f (deg)\n", north);
-	printf("\n\tTime Stamp: %f (sec)\n", sec);
-	printf("\t-------------------------------------------------------------------\n\n");
+	printf("%f,", north);
+	printf("%f\n", sec);
 	/* -------------------------------------------------------------------------------------------- */
 
         return TRUE;

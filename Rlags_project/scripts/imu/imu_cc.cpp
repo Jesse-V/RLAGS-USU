@@ -210,26 +210,13 @@ int CommandDialog(ComPortHandle comPort, unsigned int command){
 		CC_Data.M3[i] = Bytes2Float(&response[61 + i*4]);
         }
 
-	printf("\n\tAcceleration, Angular Rate & Magnetometer Vectors & Orientation Matrix\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\n\tAccel X\t\t\tAccel Y\t\t\tAccel Z\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f (G)\t\t%f (G)\t\t%f (G)\n\n", CC_Data.Accel[0], CC_Data.Accel[1], CC_Data.Accel[2]);
-	printf("\n\tAng Rate X\t\tAng Rate Y\t\tAng Rate Z\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f (deg/sec)\t%f (deg/sec)\t%f (deg/sec)\n\n", (180.0/PI)*CC_Data.AngRate[0], (180.0/PI)*CC_Data.AngRate[1], (180.0/PI)*CC_Data.AngRate[2]);
-	printf("\n\tMagneto X\t\tMagneto Y\t\tMagneto Z\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f (Gauss)\t%f (Gauss)\t%f (Gauss)\n\n", CC_Data.Mag[0], CC_Data.Mag[1], CC_Data.Mag[2]);
-	printf("\n\tM(1,1)\t\t\tM(1,2)\t\t\tM(1,3)\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f\t\t%f\t\t%f\n\n", CC_Data.M1[0], CC_Data.M1[1], CC_Data.M1[2]);
-	printf("\n\tM(2,1)\t\t\tM(2,2)\t\t\tM(2,3)\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f\t\t%f\t\t%f\n\n", CC_Data.M2[0], CC_Data.M2[1], CC_Data.M2[2]);
-	printf("\n\tM(3,1)\t\t\tM(3,2)\t\t\tM(3,3)\n");
-	printf("\t----------------------------------------------------------------------\n");
-	printf("\t%f\t\t%f\t\t%f\n\n", CC_Data.M3[0], CC_Data.M3[1], CC_Data.M3[2]);
+	//Format [accelX],[accelY],[accelZ],[AngRateX],[AngRateY],[AngRateZ],[magX],[magY],[magZ],[mtx11],[mtx12],[mtx13],[mtx21],[mtx22],[mtx23],[mtx31],[mtx32],[mtx33],[pitchDeg],[rollDeg],[yawDeg],[headingDeg],[timestamp]
+	printf("%f,%f,%f,", CC_Data.Accel[0], CC_Data.Accel[1], CC_Data.Accel[2]);
+	printf("%f,%f,%f,", (180.0/PI)*CC_Data.AngRate[0], (180.0/PI)*CC_Data.AngRate[1], (180.0/PI)*CC_Data.AngRate[2]);
+	printf("%f,%f,%f,", CC_Data.Mag[0], CC_Data.Mag[1], CC_Data.Mag[2]);
+	printf("%f,%f,%f,", CC_Data.M1[0], CC_Data.M1[1], CC_Data.M1[2]);
+	printf("%f,%f,%f,", CC_Data.M2[0], CC_Data.M2[1], CC_Data.M2[2]);
+	printf("%f,%f,%f,", CC_Data.M3[0], CC_Data.M3[1], CC_Data.M3[2]);
 
 		float mag_heading;
 	if(CC_Data.Mag[1] > 0) {
@@ -253,17 +240,15 @@ int CommandDialog(ComPortHandle comPort, unsigned int command){
 	float pitch = (180.0/PI)*asin(-CC_Data.M1[2]);
 	float roll = (180.0/PI)*atan(CC_Data.M2[2]/CC_Data.M3[2]);
 	float yaw = (180.0/PI)*atan(CC_Data.M1[1]/CC_Data.M1[0]);
-	printf("\n\t----------------------------------------------------------------------");
-	printf("\n\tPitch: %f (deg)\n", pitch);
-	printf("\n\tRoll:  %f (deg)\n", roll);
-	printf("\n\tYaw:   %f (deg)\n", yaw);
-	printf("\n\tHeading: %f (deg)\n", mag_heading);
+	printf("%f,", pitch);
+	printf("%f,", roll);
+	printf("%f,", yaw);
+	printf("%f,", mag_heading);
 
 	CC_Data.timer = Bytes2Ulong(&response[73]);
 	float sec;
 	sec = (float) (CC_Data.timer/262144.0);
-	printf("\n\tTime Stamp: %f (sec)\n", sec);
-	printf("\t----------------------------------------------------------------------\n\n");
+	printf("%f\n", sec);
 	/* -------------------------------------------------------------------------------------------- */
 
         return TRUE;
