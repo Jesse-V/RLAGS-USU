@@ -6,6 +6,7 @@ echo -e "\n"
 
 echo "Startup: initializing system..."
 ./initialize_system.sh
+cd ~/control_scripts
 echo "Startup: system initialization complete"
 
 echo "Startup: beginning sanity checks"
@@ -55,6 +56,7 @@ echo "Startup: beginning scientific capture"
 #./capture_sedi_loop.sh &	#SEDI camera capturing loop
 #./capture_cameras_loop.sh &	#Sun and star capturing loop
 #./capture_imu_loop.sh &	#IMU querying and archiving
+#./capture_gps_loop.sh &	#Periodically archive GPS data stream
 #./pull_command_loop.sh &	#Wait for commands through the uplink
 
 #wait until star/sun images come in, then we have something

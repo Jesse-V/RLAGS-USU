@@ -13,9 +13,13 @@ sudo ~/Rlags_project/scripts/drives/mount_drives
 echo "Sys init: initializing GoQat SEDI camera..."
 sudo ~/Rlags_project/scripts/sedi_camera/initialize_goqat.sh
 
-echo "Sys init: Resetting ~/latestData"
+echo "Sys init: resetting ~/latestData"
 rm -f ~/latestData/*.jpg
 rm -f ~/latestData/*.tar.bz2
 rm -f ~/latestData/lock
 rm -r -f ~/latestData/sedi
 mkdir ~/latestData/sedi
+
+echo "Sys init: initializing Odroid-Arduino communication..."
+cd ~/Rlags_project/scripts/communication/build
+./serial &
