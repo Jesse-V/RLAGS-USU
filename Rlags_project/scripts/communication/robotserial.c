@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	//baudrate = 9600;
 	fd = serialport_init("/dev/ttyACM0", baudrate);
             	if(fd==-1) return -1;
-	usleep(1000 * 1000 );
+	usleep(1000 * 1000);
  	n = serialport_read_until(fd, buf, ':');
 	while(1) {
 		strcpy(dat, "00000000:\0");

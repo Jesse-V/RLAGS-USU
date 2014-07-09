@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     char buf[256], dat[256], use[1];
     int rc,n;
 
-    //baudrate = 9600;
+    //baudrate = 19200;
     printf("initializing serial communication...");
     fd = serialport_init("/dev/ttyACM0", baudrate);
                 if(fd==-1) return -1;
@@ -149,22 +149,27 @@ void getAngle()
         std::cin >> angle;
         // if(!std::cin)
         // {
-            int newAngle = round(angle);
-            if(angle == 181)
-            {
-                angle--;
-                servoAngle = angle;
-                angleUpdated = true;
-            }
-            else if (angle > 180 || angle < 0)
-            {
-                printf("\nMust be angle between 0-180 degrees\n");
-            }
-            else
-            {
-                servoAngle = angle;
-                angleUpdated = true;
-            }
+        int newAngle = round(angle);
+//            if(newAngle == 181)
+//            {
+//                newAngle--;
+//                servoAngle = newAngle;
+//                angleUpdated = true;
+//            }
+        if(newAngle > 182 || newAngle < 0)
+        {
+            printf("\nMust be decimal values between 0-182\n");
+        }
+//        else if(newAngle == 181 || newAngle == 182)
+//        {
+//            servoAngle = newAngle;
+//            angleUpdated = true;
+//        }
+        else
+        {
+            servoAngle = newAngle;
+            angleUpdated = true;
+        }
         // }
         // else
         // {
