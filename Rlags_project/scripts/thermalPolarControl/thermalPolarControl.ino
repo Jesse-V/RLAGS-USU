@@ -296,7 +296,7 @@ void loop() {
     else if(servoAngle == 200)
     {
       Serial.print(" ");
-      digitalWrite(DIGITAL_SERVO, HIGH);
+      digitalWrite(CALIBR_ENABLE, HIGH);
       Serial.print("ON");
       Serial.print(" ");
     }
@@ -304,7 +304,7 @@ void loop() {
     else if(servoAngle = 201)
     {
       Serial.print(" ");
-      digitalWrite(DIGITAL_SERVO, LOW);
+      digitalWrite(CALIBR_ENABLE, LOW);
       Serial.print("OFF");
       Serial.print(" ");
     }
