@@ -293,7 +293,7 @@ void loop() {
       Serial.print(" ");
     }
     
-    else if(servoAngle == 181)
+    else if(servoAngle == 200)
     {
       Serial.print(" ");
       digitalWrite(DIGITAL_SERVO, HIGH);
@@ -301,7 +301,7 @@ void loop() {
       Serial.print(" ");
     }
     
-    else if(servoAngle = 182)
+    else if(servoAngle = 201)
     {
       Serial.print(" ");
       digitalWrite(DIGITAL_SERVO, LOW);

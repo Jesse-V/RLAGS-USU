@@ -150,21 +150,27 @@ void getAngle()
         // if(!std::cin)
         // {
         int newAngle = round(angle);
-//            if(newAngle == 181)
-//            {
-//                newAngle--;
-//                servoAngle = newAngle;
-//                angleUpdated = true;
-//            }
-        if(newAngle > 182 || newAngle < 0)
+        if(newAngle == 181)
         {
-            printf("\nMust be decimal values between 0-182\n");
+            newAngle--;
+            servoAngle = newAngle;
+            angleUpdated = true;
         }
-//        else if(newAngle == 181 || newAngle == 182)
-//        {
-//            servoAngle = newAngle;
-//            angleUpdated = true;
-//        }
+        if(newAngle > 180 || newAngle < 0)
+        {
+            if(newAngle == 200 || newAngle == 201)
+            {
+                printf("\Changing the calibration lamp states\n");
+                servoAngle = newAngle;
+                angleUpdated = true;
+            }
+            else
+            {
+                printf("\nAngles must be decimal values between 0-180 degrees\n");
+                printf("\nCalibration Lamp ON: decimal value 200\n");
+                printf("\nCalibration Lamp OFF: decimal value 201\n");
+            }
+        }
         else
         {
             servoAngle = newAngle;
