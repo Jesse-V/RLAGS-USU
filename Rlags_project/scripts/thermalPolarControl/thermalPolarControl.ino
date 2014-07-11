@@ -23,9 +23,12 @@
 //#define RELAY_CTRL_CH8 9  // thermalControl -> Arduino pin 9
 
 #define ERROR_TEMP -127.00
-// set Temperature @ 30C, Hysteresis @ 1C
-#define LOWER_HYST_BOUND 29.5
-#define UPPER_HYST_BOUND 30.5
+// set SEDI Temperature @ 20C, Hysteresis @ 1C
+// set Camera Temperature @ 6C, Hysteresis @ 1C
+#define LOWER_HYST_BOUND1 19.5
+#define UPPER_HYST_BOUND1 20.5
+#define LOWER_HYST_BOUND2 5.5
+#define UPPER_HYST_BOUND2 6.5
 
 // setup a oneWire instance to communicate with any OneWire devices
 OneWire oneWire_etalon(ONE_WIRE_BUS1);
@@ -191,13 +194,7 @@ void setup() {
   Serial.print("KAH4\t");
   Serial.print("DTS8\t");
   
-  Serial.print("KAH5\t");
-  Serial.print("DTS9\t");
-  
-  Serial.print("KAH6\t");
-  Serial.print("DTS9\t");
-  
-  Serial.print("KAH7\t");
+  Serial.print("KAH5s\t");
   Serial.print("DTS9\t");
   
   Serial.print("KAH8\t");
@@ -222,7 +219,7 @@ void setup() {
   Serial.print("DTS20\t");
   Serial.print("DTS21\t");
   Serial.print("DTS22\t");
-  Serial.print("DTS23\t");
+  Serial.print("DTS23:\r");
 }
 
 int countCont = 0;
@@ -287,26 +284,23 @@ void loop() {
     byte servoAngle = Serial.read();
     if(servoAngle <= 180 && servoAngle >= 0)
     {
-      Serial.print(" ");
+      Serial.print("\t");
       setServoAngle(servoAngle);
       Serial.print(servoAngle);
-      Serial.print(" ");
     }
     
     else if(servoAngle == 200)
     {
-      Serial.print(" ");
+      Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, HIGH);
       Serial.print("ON");
-      Serial.print(" ");
     }
     
     else if(servoAngle = 201)
     {
-      Serial.print(" ");
+      Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, LOW);
       Serial.print("OFF");
-      Serial.print(" ");
     }
   }
 
@@ -315,12 +309,12 @@ void loop() {
 
 void thermalActive() {
   sensors_control.requestTemperatures();
-  thermalCtrl(sensors_control, DTS_5, RELAY_CTRL_CH1, relayStateCh1, degC_5);
-  thermalCtrl(sensors_control, DTS_6, RELAY_CTRL_CH2, relayStateCh2, degC_6);
-  thermalCtrl(sensors_control, DTS_7, RELAY_CTRL_CH3, relayStateCh3, degC_7);
-  thermalCtrl(sensors_control, DTS_8, RELAY_CTRL_CH4, relayStateCh4, degC_8);
-  thermalCtrl(sensors_control, DTS_9, RELAY_CTRL_CH5, relayStateCh5, degC_9);
-  thermalCtrl(sensors_control, DTS_10, RELAY_CTRL_CH6, relayStateCh6, degC_10);
+  thermalCtrl(sensors_control, DTS_5, RELAY_CTRL_CH1, relayStateCh1, degC_5, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
+  thermalCtrl(sensors_control, DTS_6, RELAY_CTRL_CH2, relayStateCh2, degC_6, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
+  thermalCtrl(sensors_control, DTS_7, RELAY_CTRL_CH3, relayStateCh3, degC_7, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
+  thermalCtrl(sensors_control, DTS_8, RELAY_CTRL_CH4, relayStateCh4, degC_8, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
+  thermalCtrl(sensors_control, DTS_9, RELAY_CTRL_CH5, relayStateCh5, degC_9, LOWER_HYST_BOUND2, UPPER_HYST_BOUND2);
+  thermalCtrl(sensors_control, DTS_10, RELAY_CTRL_CH6, relayStateCh6, degC_10, LOWER_HYST_BOUND2, UPPER_HYST_BOUND2);
 }
 
 void thermalInfo(DallasTemperature dataLine, DeviceAddress& dts, float* arr)
@@ -338,22 +332,22 @@ void thermalInfo(DallasTemperature dataLine, DeviceAddress& dts, float* arr)
   }
 }
 
-void thermalCtrl(DallasTemperature dataLine, DeviceAddress& dts, int pin, int relayStateCh, float* arr)
+void thermalCtrl(DallasTemperature dataLine, DeviceAddress& dts, int pin, int relayStateCh, float* arr, float lower_hyst_bound, float upper_hyst_bound)
 {
   float tempC = dataLine.getTempC(dts) + retrieveOffset(dts);
 
   if (tempC != ERROR_TEMP) {
     addAverage(arr, tempC);
     tempC = getAverage(arr);
-    if (tempC <= LOWER_HYST_BOUND) {
+    if (tempC <= lower_hyst_bound) {
       relayStateCh = HIGH;
       Serial.print("1\t");
     }
-    else if (tempC >= UPPER_HYST_BOUND) {
+    else if (tempC >= upper_hyst_bound) {
       relayStateCh = LOW;
       Serial.print("0\t");
     }
-    else if (tempC < UPPER_HYST_BOUND && tempC > LOWER_HYST_BOUND) {
+    else if (tempC < upper_hyst_bound && tempC > lower_hyst_bound) {
       if (relayStateCh == LOW) {
         Serial.print("0\t");
       }
