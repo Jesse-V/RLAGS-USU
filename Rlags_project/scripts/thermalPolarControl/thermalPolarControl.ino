@@ -296,7 +296,7 @@ void loop() {
       Serial.print("ON");
     }
     
-    else if(servoAngle = 201)
+    else if(servoAngle == 201)
     {
       Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, LOW);
