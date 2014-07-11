@@ -160,7 +160,7 @@ void getAngle()
         {
             if(newAngle == 200 || newAngle == 201)
             {
-                printf("\Changing the calibration lamp states\n");
+                printf("Changing the calibration lamp states\n");
                 servoAngle = newAngle;
                 angleUpdated = true;
             }
