@@ -3,14 +3,14 @@ cd /home/linaro/Rlags_project/scripts/star_camera
 
 #--------------------------------------------------------------------------
 
-echo '1-2.1.3.4' | sudo tee /sys/bus/usb/drivers/usb/bind > /dev/null
+echo '1-2.1.5.4' | sudo tee /sys/bus/usb/drivers/usb/bind > /dev/null
 
 sleep 1
 time=$(date +%d.%H.%M.%S)
 sudo ./get_star_image
 sleep 0.1
 
-echo '1-2.1.3.4' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null
+echo '1-2.1.5.4' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null
 
 #--------------------------------------------------------------------------
 
