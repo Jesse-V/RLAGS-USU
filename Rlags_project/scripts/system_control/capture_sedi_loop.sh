@@ -1,11 +1,11 @@
 #!/bin/bash
 
+cd ~/Rlags_project/scripts/communication
+commPID=$(./get_arduino_comm_pid.sh)
+echo "SEDI: Arduino communication PID is: "$commPID
+
 cd ~/Rlags_project/scripts/sedi_camera
 echo "SEDI: capture loop started"
-
-#echo "SEDI: initializing SEDI lamp pin"
-#echo 87  > /sys/class/gpio/export
-#echo out > /sys/class/gpio/gpio87/direction
 
 while true
 do
@@ -15,17 +15,13 @@ do
 	dirName=$(date +"%d.%H.%M.%S")
 
 	echo "SEDI: turning lamp on"
-	#echo 1 > /sys/class/gpio/gpio87/value
-	#pinVal=$(cat /sys/class/gpio/gpio87/value)
-        #echo "SEDI: lamp pin is now "$pinVal
+	echo -n 200 > /proc/$commPID/fd/0
 
 	#calibration with lamp
 	sudo ./capture.sh calibration_watchfile calibration_lamp $dirName
 
 	echo "SEDI: turning lamp off"
-        #echo 0 > /sys/class/gpio/gpio87/value
-	#pinVal=$(cat /sys/class/gpio/gpio87/value)
-        #echo "SEDI: lamp pin is now "$pinVal
+	echo -n 201 > /proc/$commPID/fd/0
 
 	#calibration with no lamp
 	sudo ./capture.sh calibration_watchfile calibration_nolamp $dirName
