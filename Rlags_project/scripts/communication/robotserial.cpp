@@ -145,7 +145,7 @@ void getAngle()
     while(!shouldTerminate)
     {
         float angle = 0;
-        // std::cin.clear();
+        std::cin.clear();
         std::cin >> angle;
         // if(!std::cin)
         // {

@@ -22,4 +22,6 @@ mkdir ~/latestData/sedi
 
 echo "Sys init: initializing Odroid-Arduino communication..."
 cd ~/Rlags_project/scripts/communication/build
-./serial &
+rm -f serial_input ../serial_output
+touch serial_input ../serial_output
+tail -f serial_input | grep --line-buffered -E "*" | ./serial &> ../serial_output &

@@ -15,13 +15,13 @@ do
 	dirName=$(date +"%d.%H.%M.%S")
 
 	echo "SEDI: turning lamp on"
-	echo -n 200 > /proc/$commPID/fd/0
+	echo 200 >> ~/Rlags_project/scripts/communication/build/serial_input
 
 	#calibration with lamp
 	sudo ./capture.sh calibration_watchfile calibration_lamp $dirName
 
 	echo "SEDI: turning lamp off"
-	echo -n 201 > /proc/$commPID/fd/0
+	echo 201 >> ~/Rlags_project/scripts/communication/build/serial_input
 
 	#calibration with no lamp
 	sudo ./capture.sh calibration_watchfile calibration_nolamp $dirName
