@@ -7,7 +7,9 @@ echo '1-2.1.5.4' | sudo tee /sys/bus/usb/drivers/usb/bind > /dev/null
 
 sleep 1
 time=$(date +%d.%H.%M.%S)
+#echo "star cap"
 sudo ./get_star_image
+#echo "end"
 sleep 0.1
 
 echo '1-2.1.5.4' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null

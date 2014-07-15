@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Mutex requested on ~/latestData/"
+#echo "Mutex requested on ~/latestData/"
 
 #wait for current lock to disappear
 while [ -f ~/latestData/lock ]

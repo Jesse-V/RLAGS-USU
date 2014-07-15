@@ -20,6 +20,9 @@ rm -f ~/latestData/lock
 rm -r -f ~/latestData/sedi
 mkdir ~/latestData/sedi
 
+sudo chown linaro ~/latestData/status.log
+sudo chmod 666 ~/latestData/status.log
+
 echo "Sys init: initializing Odroid-Arduino communication..."
 cd ~/Rlags_project/scripts/communication/build
 rm -f serial_input ../serial_output

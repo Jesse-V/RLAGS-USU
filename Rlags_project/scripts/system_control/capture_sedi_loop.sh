@@ -50,7 +50,6 @@ do
                 echo "SEDI: error: camera data not stored on SSD 1"
         fi
 
-	echo "SEDI: cleaning up working directory"
 	rm -r $dirName
 
 	echo "SEDI: capture cycle ended, "$(date)

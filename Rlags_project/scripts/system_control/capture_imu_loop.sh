@@ -9,7 +9,6 @@ do
 	./get_imu_data.sh
 	./move_imu_data.sh
 
-	echo "temp"
 	sleep 5
 done
 

@@ -23,5 +23,6 @@ do
 	echo "Sun/star cameras: capture ended "$(date +%s.%N)
 
 	end=$(date +%s.%N)
-	sleep $(echo 10 - $end + $start - 0.009 | bc)
+#echo $end - $start | bc
+	sleep $(echo 30 - $end + $start - 0.009 | bc)
 done

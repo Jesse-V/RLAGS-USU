@@ -1,8 +1,5 @@
-#include "stdio.h"
 #include "highgui/highgui_c.h"
 #include "ASICamera.h"
-#include <sys/time.h>
-#include <time.h>
 
 int  main()
 {
@@ -12,7 +9,7 @@ int  main()
 	initCamera(); //this must be called before camera operation. and it only need init once
 	setImageFormat(WIDTH, HEIGHT, 1, IMG_RAW8);
 	IplImage *pRgb = cvCreateImage(cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 1);
-	setValue(CONTROL_EXPOSURE, 1000, true); //auto exposure
+	setValue(CONTROL_EXPOSURE, 1000, false);
 
 	startCapture(); //get image
 	getImageData((unsigned char*)pRgb->imageData, pRgb->imageSize, -1);
@@ -21,9 +18,3 @@ int  main()
 
 	return 1;
 }
-
-
-
-
-
-
