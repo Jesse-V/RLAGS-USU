@@ -11,4 +11,5 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 # add the executable
 add_executable(serial robotserial.cpp)
+add_executable(sendFile sendFile.cpp)
 target_link_libraries(serial ${CMAKE_THREAD_LIBS_INIT})

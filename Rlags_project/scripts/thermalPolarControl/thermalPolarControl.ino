@@ -8,7 +8,7 @@
 #define ONE_WIRE_BUS2 11  //   powerBox DTS -> Arduino pin 11
 #define ONE_WIRE_BUS3 12  //       sedi DTS -> Arduino pin 12
 #define ONE_WIRE_BUS4 13  //    control DTS -> Arduino pin 13
-#define ONE_WIRE_BUS5 15  //  attitude1 DTS -> Arduino pin 15 / A1 
+#define ONE_WIRE_BUS5 15  //  attitude1 DTS -> Arduino pin 15 / A1
 
 #define DIGITAL_SERVO 16  //   SEDI polarizer -> Arduino pin 16 / A2
 #define CALIBR_ENABLE 17  // SEDI calibration -> Arduino pin 17 / A3
@@ -109,6 +109,12 @@ float degC_23[3] = {0, 0, 0};
 int relayStateCh1, relayStateCh2, relayStateCh3, relayStateCh4,
     relayStateCh5, relayStateCh6; // relayStateCh7, relayStateCh8;
 
+int runningChange = 0;
+int lastAngle = 0;
+bool waitAngleFlag = false;
+int angleWaitCount = 0;
+
+
 void setup() {
 
   // initialization
@@ -148,7 +154,7 @@ void setup() {
   sensors_etalon.setResolution(DTS_3, DTS_PRECISION);
   sensors_etalon.setResolution(DTS_4, DTS_PRECISION);
   /*-----------------------------------------------*/
-  
+
   /*--------------------control DTS------------------*/
   sensors_control.setResolution(DTS_5, DTS_PRECISION);
   sensors_control.setResolution(DTS_6, DTS_PRECISION);
@@ -163,7 +169,7 @@ void setup() {
   sensors_powerBox.setResolution(DTS_12, DTS_PRECISION);
   sensors_powerBox.setResolution(DTS_13, DTS_PRECISION);
   /*--------------------------------------------------*/
-  
+
   /*----------------odroidX2 DTS------------------*/
   sensors_odroidX2.setResolution(DTS_14, DTS_PRECISION);
   sensors_odroidX2.setResolution(DTS_15, DTS_PRECISION);
@@ -193,10 +199,10 @@ void setup() {
 
   Serial.print("KAH4\t");
   Serial.print("DTS8\t");
-  
+
   Serial.print("KAH5s\t");
   Serial.print("DTS9\t");
-  
+
   Serial.print("KAH8\t");
   Serial.print("DTS10\t");
 
@@ -204,11 +210,11 @@ void setup() {
   Serial.print("DTS2\t");
   Serial.print("DTS3\t");
   Serial.print("DTS4\t");
-  
+
   Serial.print("DTS11\t");
   Serial.print("DTS12\t");
   Serial.print("DTS13\t");
-  
+
   Serial.print("DTS14\t");
   Serial.print("DTS15\t");
   Serial.print("DTS16\t");
@@ -226,15 +232,15 @@ int countCont = 0;
 
 void loop() {
 //  long startTime = millis();
-  
+
   // relay control based on a thermal sensor
   thermalActive();
-  
+
   if(countCont++ == 9)
   {
     countCont = 0;
     sensors_etalon.requestTemperatures();
-   
+
     thermalInfo(sensors_etalon, DTS_1, degC_1);
     Serial.print("\t");
     thermalInfo(sensors_etalon, DTS_2, degC_2);
@@ -243,7 +249,7 @@ void loop() {
     Serial.print("\t");
     thermalInfo(sensors_etalon, DTS_4, degC_4);
     Serial.print("\t");
-    
+
     sensors_powerBox.requestTemperatures();
     thermalInfo(sensors_powerBox, DTS_11, degC_11);
     Serial.print("\t");
@@ -251,7 +257,7 @@ void loop() {
     Serial.print("\t");
     thermalInfo(sensors_powerBox, DTS_13, degC_13);
     Serial.print("\t");
-    
+
     sensors_odroidX2.requestTemperatures();
     thermalInfo(sensors_odroidX2, DTS_14, degC_14);
     Serial.print("\t");
@@ -261,7 +267,7 @@ void loop() {
     Serial.print("\t");
     thermalInfo(sensors_odroidX2, DTS_17, degC_17);
     Serial.print("\t");
-    
+
     sensors_attitude.requestTemperatures();
     thermalInfo(sensors_attitude, DTS_18, degC_18);
     Serial.print("\t");
@@ -284,18 +290,41 @@ void loop() {
     byte servoAngle = Serial.read();
     if(servoAngle <= 180 && servoAngle >= 0)
     {
-      Serial.print("\t");
-      setServoAngle(servoAngle);
-      Serial.print(servoAngle);
+      if(waitAngleFlag)
+      {
+        angleWaitCount--;
+        if(angleWaitCount <= 0)
+        {
+          waitAngleFlag = false;
+        }
+      }
+      else
+      {
+        Serial.print("\t");
+        runningChange = abs(servoAngle - lastAngle);
+        if(runningChange > 170)
+        {
+          waitAngleFlag = true;
+          angleWaitCount = 3;
+          lastAngle = servoAngle;
+          setServoAngle(servoAngle);
+        }
+        else
+        {
+          lastAngle = servoAngle;
+          setServoAngle(servoAngle);
+        }
+        Serial.print(servoAngle);
+      }
     }
-    
+
     else if(servoAngle == 200)
     {
       Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, HIGH);
       Serial.print("ON");
     }
-    
+
     else if(servoAngle == 201)
     {
       Serial.print("\t");
@@ -456,7 +485,7 @@ float retrieveOffset(DeviceAddress& dev)
 void setServoAngle(int servoAngle)
 {
   const int SERVO_LOW = 900;
-  const int SERVO_HIGH = 2100;
+  const int SERVO_HIGH = 1980;
 
   // linrear mapping degree with the servo (value between 0 and 180)
   servoAngle = servoMap(servoAngle, 0, 180, SERVO_LOW, SERVO_HIGH);
