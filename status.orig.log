@@ -1,0 +1,1959 @@
+-e 
+System startup at Tue Jul 15 07:20:08 UTC 2014
+
+[    8.118934] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.119688] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.121203] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.129293] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.132172] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.138798]  sdb: sdb1
+[    8.141302] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.143623] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.149686] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.809267] init: failsafe main process (1729) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+1-2.1.5.1
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:20:17 UTC 2014
+SEDI: Arduino communication PID is: 2337 2339
+SEDI: capture loop started
+SEDI: capture cycle started, Tue Jul 15 07:20:17 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.20.17
+SEDI: triggering GoQat camera for calibration_lamp, 07:20:17
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405408818.575720270, Tue Jul 15 07:20:18 UTC 2014
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:20:27 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:20:37 UTC 2014
+IMU: querying IMU
+SEDI: camera returned image, 07:20:38
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:20:38
+Startup: startup complete, all systems activated. Tue Jul 15 07:20:39 UTC 2014
+Sun/star cameras: capture ended 1405408839.818213719
+Comm: assembling data bundle, beginning transmission. Tue Jul 15 07:20:39 UTC 2014
+Housekeeping: assembling latest data
+Housekeeping: compressing sun/star images
+Housekeeping: compressing bundle
+Housekeeping: bundling complete
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:20:47 UTC 2014
+Sun/star cameras: capture started 1405408848.583412299, Tue Jul 15 07:20:48 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:20:57 UTC 2014
+IMU: querying IMU
+SEDI: camera returned image, 07:21:00
+SEDI: triggering GoQat camera for capture, 07:21:00
+SEDI: camera returned image, 07:21:02
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:21:02 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:21:02 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.21.02
+SEDI: triggering GoQat camera for calibration_lamp, 07:21:02
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:21:07 UTC 2014
+IMU: querying IMU
+Comm: transmission completed. Tue Jul 15 07:21:10 UTC 2014
+Sun/star cameras: capture ended 1405408870.930212542
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:21:17 UTC 2014
+Sun/star cameras: capture started 1405408878.583325941, Tue Jul 15 07:21:18 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 07:21:23
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:21:23
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:21:27 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:21:37 UTC 2014
+Sun/star cameras: capture ended 1405408899.664279868
+IMU: querying IMU
+SEDI: camera returned image, 07:21:45
+SEDI: triggering GoQat camera for capture, 07:21:45
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+SEDI: camera returned image, 07:21:47
+GPS: archived GPS data stream log. Tue Jul 15 07:21:47 UTC 2014
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:21:47 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:21:47 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.21.47
+SEDI: triggering GoQat camera for calibration_lamp, 07:21:47
+Sun/star cameras: capture started 1405408908.583257091, Tue Jul 15 07:21:48 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:21:57 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:22:07 UTC 2014
+SEDI: camera returned image, 07:22:08
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:22:09
+Sun/star cameras: capture ended 1405408930.491857094
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:22:17 UTC 2014
+Sun/star cameras: capture started 1405408938.583246812, Tue Jul 15 07:22:18 UTC 2014
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:22:27 UTC 2014
+IMU: querying IMU
+SEDI: camera returned image, 07:22:30
+SEDI: triggering GoQat camera for capture, 07:22:30
+SEDI: camera returned image, 07:22:32
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:22:32 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:22:32 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.22.32
+SEDI: triggering GoQat camera for calibration_lamp, 07:22:32
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:22:38 UTC 2014
+IMU: querying IMU
+Sun/star cameras: capture ended 1405408959.847106230
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:22:47 UTC 2014
+Sun/star cameras: capture started 1405408968.583393487, Tue Jul 15 07:22:48 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+SEDI: camera returned image, 07:22:54
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:22:54
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:22:57 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:23:07 UTC 2014
+Sun/star cameras: capture ended 1405408989.664098082
+IMU: querying IMU
+IMU: querying IMU
+SEDI: camera returned image, 07:23:15
+SEDI: triggering GoQat camera for capture, 07:23:15
+SEDI: camera returned image, 07:23:17
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+SEDI: storing camera data
+GPS: archived GPS data stream log. Tue Jul 15 07:23:17 UTC 2014
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:23:17 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:23:17 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.23.17
+SEDI: triggering GoQat camera for calibration_lamp, 07:23:17
+Sun/star cameras: capture started 1405408998.583932232, Tue Jul 15 07:23:18 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:23:27 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:23:37 UTC 2014
+SEDI: camera returned image, 07:23:39
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:23:39
+Sun/star cameras: capture ended 1405409020.423661859
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:23:47 UTC 2014
+Sun/star cameras: capture started 1405409028.583946633, Tue Jul 15 07:23:48 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:23:57 UTC 2014
+SEDI: camera returned image, 07:24:00
+SEDI: triggering GoQat camera for capture, 07:24:00
+IMU: querying IMU
+SEDI: camera returned image, 07:24:02
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:24:02 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:24:02 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.24.02
+SEDI: triggering GoQat camera for calibration_lamp, 07:24:02
+IMU: querying IMU
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:24:07 UTC 2014
+Sun/star cameras: capture ended 1405409050.467554354
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:24:17 UTC 2014
+Sun/star cameras: capture started 1405409058.583967036, Tue Jul 15 07:24:18 UTC 2014
+800, 20, 100
+IMU: querying IMU
+SEDI: camera returned image, 07:24:24
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:24:24
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:24:27 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:24:37 UTC 2014
+IMU: querying IMU
+Sun/star cameras: capture ended 1405409079.211086132
+IMU: querying IMU
+SEDI: camera returned image, 07:24:45
+SEDI: triggering GoQat camera for capture, 07:24:45
+SEDI: camera returned image, 07:24:47
+SEDI: storing camera data
+Thermal: Odroid at 44C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:24:47 UTC 2014
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:24:47 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:24:47 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.24.47
+SEDI: triggering GoQat camera for calibration_lamp, 07:24:47
+Sun/star cameras: capture started 1405409088.584305553, Tue Jul 15 07:24:48 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:24:57 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:25:07 UTC 2014
+SEDI: camera returned image, 07:25:09
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:25:09
+Sun/star cameras: capture ended 1405409109.508281938
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:25:17 UTC 2014
+Sun/star cameras: capture started 1405409118.584239234, Tue Jul 15 07:25:18 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:25:27 UTC 2014
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             -e 
+System startup at Tue Jul 15 07:26:20 UTC 2014
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     -e 
+System startup at Tue Jul 15 07:31:51 UTC 2014
+
+[    8.388092] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.388830] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.390780] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.398689] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.401380] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.408069]  sdb: sdb1
+[    8.410706] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.412836] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.418874] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.731130] init: failsafe main process (1727) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:32:01 UTC 2014
+1-2.1.5.1
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+SEDI: Arduino communication PID is: 2331 2333
+SEDI: capture loop started
+SEDI: capture cycle started, Tue Jul 15 07:32:01 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.32.01
+SEDI: triggering GoQat camera for calibration_lamp, 07:32:01
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405409522.273928168, Tue Jul 15 07:32:02 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:32:11 UTC 2014
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:32:21 UTC 2014
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 07:32:22
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:32:22
+Sun/star cameras: capture ended 1405409543.121086012
+Startup: startup complete, all systems activated. Tue Jul 15 07:32:23 UTC 2014
+Comm: assembling data bundle, beginning transmission. Tue Jul 15 07:32:23 UTC 2014
+Housekeeping: assembling latest data
+Housekeeping: compressing sun/star images
+Housekeeping: compressing bundle
+Housekeeping: bundling complete
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:32:31 UTC 2014
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405409552.274496599, Tue Jul 15 07:32:32 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:32:41 UTC 2014
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 07:32:43
+SEDI: triggering GoQat camera for capture, 07:32:43
+SEDI: camera returned image, 07:32:46
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:32:46 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:32:46 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.32.46
+SEDI: triggering GoQat camera for calibration_lamp, 07:32:46
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:32:51 UTC 2014
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+IMU: querying IMU
+Sun/star cameras: capture ended 1405409573.672715151
+Comm: transmission completed. Tue Jul 15 07:32:54 UTC 2014
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:33:01 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405409582.274393447, Tue Jul 15 07:33:02 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 07:33:07
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:33:07
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:33:11 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:33:21 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+Sun/star cameras: capture ended 1405409603.149774624
+IMU: querying IMU
+SEDI: camera returned image, 07:33:28
+SEDI: triggering GoQat camera for capture, 07:33:28
+IMU: querying IMU
+SEDI: camera returned image, 07:33:31
+SEDI: storing camera data
+GPS: archived GPS data stream log. Tue Jul 15 07:33:31 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:33:31 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:33:31 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.33.31
+SEDI: triggering GoQat camera for calibration_lamp, 07:33:31
+Sun/star cameras: capture started 1405409612.274314128, Tue Jul 15 07:33:32 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:33:41 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:33:51 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+SEDI: camera returned image, 07:33:52
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:33:52
+Sun/star cameras: capture ended 1405409633.069796179
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:34:01 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405409642.273815642, Tue Jul 15 07:34:02 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:34:11 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 07:34:13
+SEDI: triggering GoQat camera for capture, 07:34:13
+SEDI: camera returned image, 07:34:16
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:34:16 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:34:16 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.34.16
+SEDI: triggering GoQat camera for calibration_lamp, 07:34:16
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:34:21 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+Sun/star cameras: capture ended 1405409663.012367735
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:34:31 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405409672.273823698, Tue Jul 15 07:34:32 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 07:34:37
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:34:37
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:34:41 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:34:51 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+Sun/star cameras: capture ended 1405409693.885945542
+IMU: querying IMU
+SEDI: camera returned image, 07:34:58
+SEDI: triggering GoQat camera for capture, 07:34:58
+SEDI: camera returned image, 07:35:01
+SEDI: storing camera data
+GPS: archived GPS data stream log. Tue Jul 15 07:35:01 UTC 2014
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:35:01 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:35:01 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.35.01
+SEDI: triggering GoQat camera for calibration_lamp, 07:35:01
+Sun/star cameras: capture started 1405409702.273761712, Tue Jul 15 07:35:02 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:35:11 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:35:21 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+SEDI: camera returned image, 07:35:22
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:35:22
+Sun/star cameras: capture ended 1405409723.654534723
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:35:31 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405409732.273670018, Tue Jul 15 07:35:32 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:35:41 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+SEDI: camera returned image, 07:35:43
+SEDI: triggering GoQat camera for capture, 07:35:43
+IMU: querying IMU
+SEDI: camera returned image, 07:35:46
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:35:46 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:35:46 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.35.46
+SEDI: triggering GoQat camera for calibration_lamp, 07:35:46
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:35:51 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+Sun/star cameras: capture ended 1405409753.635517445
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:36:01 UTC 2014
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405409762.273537533, Tue Jul 15 07:36:02 UTC 2014
+800, 20, 100
+IMU: querying IMU
+SEDI: camera returned image, 07:36:07
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:36:07
+GPS: archived GPS data stream log. Tue Jul 15 07:36:11 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+                  -e 
+System startup at Tue Jul 15 07:37:17 UTC 2014
+
+[    8.123411] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.124148] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.126363] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.136632] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.138677] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.144889]  sdb: sdb1
+[    8.147529] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.149662] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.155728] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.856758] init: failsafe main process (1721) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:37:26 UTC 2014
+1-2.1.5.1
+SEDI: Arduino communication PID is: 2342 2344
+SEDI: capture loop started
+SEDI: capture cycle started, Tue Jul 15 07:37:26 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+SEDI: turning lamp on
+SEDI: made working directory 15.07.37.26
+SEDI: triggering GoQat camera for calibration_lamp, 07:37:26
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405409848.051926374, Tue Jul 15 07:37:28 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 07:37:36 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+-e 
+System startup at Tue Jul 15 07:49:22 UTC 2014
+
+[    8.378135] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.378889] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.380936] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.389242] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.391633] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.398248]  sdb: sdb1
+[    8.400634] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.403065] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.409106] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.831392] init: failsafe main process (1726) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+1-2.1.5.1
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:49:32 UTC 2014
+SEDI: Arduino communication PID is: 2342 2344
+SEDI: capture loop started
+SEDI: capture cycle started, Tue Jul 15 07:49:32 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.49.32
+SEDI: triggering GoQat camera for calibration_lamp, 07:49:32
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405410573.299591960, Tue Jul 15 07:49:33 UTC 2014
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 37C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:49:42 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:49:52 UTC 2014
+IMU: querying IMU
+SEDI: camera returned image, 07:49:53
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:49:53
+Startup: startup complete, all systems activated. Tue Jul 15 07:49:54 UTC 2014
+Sun/star cameras: capture ended 1405410594.311597428
+Comm: assembling data bundle, beginning transmission. Tue Jul 15 07:49:54 UTC 2014
+Housekeeping: assembling latest data
+Housekeeping: compressing sun/star images
+Housekeeping: compressing bundle
+Housekeeping: bundling complete
+IMU: querying IMU
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:50:02 UTC 2014
+Sun/star cameras: capture started 1405410603.312656558, Tue Jul 15 07:50:03 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:50:12 UTC 2014
+IMU: querying IMU
+SEDI: camera returned image, 07:50:14
+SEDI: triggering GoQat camera for capture, 07:50:14
+SEDI: camera returned image, 07:50:17
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:50:17 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:50:17 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.50.17
+SEDI: triggering GoQat camera for calibration_lamp, 07:50:17
+IMU: querying IMU
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:50:22 UTC 2014
+Sun/star cameras: capture ended 1405410624.062784609
+IMU: querying IMU
+Comm: transmission completed. Tue Jul 15 07:50:25 UTC 2014
+IMU: querying IMU
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:50:32 UTC 2014
+Sun/star cameras: capture started 1405410633.312515905, Tue Jul 15 07:50:33 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 07:50:38
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:50:38
+IMU: querying IMU
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:50:42 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:50:52 UTC 2014
+Sun/star cameras: capture ended 1405410653.971756665
+IMU: querying IMU
+SEDI: camera returned image, 07:50:59
+SEDI: triggering GoQat camera for capture, 07:50:59
+IMU: querying IMU
+SEDI: camera returned image, 07:51:02
+SEDI: storing camera data
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:51:02 UTC 2014
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:51:02 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:51:02 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.51.02
+SEDI: triggering GoQat camera for calibration_lamp, 07:51:02
+Sun/star cameras: capture started 1405410663.312191961, Tue Jul 15 07:51:03 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:51:12 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:51:22 UTC 2014
+SEDI: camera returned image, 07:51:23
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:51:23
+Sun/star cameras: capture ended 1405410684.023731929
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:51:32 UTC 2014
+Sun/star cameras: capture started 1405410693.312213184, Tue Jul 15 07:51:33 UTC 2014
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:51:42 UTC 2014
+IMU: querying IMU
+SEDI: camera returned image, 07:51:45
+SEDI: triggering GoQat camera for capture, 07:51:45
+SEDI: camera returned image, 07:51:47
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:51:47 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:51:47 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.51.47
+SEDI: triggering GoQat camera for calibration_lamp, 07:51:47
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:51:52 UTC 2014
+IMU: querying IMU
+Sun/star cameras: capture ended 1405410714.689297027
+IMU: querying IMU
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:52:02 UTC 2014
+Sun/star cameras: capture started 1405410723.312504781, Tue Jul 15 07:52:03 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+SEDI: camera returned image, 07:52:08
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:52:08
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:52:12 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:52:22 UTC 2014
+IMU: querying IMU
+Sun/star cameras: capture ended 1405410744.824524208
+IMU: querying IMU
+SEDI: camera returned image, 07:52:30
+SEDI: triggering GoQat camera for capture, 07:52:30
+SEDI: camera returned image, 07:52:32
+SEDI: storing camera data
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:52:32 UTC 2014
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:52:32 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:52:32 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.52.32
+SEDI: triggering GoQat camera for calibration_lamp, 07:52:32
+Sun/star cameras: capture started 1405410753.312728004, Tue Jul 15 07:52:33 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:52:42 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:52:52 UTC 2014
+SEDI: camera returned image, 07:52:53
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:52:53
+Sun/star cameras: capture ended 1405410774.242646931
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:53:02 UTC 2014
+Sun/star cameras: capture started 1405410783.312713685, Tue Jul 15 07:53:03 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:53:12 UTC 2014
+SEDI: camera returned image, 07:53:15
+SEDI: triggering GoQat camera for capture, 07:53:15
+IMU: querying IMU
+SEDI: camera returned image, 07:53:17
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:53:17 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:53:17 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.53.17
+SEDI: triggering GoQat camera for calibration_lamp, 07:53:17
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:53:22 UTC 2014
+Sun/star cameras: capture ended 1405410804.307769153
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:53:32 UTC 2014
+Sun/star cameras: capture started 1405410813.312685241, Tue Jul 15 07:53:33 UTC 2014
+800, 20, 100
+IMU: querying IMU
+SEDI: camera returned image, 07:53:38
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:53:38
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:53:42 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:53:52 UTC 2014
+IMU: querying IMU
+Sun/star cameras: capture ended 1405410835.178305418
+IMU: querying IMU
+SEDI: camera returned image, 07:54:00
+SEDI: triggering GoQat camera for capture, 07:54:00
+SEDI: camera returned image, 07:54:02
+SEDI: storing camera data
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:54:02 UTC 2014
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:54:02 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:54:02 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.54.02
+SEDI: triggering GoQat camera for calibration_lamp, 07:54:02
+Sun/star cameras: capture started 1405410843.312567797, Tue Jul 15 07:54:03 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:54:12 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:54:22 UTC 2014
+SEDI: camera returned image, 07:54:23
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 07:54:23
+Sun/star cameras: capture ended 1405410864.387701349
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:54:32 UTC 2014
+Sun/star cameras: capture started 1405410873.312726520, Tue Jul 15 07:54:33 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:54:42 UTC 2014
+SEDI: camera returned image, 07:54:45
+SEDI: triggering GoQat camera for capture, 07:54:45
+IMU: querying IMU
+SEDI: camera returned image, 07:54:47
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 07:54:47 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 07:54:47 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.07.54.47
+SEDI: triggering GoQat camera for calibration_lamp, 07:54:47
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 07:54:52 UTC 2014
+Sun/star cameras: capture ended 1405410894.714130488
+IMU: querying IMU
+-e 
+System startup at Tue Jul 15 08:12:14 UTC 2014
+
+[    8.379926] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.380742] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.381803] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.389858] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.392684] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.399364]  sdb: sdb1
+[    8.401751] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.404153] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.410235] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.001080] init: failsafe main process (1778) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+1-2.1.5.1
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:12:24 UTC 2014
+SEDI: Arduino communication PID is: 2337 2339
+SEDI: capture loop started
+SEDI: capture cycle started, Tue Jul 15 08:12:24 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.12.24
+SEDI: triggering GoQat camera for calibration_lamp, 08:12:24
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405411945.184659460, Tue Jul 15 08:12:25 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:12:34 UTC 2014
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:12:44 UTC 2014
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 08:12:45
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:12:45
+Startup: startup complete, all systems activated. Tue Jul 15 08:12:46 UTC 2014
+Comm: assembling data bundle, beginning transmission. Tue Jul 15 08:12:46 UTC 2014
+Housekeeping: assembling latest data
+Housekeeping: compressing sun/star images
+Sun/star cameras: capture ended 1405411966.301868137
+Housekeeping: compressing bundle
+Housekeeping: bundling complete
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:12:54 UTC 2014
+Thermal: Odroid at 38C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405411975.193211599, Tue Jul 15 08:12:55 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:13:04 UTC 2014
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 08:13:06
+SEDI: triggering GoQat camera for capture, 08:13:06
+SEDI: camera returned image, 08:13:08
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:13:09 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:13:09 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.13.09
+SEDI: triggering GoQat camera for calibration_lamp, 08:13:09
+IMU: querying IMU
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:13:14 UTC 2014
+IMU: querying IMU
+Sun/star cameras: capture ended 1405411996.687486109
+Comm: transmission completed. Tue Jul 15 08:13:17 UTC 2014
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:13:24 UTC 2014
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405412005.193243530, Tue Jul 15 08:13:25 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 08:13:30
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:13:30
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:13:34 UTC 2014
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:13:44 UTC 2014
+Thermal: Odroid at 39C, archived, timestamped Dua stream
+Sun/star cameras: capture ended 1405412025.794670082
+IMU: querying IMU
+SEDI: camera returned image, 08:13:51
+SEDI: triggering GoQat camera for capture, 08:13:51
+IMU: querying IMU
+SEDI: camera returned image, 08:13:53
+SEDI: storing camera data
+GPS: archived GPS data stream log. Tue Jul 15 08:13:54 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:13:54 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:13:54 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.13.54
+SEDI: triggering GoQat camera for calibration_lamp, 08:13:54
+Sun/star cameras: capture started 1405412035.193357461, Tue Jul 15 08:13:55 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:14:04 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:14:14 UTC 2014
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+SEDI: camera returned image, 08:14:15
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:14:15
+Sun/star cameras: capture ended 1405412055.977031679
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:14:24 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405412065.193318642, Tue Jul 15 08:14:25 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:14:34 UTC 2014
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 08:14:36
+SEDI: triggering GoQat camera for capture, 08:14:36
+SEDI: camera returned image, 08:14:39
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:14:39 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:14:39 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.14.39
+SEDI: triggering GoQat camera for calibration_lamp, 08:14:39
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:14:44 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+Sun/star cameras: capture ended 1405412086.962158903
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:14:54 UTC 2014
+Thermal: Odroid at 40C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405412095.193416031, Tue Jul 15 08:14:55 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 08:15:00
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:15:00
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:15:04 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:15:14 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+Sun/star cameras: capture ended 1405412116.659270000
+IMU: querying IMU
+SEDI: camera returned image, 08:15:21
+SEDI: triggering GoQat camera for capture, 08:15:21
+SEDI: camera returned image, 08:15:24
+SEDI: storing camera data
+GPS: archived GPS data stream log. Tue Jul 15 08:15:24 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:15:24 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:15:24 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.15.24
+SEDI: triggering GoQat camera for calibration_lamp, 08:15:24
+Sun/star cameras: capture started 1405412125.193330046, Tue Jul 15 08:15:25 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:15:34 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:15:44 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+SEDI: camera returned image, 08:15:45
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:15:45
+Sun/star cameras: capture ended 1405412145.968265556
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:15:54 UTC 2014
+Sun/star cameras: capture started 1405412155.193220560, Tue Jul 15 08:15:55 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:16:04 UTC 2014
+SEDI: camera returned image, 08:16:06
+SEDI: triggering GoQat camera for capture, 08:16:06
+IMU: querying IMU
+SEDI: camera returned image, 08:16:09
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:16:09 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:16:09 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.16.09
+SEDI: triggering GoQat camera for calibration_lamp, 08:16:09
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:16:14 UTC 2014
+Sun/star cameras: capture ended 1405412176.185079278
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:16:24 UTC 2014
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405412185.193529616, Tue Jul 15 08:16:25 UTC 2014
+800, 20, 100
+IMU: querying IMU
+SEDI: camera returned image, 08:16:30
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:16:30
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:16:34 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:16:44 UTC 2014
+IMU: querying IMU
+Sun/star cameras: capture ended 1405412206.994350710
+IMU: querying IMU
+SEDI: camera returned image, 08:16:51
+SEDI: triggering GoQat camera for capture, 08:16:51
+SEDI: camera returned image, 08:16:54
+SEDI: storing camera data
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:16:54 UTC 2014
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:16:54 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:16:54 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.16.54
+SEDI: triggering GoQat camera for calibration_lamp, 08:16:54
+Sun/star cameras: capture started 1405412215.193728005, Tue Jul 15 08:16:55 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:17:04 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:17:14 UTC 2014
+SEDI: camera returned image, 08:17:15
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:17:15
+Sun/star cameras: capture ended 1405412236.171707974
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:17:24 UTC 2014
+Sun/star cameras: capture started 1405412245.193724853, Tue Jul 15 08:17:25 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:17:34 UTC 2014
+SEDI: camera returned image, 08:17:36
+SEDI: triggering GoQat camera for capture, 08:17:36
+IMU: querying IMU
+SEDI: camera returned image, 08:17:39
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:17:39 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:17:39 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.17.39
+SEDI: triggering GoQat camera for calibration_lamp, 08:17:39
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:17:44 UTC 2014
+Sun/star cameras: capture ended 1405412266.804577988
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:17:54 UTC 2014
+Sun/star cameras: capture started 1405412275.193850284, Tue Jul 15 08:17:55 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 08:18:00
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:18:00
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:18:04 UTC 2014
+IMU: querying IMU
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:18:14 UTC 2014
+Sun/star cameras: capture ended 1405412296.567518377
+IMU: querying IMU
+SEDI: camera returned image, 08:18:21
+SEDI: triggering GoQat camera for capture, 08:18:22
+IMU: querying IMU
+SEDI: camera returned image, 08:18:24
+SEDI: storing camera data
+Thermal: Odroid at 45C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:18:24 UTC 2014
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:18:24 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:18:24 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.18.24
+SEDI: triggering GoQat camera for calibration_lamp, 08:18:24
+Sun/star cameras: capture started 1405412305.194076840, Tue Jul 15 08:18:25 UTC 2014
+800, 20, 100
+IMU: querying IMU
+-e 
+System startup at Tue Jul 15 08:19:15 UTC 2014
+
+[    8.119633] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.120383] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.121326] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.129485] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.132314] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.138992]  sdb: sdb1
+[    8.141501] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.143775] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.149864] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.241112] init: failsafe main process (1795) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+1-2.1.5.1
+GPS: archived GPS data stream log. Tue Jul 15 08:19:25 UTC 2014
+SEDI: Arduino communication PID is: 2344 2346
+SEDI: capture loop started
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+SEDI: capture cycle started, Tue Jul 15 08:19:25 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.19.25
+SEDI: triggering GoQat camera for calibration_lamp, 08:19:25
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405412366.475083980, Tue Jul 15 08:19:26 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:19:35 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:19:45 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 08:19:46
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:19:46
+Sun/star cameras: capture ended 1405412387.730608816
+Startup: startup complete, all systems activated. Tue Jul 15 08:19:47 UTC 2014
+Comm: assembling data bundle, beginning transmission. Tue Jul 15 08:19:47 UTC 2014
+Housekeeping: assembling latest data
+Housekeeping: compressing sun/star images
+Housekeeping: compressing bundle
+Housekeeping: bundling complete
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:19:55 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405412396.475761962, Tue Jul 15 08:19:56 UTC 2014
+IMU: querying IMU
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:20:05 UTC 2014
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 08:20:07
+SEDI: triggering GoQat camera for capture, 08:20:07
+SEDI: camera returned image, 08:20:10
+SEDI: storing camera data
+SEDI: capture directory confirmed on SSD 0
+SEDI: capture directory confirmed on SSD 1
+SEDI: capture cycle ended, Tue Jul 15 08:20:10 UTC 2014
+SEDI: capture cycle started, Tue Jul 15 08:20:10 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.20.10
+SEDI: triggering GoQat camera for calibration_lamp, 08:20:10
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:20:15 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+Sun/star cameras: capture ended 1405412417.398584488
+IMU: querying IMU
+Comm: transmission completed. Tue Jul 15 08:20:18 UTC 2014
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:20:25 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+Sun/star cameras: capture started 1405412426.475592812, Tue Jul 15 08:20:26 UTC 2014
+IMU: querying IMU
+800, 20, 100
+SEDI: camera returned image, 08:20:31
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:20:31
+-e 
+System startup at Tue Jul 15 08:21:07 UTC 2014
+
+[    8.124948] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.125696] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.126633] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.134799] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.137623] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.144306]  sdb: sdb1
+[    8.146814] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.149104] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.155181] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.610379] init: failsafe main process (1788) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+1-2.1.5.1
+GPS: archived GPS data stream log. Tue Jul 15 08:21:17 UTC 2014
+SEDI: Arduino communication PID is: 2340 2342
+SEDI: capture loop started
+SEDI: capture cycle started, Tue Jul 15 08:21:17 UTC 2014
+SEDI: turning lamp on
+Thermal: Odroid at 44C, archived, timestamped Dua stream
+SEDI: made working directory 15.08.21.17
+SEDI: triggering GoQat camera for calibration_lamp, 08:21:17
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405412478.937916002, Tue Jul 15 08:21:18 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:21:27 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:21:37 UTC 2014
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 08:21:39
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:21:39
+Sun/star cameras: capture ended 1405412499.818396845
+Startup: startup complete, all systems-e 
+System startup at Tue Jul 15 08:22:23 UTC 2014
+
+[    8.374433] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.375172] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.376343] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.384281] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.387101] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.393792]  sdb: sdb1
+[    8.396302] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.398621] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.404670] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.318754] init: failsafe main process (1787) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+1-2.1.5.1
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:22:32 UTC 2014
+SEDI: Arduino communication PID is: 2339 2341
+SEDI: capture loop started
+SEDI: capture cycle started, Tue Jul 15 08:22:32 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.22.32
+SEDI: triggering GoQat camera for calibration_lamp, 08:22:32
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405412554.054320441, Tue Jul 15 08:22:34 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:22:42 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:22:52 UTC 2014
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+IMU: querying IMU
+SEDI: camera returned image, 08:22:54
+SEDI: turning lamp off
+SEDI: triggering GoQat camera for calibration_nolamp, 08:22:54
+-e 
+System startup at Tue Jul 15 08:23:34 UTC 2014
+
+[    8.384617] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.385373] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.386557] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.394600] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.397326] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.403982]  sdb: sdb1
+[    8.406490] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.408767] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.414860] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.710065] init: failsafe main process (1768) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+1-2.1.5.1
+GPS: archived GPS data stream log. Tue Jul 15 08:23:44 UTC 2014
+SEDI: Arduino communication PID is: 2344 2346
+SEDI: capture loop started
+Thermal: Odroid at 44C, archived, timestamped Dua stream
+SEDI: capture cycle started, Tue Jul 15 08:23:44 UTC 2014
+SEDI: turning lamp on
+SEDI: made working directory 15.08.23.44
+SEDI: triggering GoQat camera for calibration_lamp, 08:23:44
+1-2.1.5.2
+1-2.1.5.3
+1-2.1.5.4
+Sun/star cameras: capture started 1405412625.402007918, Tue Jul 15 08:23:45 UTC 2014
+800, 20, 100
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:23:54 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+-e 
+System startup at Tue Jul 15 08:24:16 UTC 2014
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           -e 
+System startup at Tue Jul 15 08:25:13 UTC 2014
+
+[    8.139834] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.140694] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.141899] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.150216] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.152759] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.159440]  sdb: sdb1
+[    8.162073] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.164108] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.170191] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.812515] init: failsafe main process (1789) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:25:22 UTC 2014
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:25:32 UTC 2014
+Thermal: Odroid at 42C, archived, timesta-e 
+System startup at Tue Jul 15 08:26:53 UTC 2014
+
+[    8.254495] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.255242] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.256182] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.264852] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.267176] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.273856]  sdb: sdb1
+[    8.276616] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.278643] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.284819] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.452365] init: failsafe main process (1787) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:27:04 UTC 2014
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:27:14 UTC 2014
+Thermal: Odroid at 44C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:27:24 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:27:34 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:27:44 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:27:54 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:28:04 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:28:14 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                     -e 
+System startup at Tue Jul 15 08:29:08 UTC 2014
+
+[    8.120276] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.121019] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.122186] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.130130] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.132967] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.139635]  sdb: sdb1
+[    8.142264] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.144437] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.150519] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.716608] init: failsafe main process (1787) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+Thermal: Odroid at 45C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:29:18 UTC 2014
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:29:28 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:29:38 UTC 2014
+Thermal: Odroid at 41C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:29:48 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+-e 
+System startup at Tue Jul 15 08:30:25 UTC 2014
+
+[    8.119686] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.120422] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.121368] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.129530] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.132348] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.139037]  sdb: sdb1
+[    8.141675] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.143814] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.149920] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.377674] init: failsafe main process (1791) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+IMU: starting IMU capture
+IMU: querying IMU
+Thermal: Odroid at 43C, archived, timestamped Dua stream
+GPS: archived GPS data stream log. Tue Jul 15 08:30:35 UTC 2014
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:30:45 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:30:55 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+IMU: querying IMU
+GPS: archived GPS data stream log. Tue Jul 15 08:31:05 UTC 2014
+Thermal: Odroid at 42C, archived, timestamped Dua stream
+IMU: querying IMU
+-e 
+System startup at Tue Jul 15 08:31:24 UTC 2014
+
+-e 
+System startup at Tue Jul 15 08:32:57 UTC 2014
+
+[    6.351421] usb 1-2.1.5.3.4: config 1 interface 0 altsetting 0 bulk endpoint 0x82 has invalid maxpacket 1024
+[    6.351917] usb 1-2.1.5.3.4: New USB device found, idVendor=03c3, idProduct=120a
+[    6.351924] usb 1-2.1.5.3.4: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[    6.351930] usb 1-2.1.5.3.4: Product: ASI120MM
+[    6.351934] usb 1-2.1.5.3.4: Manufacturer: ZWOptical company  
+[    6.351939] usb 1-2.1.5.3.4: SerialNumber: 00000
+[    6.421430] usb 1-2.1.5.4.4: new high-speed USB device number 20 using s5p-ehci
+[    7.435626] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    7.436550] smsc95xx 1-2.1.1:1.0 eth0: link up, 10Mbps, half-duplex, lpa 0x0020
+[    9.380958] init: failsafe main process (1727) killed by TERM signal
+-e 
+
+Startup: initializing system...
+-e 
+System startup at Tue Jul 15 08:34:28 UTC 2014
+
+[    8.128339] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.129330] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.130598] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.138564] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.141377] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.148071]  sdb: sdb1
+[    8.150708] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.152742] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.158845] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.437808] init: failsafe main process (1784) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+-e 
+System startup at Tue Jul 15 08:36:23 UTC 2014
+
+[    8.380450] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.381496] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.382749] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.391305] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.393680] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.400294]  sdb: sdb1
+[    8.404801] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.405955] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.411723] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.537291] init: failsafe main process (1764) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+-e 
+System startup at Tue Jul 15 08:37:47 UTC 2014
+
+[    8.379721] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.380463] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.381566] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.389695] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.392391] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.399077]  sdb: sdb1
+[    8.401470] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.403896] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.409955] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    8.963800] init: failsafe main process (1782) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+-e 
+System startup at Tue Jul 15 08:39:07 UTC 2014
+
+[    8.374450] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.375198] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.376282] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.384678] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.387183] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.393808]  sdb: sdb1
+[    8.396442] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.398596] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.404704] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.032007] init: failsafe main process (1789) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+-e 
+System startup at Tue Jul 15 08:39:55 UTC 2014
+
+-e 
+System startup at Tue Jul 15 08:40:56 UTC 2014
+
+[    8.373530] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.374285] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.376150] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.384138] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.386903] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.393518]  sdb: sdb1
+[    8.396023] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.398342] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.404370] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.064296] init: failsafe main process (1723) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture
+-e 
+System startup at Tue Jul 15 08:43:16 UTC 2014
+
+[    8.123240] sd 3:0:0:0: [sdb] Mode Sense: 23 00 00 00
+[    8.123982] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.125561] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.133964] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.136506] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.143096]  sdb: sdb1
+[    8.145484] sd 3:0:0:0: [sdb] No Caching mode page found
+[    8.147961] sd 3:0:0:0: [sdb] Assuming drive cache: write through
+[    8.153986] sd 3:0:0:0: [sdb] Attached SCSI disk
+[    9.119632] init: failsafe main process (1729) killed by TERM signal
+-e 
+
+Startup: initializing system...
+Sys init: SSDs recognized by kernel, will now mount
+Sys init: mounting SSDs...
+Sys init: initializing GoQat SEDI camera...
+SEDI: killing any existing GoQat processes...
+SEDI: starting fresh GoQat instance
+Sys init: resetting ~/latestData
+Sys init: initializing Odroid-Arduino communication...
+Startup: system initialization complete
+Startup: beginning sanity checks
+Startup: ERR: Not enough sun cameras (counted 3)
+Startup: notice: ssd_0 is mounted, sun_camera directory exists
+Startup: notice: SSD write capability functioning normally
+Startup: notice: SEDI camera is ready
+Startup: notice: USB-serial converter is ready
+Startup: end of sanity checks
+Xlib:  extension "RANDR" missing on display ":99".
+Startup: beginning scientific capture

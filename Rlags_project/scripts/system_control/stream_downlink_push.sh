@@ -22,6 +22,6 @@ do
 
 	if [ $waitTime -gt 0 ] #if it's > 0
 	then
-		sleep $(echo $waitTime * 60 - $end + $start | bc) #question: what if $waitTime < end-start?
+		sleep $(echo "$waitTime * 60 - $end + $start" | bc) #question: what if $waitTime < end-start?
 	fi
 done

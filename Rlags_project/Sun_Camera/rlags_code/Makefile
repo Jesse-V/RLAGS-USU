@@ -15,10 +15,10 @@ LIBSPATH = -L../lib/$(platform) -I../include
 
 ifeq ($(ver), debug)
 DEFS = -D_LIN -D_DEBUG 
-CFLAGS = -g  -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH) $(LIBS) -lpthread  $(USB) -DGLIBC_20
+CFLAGS = -g -std=c++11 -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH) $(LIBS) -lpthread  $(USB) -DGLIBC_20
 else
 DEFS = -D_LIN 
-CFLAGS =  -O3 -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH) $(LIBS) -lpthread  $(USB) -DGLIBC_20
+CFLAGS =  -O3 -std=c++11 -I $(INCLIB) -L $(LDLIB) $(DEFS) $(COMMON) $(LIBSPATH) $(LIBS) -lpthread  $(USB) -DGLIBC_20
 endif
 
 ifeq ($(platform), x64)

@@ -54,5 +54,5 @@ do
 
 	echo "SEDI: capture cycle ended, "$(date)
 
-	sleep 2 #leaves time to control-C if need be
+	# sleep 5 #leaves time to control-C if need be
 done
