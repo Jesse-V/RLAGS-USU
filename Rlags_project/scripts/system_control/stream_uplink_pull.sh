@@ -42,4 +42,6 @@ waitForCommand()
 }
 
 cd ~/Rlags_project/scripts/communication
+rm -r uplink_in_stream
+touch uplink_in_stream
 tail -f uplink_in_stream | grep --line-buffered -E "*" | waitForCommand

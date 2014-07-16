@@ -1,6 +1,6 @@
 #include "highgui/highgui_c.h"
 #include "ASICamera.h"
-
+#include <thread>
 #include <iostream>
 
 int main()
@@ -21,28 +21,27 @@ int main()
 
 	bool autov;
 	setImageFormat(WIDTH, HEIGHT, 1, IMG_RAW8);
-	setValue(CONTROL_EXPOSURE, 800, true);
-	setValue(CONTROL_GAIN, 10, false);
-x
-	int exposure_us = getValue(CONTROL_EXPOSURE, &autov);
-	int gain = getValue(CONTROL_GAIN, &autov);
-	int max_gain = getMax(CONTROL_GAIN);
-	std::cout << exposure_us << ", " << gain << ", " << max_gain << std::endl;
+	setValue(CONTROL_EXPOSURE, 400, false);
+	setValue(CONTROL_GAIN, 35, false);
+
+	//int exposure_us = getValue(CONTROL_EXPOSURE, &autov);
+	//int gain = getValue(CONTROL_GAIN, &autov);
+	//int max_gain = getMax(CONTROL_GAIN);
+	//std::cout << exposure_us << ", " << gain << ", " << max_gain << std::endl;
 
 	IplImage *buffer = cvCreateImage(cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 1);
-
 	startCapture();
 
 	bool captured = false;
 	do
 	{
+		std::chrono::milliseconds(10);
 		captured = getImageData((unsigned char*)buffer->imageData, buffer->imageSize, -1);
 	} while (!captured);
 
 	cvSaveImage("/home/linaro/Rlags_project/scripts/sun_cameras/sun_cam_1.jpg", buffer);
 	stopCapture();
 	closeCamera();
-	// delete [] buffer;
 
 	return false;
 }
