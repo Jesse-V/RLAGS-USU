@@ -1,12 +1,12 @@
 #!/bin/bash
 
-sudo echo '1-2.1.5.1' | sudo tee /sys/bus/usb/drivers/usb/unbind
+sudo echo '1-2.1.2.1' | sudo tee /sys/bus/usb/drivers/usb/unbind
 sleep 0.25
-sudo echo '1-2.1.5.2' | sudo tee /sys/bus/usb/drivers/usb/unbind
+sudo echo '1-2.1.2.2' | sudo tee /sys/bus/usb/drivers/usb/unbind
 sleep 0.25
-sudo echo '1-2.1.5.3' | sudo tee /sys/bus/usb/drivers/usb/unbind
+sudo echo '1-2.1.2.3' | sudo tee /sys/bus/usb/drivers/usb/unbind
 sleep 0.25
-sudo echo '1-2.1.5.4' | sudo tee /sys/bus/usb/drivers/usb/unbind
+sudo echo '1-2.1.2.4' | sudo tee /sys/bus/usb/drivers/usb/unbind
 sleep 0.25
 
 while true
@@ -24,5 +24,5 @@ do
 
 	end=$(date +%s.%N)
 #echo $end - $start | bc
-	sleep $(echo 30 - $end + $start - 0.009 | bc)
+	sleep $(echo 45 - $end + $start - 0.009 | bc)
 done

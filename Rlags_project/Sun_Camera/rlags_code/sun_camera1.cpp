@@ -39,7 +39,7 @@ int main()
 		captured = getImageData((unsigned char*)buffer->imageData, buffer->imageSize, -1);
 	} while (!captured);
 
-	cvSaveImage("/home/linaro/Rlags_project/scripts/sun_cameras/sun_cam_1.jpg", buffer);
+	cvSaveImage("sun_cam_1.jpg", buffer);
 	stopCapture();
 	closeCamera();
 

@@ -19,10 +19,17 @@ int main()
 		return true;
 	}
 
+	int exposureTime;
+	bool autoExpose;
+	std::cin >> exposureTime;
+	std::cin >> autoExpose;
+
 	bool autov;
 	setImageFormat(WIDTH, HEIGHT, 1, IMG_RAW8);
-	setValue(CONTROL_EXPOSURE, 1500, true);
-	setValue(CONTROL_GAIN, 35, false);
+	setValue(CONTROL_EXPOSURE, exposureTime, autoExpose);
+	setValue(CONTROL_BRIGHTNESS, 5, false);
+	setValue(CONTROL_GAMMA, 50, false);
+	setValue(CONTROL_GAIN, 50, false);
 
 	//int exposure_us = getValue(CONTROL_EXPOSURE, &autov);
 	//int gain = getValue(CONTROL_GAIN, &autov);
@@ -39,7 +46,7 @@ int main()
 		captured = getImageData((unsigned char*)buffer->imageData, buffer->imageSize, -1);
 	} while (!captured);
 
-	cvSaveImage("/home/linaro/Rlags_project/scripts/star_camera/star_cam.jpg", buffer);
+	cvSaveImage("star_cam.jpg", buffer);
 	stopCapture();
 	closeCamera();
 
