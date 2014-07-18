@@ -45,6 +45,8 @@ re34='([+-]?\\d*\\.\\d+)(?![-+0-9\\.])' # Float 8
 re35='.*?'  # Non-greedy match on filler
 re36='([+-]?\\d*\\.\\d+)(?![-+0-9\\.])' # Float 9
 
+outFile = open("latestCC", "w")
+
 rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13+re14+re15+re16+re17+re18+re19+re20+re21+re22+re23+re24+re25+re26+re27+re28+re29+re30+re31+re32+re33+re34+re35+re36,re.IGNORECASE|re.DOTALL)
 m = rg.search(txt)
 if m:
@@ -58,3 +60,6 @@ if m:
     float8=m.group(8)
     float9=m.group(9)
     print float1+" "+float2+" "+float3+" "+float4+" "+float5+" "+float6+" "+float7+" "+float8+" "+float9+" "
+    outFile.write(float1+" "+float2+" "+float3+" "+float4+" "+float5+" "+float6+" "+float7+" "+float8+" "+float9+" ")
+
+outFile.close()
