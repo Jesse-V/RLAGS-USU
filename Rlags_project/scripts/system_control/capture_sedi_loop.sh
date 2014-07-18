@@ -53,6 +53,6 @@ do
 	rm -r $dirName
 
 	echo "SEDI: capture cycle ended, "$(date)
-
+	echo "UPTIME: "$(uptime)
 	# sleep 5 #leaves time to control-C if need be
 done
