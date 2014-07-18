@@ -57,4 +57,4 @@ if m:
     float7=m.group(7)
     float8=m.group(8)
     float9=m.group(9)
-    print float1+","+float2+","+float3+","+float4+","+float5+","+float6+","+float7+","+float8+","+float9
+    print float1+" "+float2+" "+float3+" "+float4+" "+float5+" "+float6+" "+float7+" "+float8+" "+float9+" "

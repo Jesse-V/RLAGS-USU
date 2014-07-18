@@ -72,11 +72,11 @@ while 1:
       c4=m.group(15)
       if c2 == 'N':
         if c4 == 'E':
-          print d1+d2+","+d3+d4+c1+int1+","+d5+d6+d7+","+d8+d9+c3+int2
+          print d1+d2+" "+d3+d4+c1+int1+" "+d5+d6+d7+" "+d8+d9+c3+int2
         else:
-          print d1+d2+","+d3+d4+c1+int1+",-"+d5+d6+d7+",-"+d8+d9+c3+int2
+          print d1+d2+" "+d3+d4+c1+int1+" -"+d5+d6+d7+" -"+d8+d9+c3+int2
       else:
         if c4 == 'E':
-          print "-"+d1+d2+",-"+d3+d4+c1+int1+","+d5+d6+d7+","+d8+d9+c3+int2
+          print "-"+d1+d2+" -"+d3+d4+c1+int1+" "+d5+d6+d7+" "+d8+d9+c3+int2
         else:
-          print "-"+d1+d2+",-"+d3+d4+c1+int1+",-"+d5+d6+d7+",-"+d8+d9+c3+int2
+          print "-"+d1+d2+" -"+d3+d4+c1+int1+" -"+d5+d6+d7+" -"+d8+d9+c3+int2
