@@ -122,7 +122,7 @@ void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_
   // Converts the date to J (Julian Epoch - 2000, to within a minute or so)
   double julianDay = juliandate(day, gmt);
 
-  std::cout << juliandate << std::endl;
+  // std::cout << juliandate << std::endl;
 
   double dDay = (juliandate(day, gmt) - 2456894.0000);
   double RAsun = 153.263 + dDay*0.922;                           // unit of degrees
