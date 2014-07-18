@@ -338,12 +338,12 @@ void loop() {
 
 void thermalActive() {
   sensors_control.requestTemperatures();
-  thermalCtrl(sensors_control, DTS_5, RELAY_CTRL_CH1, relayStateCh1, degC_5, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
-  thermalCtrl(sensors_control, DTS_6, RELAY_CTRL_CH2, relayStateCh2, degC_6, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
-  thermalCtrl(sensors_control, DTS_7, RELAY_CTRL_CH3, relayStateCh3, degC_7, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
-  thermalCtrl(sensors_control, DTS_8, RELAY_CTRL_CH4, relayStateCh4, degC_8, LOWER_HYST_BOUND1, UPPER_HYST_BOUND1);
-  thermalCtrl(sensors_control, DTS_9, RELAY_CTRL_CH5, relayStateCh5, degC_9, LOWER_HYST_BOUND2, UPPER_HYST_BOUND2);
-  thermalCtrl(sensors_control, DTS_10, RELAY_CTRL_CH6, relayStateCh6, degC_10, LOWER_HYST_BOUND2, UPPER_HYST_BOUND2);
+  thermalCtrl1(sensors_control, DTS_5, RELAY_CTRL_CH1, relayStateCh1, degC_5);
+  thermalCtrl1(sensors_control, DTS_6, RELAY_CTRL_CH2, relayStateCh2, degC_6);
+  thermalCtrl1(sensors_control, DTS_7, RELAY_CTRL_CH3, relayStateCh3, degC_7);
+  thermalCtrl1(sensors_control, DTS_8, RELAY_CTRL_CH4, relayStateCh4, degC_8);
+  thermalCtrl2(sensors_control, DTS_9, RELAY_CTRL_CH5, relayStateCh5, degC_9);
+  thermalCtrl2(sensors_control, DTS_10, RELAY_CTRL_CH6, relayStateCh6, degC_10);
 }
 
 void thermalInfo(DallasTemperature dataLine, DeviceAddress& dts, float* arr)
@@ -361,26 +361,64 @@ void thermalInfo(DallasTemperature dataLine, DeviceAddress& dts, float* arr)
   }
 }
 
-void thermalCtrl(DallasTemperature dataLine, DeviceAddress& dts, int pin, int relayStateCh, float* arr, float lower_hyst_bound, float upper_hyst_bound)
+void thermalCtrl1(DallasTemperature dataLine, DeviceAddress& dts, int pin, int relayStateCh, float* arr)
 {
   float tempC = dataLine.getTempC(dts) + retrieveOffset(dts);
 
   if (tempC != ERROR_TEMP) {
     addAverage(arr, tempC);
     tempC = getAverage(arr);
-    if (tempC <= lower_hyst_bound) {
+    if (tempC <= LOWER_HYST_BOUND1) {
       relayStateCh = HIGH;
       Serial.print("1\t");
     }
-    else if (tempC >= upper_hyst_bound) {
+    else if (tempC >= UPPER_HYST_BOUND1) {
       relayStateCh = LOW;
       Serial.print("0\t");
     }
-    else if (tempC < upper_hyst_bound && tempC > lower_hyst_bound) {
+    else if (tempC < UPPER_HYST_BOUND1 && tempC > LOWER_HYST_BOUND1) {
       if (relayStateCh == LOW) {
+        relayStateCh = LOW;
         Serial.print("0\t");
       }
       else {
+        relayStateCh = HIGH;
+        Serial.print("1\t");
+      }
+    }
+  }
+  else {
+    relayStateCh = LOW;
+    Serial.print("0\t");
+    Serial.print("Error\t");
+  }
+  digitalWrite(pin, relayStateCh);
+  Serial.print(tempC);
+  Serial.print("\t");
+}
+
+void thermalCtrl2(DallasTemperature dataLine, DeviceAddress& dts, int pin, int relayStateCh, float* arr)
+{
+  float tempC = dataLine.getTempC(dts) + retrieveOffset(dts);
+
+  if (tempC != ERROR_TEMP) {
+    addAverage(arr, tempC);
+    tempC = getAverage(arr);
+    if (tempC <= LOWER_HYST_BOUND2) {
+      relayStateCh = HIGH;
+      Serial.print("1\t");
+    }
+    else if (tempC >= UPPER_HYST_BOUND2) {
+      relayStateCh = LOW;
+      Serial.print("0\t");
+    }
+    else if (tempC < UPPER_HYST_BOUND2 && tempC > LOWER_HYST_BOUND2) {
+      if (relayStateCh == LOW) {
+        relayStateCh = LOW;
+        Serial.print("0\t");
+      }
+      else {
+        relayStateCh = HIGH;
         Serial.print("1\t");
       }
     }

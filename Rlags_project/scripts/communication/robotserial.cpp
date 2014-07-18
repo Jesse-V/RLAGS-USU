@@ -98,38 +98,47 @@ int main(int argc, char *argv[])
     std::stringstream fileName;
     time_t timer;
     struct tm* y2k;
+    struct tm* now;
     time (&timer);
     y2k = localtime(&timer);
+
 	fileName << "RLAGS_Data/RLAGS_" << y2k->tm_mon << "_" << y2k->tm_mday << "_" << y2k->tm_hour << "_" << y2k->tm_min << "_" << y2k->tm_sec << ".txt";
-	while(!shouldTerminate) {
+	while(!shouldTerminate)
+	{
 		strcpy(dat, "00000000:\0");
 		//gets(use);
 //		rc = serialport_write(fd, dat);
   //          		if(rc==-1) return -1;
 	 	//printf("Waiting until UART buffer clears: %d\n", tcdrain(fd));
 	 	n = serialport_read_until(fd, buf, ':');
-     	printf("%s", buf);
+
+		time(&timer);
+		now = localtime(&timer);
+		printf("%s", buf);
+		std::cout << "  {{" << now->tm_mday << "." << now->tm_hour << "." << now->tm_min << "." << now->tm_sec << "}}";
+
 		outFile.open(fileName.str().c_str(), std::ofstream::out | std::ofstream::app);
 		outFile << buf;
 		outFile.close();
-        if(angleUpdated)
-        {
-            // sleep(2);
-            // tcflush( fd, TCIFLUSH );
-            serialport_writebyte(fd, servoAngle);
-            angleUpdated = false;
-            // if(blah >= 180)
-            //     blah = 0;
-            // else
-            //     blah += 45;
-            // update = false;
-        }
 
+		if(angleUpdated)
+		{
+            		// sleep(2);
+            		// tcflush( fd, TCIFLUSH );
+            		serialport_writebyte(fd, servoAngle);
+            		angleUpdated = false;
+            		// if(blah >= 180)
+            		//     blah = 0;
+            		// else
+            		//     blah += 45;
+            		// update = false;
+        	}
 
 		usleep(1000);
 //         	printf("wrote %d bytes, read %d bytes: %s\n", rc, n, buf);
 	}
-    t.join();
+
+	t.join();
 	close(fd);
 
     exit(EXIT_SUCCESS);
@@ -160,7 +169,7 @@ void getAngle()
         {
             if(newAngle == 200 || newAngle == 201)
             {
-                printf("Changing the calibration lamp states\n");
+                //printf("Changing the calibration lamp states\n");
                 servoAngle = newAngle;
                 angleUpdated = true;
             }
@@ -176,11 +185,6 @@ void getAngle()
             servoAngle = newAngle;
             angleUpdated = true;
         }
-        // }
-        // else
-        // {
-        //     printf("\nMust be angle between 0-180 degrees\n");
-        // }
     }
 }
 

@@ -22,8 +22,8 @@
 #define RELAY_CTRL_CH8 9 // thermalControl -> Arduino pin 9
 
 #define ERROR_TEMP -127.00
-#define LOWER_HIST_BOUND 29.5
-#define UPPER_HIST_BOUND 30.5
+#define LOWER_HIST_BOUND 20.5
+#define UPPER_HIST_BOUND 21.5
 
 // setup a oneWire instance to communicate with any OneWire devices
 OneWire oneWire_etalon(ONE_WIRE_BUS1);
