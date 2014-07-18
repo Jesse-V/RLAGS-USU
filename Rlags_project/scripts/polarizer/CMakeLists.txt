@@ -7,3 +7,4 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 # add the executable
 add_executable(polarizer polarizerAlan.cpp)
+file(COPY ${CMAKE_SOURCE_DIR}/updatePolarizer.sh DESTINATION ${CMAKE_BINARY_DIR}/)
