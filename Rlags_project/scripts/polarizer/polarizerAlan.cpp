@@ -15,9 +15,9 @@ int main(int argc, char const *argv[])
   Degree lat(atoi(argv[7]), atof(argv[8]));
   Degree lon(atoi(argv[9]), atof(argv[10]));
   Matrix_3x3d IMU;
-  IMU <<  atoi(argv[11]),atoi(argv[12]),atoi(argv[13]),
-          atoi(argv[14]),atoi(argv[15]),atoi(argv[16]),
-          atoi(argv[17]),atoi(argv[18]),atoi(argv[19]);
+  IMU <<  atof(argv[11]),atof(argv[12]),atof(argv[13]),
+          atof(argv[14]),atof(argv[15]),atof(argv[16]),
+          atof(argv[17]),atof(argv[18]),atof(argv[19]);
   // GMT gmt(10, 10, 10);
   // Day date(2014, 06, 18);
   // Degree lat(50, 30.5);
@@ -100,13 +100,30 @@ double degMin2DecDeg(Degree val)
 void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_3x3d IMU)
 {
 
+  // std::cout << "Lat Degrees: " << lat.degrees << std::endl;
+  // std::cout << "Lat Min: " << lat.min << std::endl;
+  // std::cout << "lon Degrees: " << lon.degrees << std::endl;
+  // std::cout << "lon Min: " << lon.min << std::endl;
+  // std::cout << "GMT Hr: " << gmt.hr << std::endl;
+  // std::cout << "GMT Min: " << gmt.min << std::endl;
+  // std::cout << "GMT Sec: " << gmt.sec << std::endl;
+  // std::cout << "Date Year: " << day.year << std::endl;
+  // std::cout << "Date Month: " << day.month << std::endl;
+  // std::cout << "Date Day: " << day.day << std::endl;
+  // std::cout << IMU << std::endl; 
+
   double Lon = degMin2DecDeg(lon);
   double Lat = degMin2DecDeg(lat);
+
+  // std::cout << Lat << "   " << Lon << std::endl;
 
   // SECTION 1: Finding the sun in Earth-Centered Inertial (ECI) coordinates
 
   // Converts the date to J (Julian Epoch - 2000, to within a minute or so)
   double julianDay = juliandate(day, gmt);
+
+  std::cout << juliandate << std::endl;
+
   double dDay = (juliandate(day, gmt) - 2456894.0000);
   double RAsun = 153.263 + dDay*0.922;                           // unit of degrees
   double DECsun = 10.991 - dDay*0.339;                           // unit of degrees
@@ -150,11 +167,15 @@ void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_
 
   Matrix_3x1d sunP = Mp * IMU * sunM;
 
+  // std::cout << sunP << std::endl;
+
   // calculate the polarizer rotation angle and the corresponding
   // actuator position code
 
   double phi = atan2(sunP[0],sunP[1])*180/M_PI;  //units of degrees
   double dPhi = fmod(167.5-phi,180);
+
+  // std::cout << dPhi << std::endl;
 
   double CODE = 0;
   if (dPhi < 92.5)
