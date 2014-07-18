@@ -1,7 +1,7 @@
 % lat = 41.7378;
 % lon = 111.8308;
-% day = [2014,8,1];
-% GMT = [00,30,00];
+% day = [2014,7,17];
+% GMT = [11,30,00];
 % imu = [0,1,0;1,0,0;0,0,-1];
 function [CODE] = PolarizerAngle(Lat,Lon,GMT,Day,IMU)
 % RLAGS polarizer control algorithm
@@ -27,6 +27,7 @@ RAsun = RAsun*pi/180;
 DECsun = DECsun*pi/180;
 LST = LST*pi/12;
 magDec = magDec*pi/180;
+%vpa(pi);
 
 % construct sun vector, equatorial NED coordinate system
 sunE = [sin(DECsun); -cos(DECsun)*sin(LST-RAsun); -cos(DECsun)*cos(LST-RAsun)];

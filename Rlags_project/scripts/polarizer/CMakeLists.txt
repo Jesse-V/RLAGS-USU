@@ -6,4 +6,4 @@ include_directories("/usr/local/include/eigen3")
 include_directories(${CMAKE_SOURCE_DIR})
 
 # add the executable
-add_executable(polarizer polarizer.cpp)
+add_executable(polarizer polarizerAlan.cpp)
