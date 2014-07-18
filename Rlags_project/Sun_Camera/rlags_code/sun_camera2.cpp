@@ -21,7 +21,7 @@ int main()
 
 	bool autov;
 	setImageFormat(WIDTH, HEIGHT, 1, IMG_RAW8);
-	setValue(CONTROL_EXPOSURE, 400, false);
+	setValue(CONTROL_EXPOSURE, 400, true);
 	setValue(CONTROL_GAIN, 35, false);
 
 	//int exposure_us = getValue(CONTROL_EXPOSURE, &autov);

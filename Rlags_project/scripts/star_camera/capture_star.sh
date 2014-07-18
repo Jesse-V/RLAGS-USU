@@ -14,19 +14,19 @@ cp star_cam.jpg /home/linaro/latestData/
 mv star_cam.jpg star_cam.$time.auto.jpg
 sleep 0.2
 
-#echo "300"
-echo "300 0" | sudo ./get_star_image
-mv star_cam.jpg star_cam.$time.300.jpg
+#echo "1"
+echo "10 0" | sudo ./get_star_image
+mv star_cam.jpg star_cam.$time.10.jpg
 sleep 0.2
 
-#echo "500"
-echo "500 0" | sudo ./get_star_image
-mv star_cam.jpg star_cam.$time.500.jpg
+#echo "5"
+echo "25 0" | sudo ./get_star_image
+mv star_cam.jpg star_cam.$time.25.jpg
 sleep 0.2
 
-#echo "700"
-echo "700 0" | sudo ./get_star_image
-mv star_cam.jpg star_cam.$time.700.jpg
+#echo "10"
+echo "50 0" | sudo ./get_star_image
+mv star_cam.jpg star_cam.$time.50.jpg
 sleep 0.2
 
 echo '1-2.1.2.4' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null

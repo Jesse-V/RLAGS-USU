@@ -1,15 +1,19 @@
 #!/bin/bash
 
-echo "getting latest gps data"
-
 gps=$(cat ../../gps/latestGps)
 
 cd ../../imu/build/
-ls
 ./get_imu_data.sh
 imu=$(cat new_cc_data.txt | python parseCC.py)
 
-cd ../../polarizer/build/s
+cd ../../polarizer/build/
 
-echo ${gps}
-echo ${imu}
+year=$(date +'%Y')
+month=$(date +'%m')
+day=$(date +'%d')
+hour=$(date +'%H')
+min=$(date +'%M')
+sec=$(date +'%S')
+
+angle=$(./polarizer ${year} ${month} ${day} ${hour} ${min} ${sec} ${gps} ${imu})
+echo $angle >> ~/Rlags_project/scripts/communication/build/serial_input
