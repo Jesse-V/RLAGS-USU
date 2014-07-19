@@ -16,4 +16,6 @@ min=$(date +'%M')
 sec=$(date +'%S')
 
 angle=$(./polarizer ${year} ${month} ${day} ${hour} ${min} ${sec} ${gps} ${imu})
+#echo ${year} ${month} ${day} ${hour} ${min} ${sec} ${gps} ${imu}
+echo $angle
 echo $angle >> ~/Rlags_project/scripts/communication/build/serial_input

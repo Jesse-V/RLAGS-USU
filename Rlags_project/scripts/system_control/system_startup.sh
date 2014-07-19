@@ -58,6 +58,7 @@ echo "Startup: beginning scientific capture"
 #./capture_imu_loop.sh &>> ~/latestData/status.log &	  #IMU querying and archiving
 #./capture_gps_loop.sh &>> ~/latestData/status.log &	  #Periodically archive GPS data stream
 ./capture_thermal_loop.sh &>> ~/latestData/status.log &  #Timestamp and archive thermal data
+#calibrate_polarizer_loop.sh #keep the polarizer calibrated properly
 
 #wait until star/sun images come in, then we have something
 while [ ! -f ~/latestData/star_cam.jpg ];
