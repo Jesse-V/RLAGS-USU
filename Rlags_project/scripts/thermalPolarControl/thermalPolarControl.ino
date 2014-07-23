@@ -109,10 +109,10 @@ float degC_23[3] = {0, 0, 0};
 int relayStateCh1, relayStateCh2, relayStateCh3, relayStateCh4,
     relayStateCh5, relayStateCh6; // relayStateCh7, relayStateCh8;
 
-int runningChange = 0;
-int lastAngle = 0;
-bool waitAngleFlag = false;
-int angleWaitCount = 0;
+//int runningChange = 0;
+//int lastAngle = 0;
+//bool waitAngleFlag = false;
+//int angleWaitCount = 0;
 
 
 void setup() {
@@ -290,46 +290,48 @@ void loop() {
     byte servoAngle = Serial.read();
     if(servoAngle <= 180 && servoAngle >= 0)
     {
-      if(waitAngleFlag)
-      {
-        angleWaitCount--;
-        if(angleWaitCount <= 0)
-        {
-          waitAngleFlag = false;
-        }
-      }
-      else
-      {
-        Serial.print("\t");
-        runningChange = abs(servoAngle - lastAngle);
-        if(runningChange > 170)
-        {
-          waitAngleFlag = true;
-          angleWaitCount = 3;
-          lastAngle = servoAngle;
-          setServoAngle(servoAngle);
-        }
-        else
-        {
-          lastAngle = servoAngle;
-          setServoAngle(servoAngle);
-        }
-        Serial.print(servoAngle);
-      }
+//      if(waitAngleFlag)
+//      {
+//        angleWaitCount--;
+//        if(angleWaitCount <= 0)
+//        {
+//          waitAngleFlag = false;
+//        }
+//      }
+//      else
+//      {
+//        Serial.print("\t");
+//        runningChange = abs(servoAngle - lastAngle);
+//        if(runningChange > 170)
+//        {
+//          waitAngleFlag = true;
+//          angleWaitCount = 3;
+//          lastAngle = servoAngle;
+//          setServoAngle(servoAngle);
+//        }
+//        else
+//        {
+//          lastAngle = servoAngle;
+//          setServoAngle(servoAngle);
+//        }
+        //Serial.print(servoAngle);
+        servoAngle = 0;
+        setServoAngle(servoAngle);
+//      }
     }
 
     else if(servoAngle == 200)
     {
-      Serial.print("\t");
+      //Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, HIGH);
-      Serial.print("ON");
+      //Serial.print("ON");
     }
 
     else if(servoAngle == 201)
     {
-      Serial.print("\t");
+      //Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, LOW);
-      Serial.print("OFF");
+      //Serial.print("OFF");
     }
   }
 

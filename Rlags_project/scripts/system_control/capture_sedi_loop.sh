@@ -5,14 +5,18 @@ commPID=$(./get_arduino_comm_pid.sh)
 echo "SEDI: Arduino communication PID is: "$commPID
 
 cd ~/Rlags_project/scripts/sedi_camera
+rm -rf workingDir
+mkdir workingDir
+cd workingDir
+
 echo "SEDI: capture loop started"
 
-while true
-do
+# takes one argument: the capture trial number, 1, 2, or 3
+function startCycle() {
 	echo "SEDI: capture cycle started, "$(date)
 
 	#get current time, this will be our working directory
-	dirName=$(date +"%d.%H.%M.%S")
+	dirName=$(date +"%d.%H.%M.%S")_$1
 
 	echo "SEDI: turning lamp on"
 	echo 200 >> ~/Rlags_project/scripts/communication/build/serial_input
@@ -27,7 +31,7 @@ do
 	sudo ./capture.sh calibration_watchfile calibration_nolamp $dirName
 
 	#scientific capture
-	sudo ./capture.sh exposure_watchfile capture $dirName
+	sudo ./capture.sh exposure_watchfile$1 capture_trial$1 $dirName
 
 	echo "SEDI: storing camera data"
 	(cd ~/Rlags_project/scripts; ./getDataLock.sh) #request mutex on latestData/
@@ -55,4 +59,15 @@ do
 	echo "SEDI: capture cycle ended, "$(date)
 	echo "UPTIME: "$(uptime)
 	# sleep 5 #leaves time to control-C if need be
+}
+
+while true
+do
+	# run each calibration_lamp, calibration_nolamp, capture cycle
+	# each scientific capture is one of three possible watchfiles
+	# Landon wanted a consistent integration time for calibration, but 120/180/240 seconds for capture
+	# these values have been stored to the Odroid in the appropriate watchfile
+	startCycle 1
+	startCycle 2
+	startCycle 3
 done

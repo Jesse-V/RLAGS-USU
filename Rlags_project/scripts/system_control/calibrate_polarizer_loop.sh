@@ -2,16 +2,25 @@
 
 echo "Polarizer: beginning continue polarizer adjustments"
 cd ~/Rlags_project/scripts/polarizer/build
-counter=1
+start=$(date +%d.%H.%M.%S)
+
+counter=0
 
 while true
 do
-	angle=$(./updatePolarizer.sh)
-	((counter++))
+	./updatePolarizer.sh > ~/latestData/polarizerInfo.txt
 
-	if [[ $((counter % 5)) -eq 0 ]]; then
-		echo "Polarizer: set to "$angle", "$(date)
-	fi
+	cat ~/latestData/polarizerInfo.txt >> /media/ssd_0/polarizer/stream.$start.txt
+	cat ~/latestData/polarizerInfo.txt >> /media/ssd_1/polarizer/stream.$start.txt
+
+	cat ~/latestData/polarizerInfo.txt
+
+#	angle=$(tail -1 ~/latestData/polarizerInfo.txt)
+#	((counter++))
+
+#	if [[ $((counter % 5)) -eq 0 ]]; then
+#		echo "Polarizer: set to "$angle", "$(date)
+#	fi
 
 	sleep 2.5
 done

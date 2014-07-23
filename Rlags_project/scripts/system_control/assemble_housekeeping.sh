@@ -6,9 +6,9 @@ echo "Housekeeping: assembling latest data"
 cd ~/latestData/
 mkdir housekeeping/
 
-#gemeral assembly, grab last bits of logs
+#general assembly, grab last bits of logs
 echo $date > housekeeping/timestamp.txt
-tail -75 status.log > housekeeping/latestEvents.txt
+tail -100 status.log > housekeeping/latestEvents.txt
 echo "**************************" >> housekeeping/latestEvents.txt
 sudo tail -50 /root/GoQat/log.txt >> housekeeping/latestEvents.txt
 
@@ -19,6 +19,8 @@ if [ -f ~/latestData/sedi/capture.fit ]; then
 
 	cp sedi/*.fit housekeeping/
 fi
+
+cp polarizerInfo.txt housekeeping/polarizerInfo.txt
 
 echo "Housekeeping: compressing sun/star images"
 convert star_cam.jpg  -resize 640x480 housekeeping/star_cam.jpg
