@@ -2,7 +2,7 @@
 
 echo "Polarizer: beginning continue polarizer adjustments"
 cd ~/Rlags_project/scripts/polarizer/build
-start=$(date +%d.%H.%M.%S)
+start=$(date +%s.%N)
 
 counter=0
 

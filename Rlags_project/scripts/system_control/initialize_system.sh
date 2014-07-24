@@ -29,5 +29,21 @@ rm -f serial_input ../serial_output
 touch serial_input ../serial_output
 tail -f serial_input | grep --line-buffered -E "*" | ./serial &> ../serial_output &
 
-echo "Sys init: setting baudrate on GPS (ttyUSB0) link..."
+echo "Sys init: setting baudrate for GPS (ttyUSB0) link..."
 sudo stty -F /dev/ttyUSB0 600
+
+echo "Sys init: setting baudrate for RX (ttyUSB1) uplink..."
+sudo stty -F /dev/ttyUSB1 1200
+
+echo "Sys init: setting baudrate for TX (ttyUSB2) downlink..."
+sudo stty -F /dev/ttyUSB2 115200
+
+echo "Sys init: archiving IMU timestamp..."
+cd ~/Rlags_project/scripts/imu/build
+./get_imu_data.sh
+now=$(date +%s.%N)
+cat new_cc_data.txt >> /media/ssd_0/time/imu_cc_$now.txt
+cat new_d2_data.txt >> /media/ssd_0/time/imu_d2_$now.txt
+cat new_cc_data.txt >> /media/ssd_1/time/imu_cc_$now.txt
+cat new_d2_data.txt >> /media/ssd_1/time/imu_d2_$now.txt
+

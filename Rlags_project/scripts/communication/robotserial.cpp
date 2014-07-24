@@ -112,10 +112,8 @@ int main(int argc, char *argv[])
 	 	//printf("Waiting until UART buffer clears: %d\n", tcdrain(fd));
 	 	n = serialport_read_until(fd, buf, ':');
 
-		time(&timer);
-		now = localtime(&timer);
 		printf("%s", buf);
-		std::cout << "  {{" << now->tm_mday << "." << now->tm_hour << "." << now->tm_min << "." << now->tm_sec << "}}";
+		std::cout << "  {{" << time(&timer) << "}}";
 
 		outFile.open(fileName.str().c_str(), std::ofstream::out | std::ofstream::app);
 		outFile << buf;

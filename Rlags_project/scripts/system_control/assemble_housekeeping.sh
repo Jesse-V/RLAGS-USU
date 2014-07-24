@@ -5,35 +5,30 @@ echo "Housekeeping: assembling latest data"
 
 cd ~/latestData/
 mkdir housekeeping/
+touch housekeeping/bundle.txt
 
-#general assembly, grab last bits of logs
-echo $date > housekeeping/timestamp.txt
-tail -100 status.log > housekeeping/latestEvents.txt
-echo "**************************" >> housekeeping/latestEvents.txt
-sudo tail -50 /root/GoQat/log.txt >> housekeeping/latestEvents.txt
+#timestamp, log file + temperature + IMU + GPS
+echo "****BEGIN****"		>> housekeeping/bundle.txt
+echo $(date) 			>> housekeeping/bundle.txt
+echo $(uptime) 			>> housekeeping/bundle.txt
+echo -e "\n****EVENTS***" 	>> housekeeping/bundle.txt
+tail -100 status.log		>> housekeeping/bundle.txt
+echo -e "\n****GOQAT****" 	>> housekeeping/bundle.txt
+sudo tail -40 /root/GoQat/log.txt >> housekeeping/bundle.txt
+echo -e "\n****TEMPS****" 	>> housekeeping/bundle.txt
+cat odroidTemperature.txt 	>> housekeeping/bundle.txt
+echo ""				>> housekeeping/bundle.txt
+cat thermal_sensors.txt 	>> housekeeping/bundle.txt
+echo -e "\n*****IMU*****"	>> housekeeping/bundle.txt
+cat cc_imu.txt			>> housekeeping/bundle.txt
+cat d2_imu.txt			>> housekeeping/bundle.txt
+echo -e "\n*****GPS*****"	>> housekeeping/bundle.txt
+cat gpsData.txt			>> housekeeping/bundle.txt
+echo -e "\n*****END*****"	>> housekeeping/bundle.txt
 
-#if they exist, truncate SEDI images to save space
-if [ -f ~/latestData/sedi/capture.fit ]; then
-	echo "Housekeeping: preparing SEDI .fit images"
-	cp -r sedi/*.txt housekeeping/ #move all housekeeping data files
+#cp polarizerInfo.txt housekeeping/polarizerInfo.txt
 
-	cp sedi/*.fit housekeeping/
-fi
-
-cp polarizerInfo.txt housekeeping/polarizerInfo.txt
-
-echo "Housekeeping: compressing sun/star images"
-convert star_cam.jpg  -resize 640x480 housekeeping/star_cam.jpg
-convert sun_cam_0.jpg -resize 640x480 housekeeping/sun_cam_0.jpg
-convert sun_cam_1.jpg -resize 640x480 housekeeping/sun_cam_1.jpg
-convert sun_cam_2.jpg -resize 640x480 housekeeping/sun_cam_2.jpg
-
-echo "Housekeeping: compressing bundle"
-
-cd housekeeping/
-tar -cjf ../bundle.tar.bz2 *
-cd ..
-
+cp housekeeping/bundle.txt bundle.txt
 rm -r housekeeping/
 
 (cd ~/Rlags_project/scripts; ./releaseDataLock.sh) #release mutex on latestData/

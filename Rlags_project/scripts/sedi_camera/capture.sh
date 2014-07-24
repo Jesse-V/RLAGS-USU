@@ -10,17 +10,17 @@ if [ ! -d $3 ]; then
 	echo "SEDI: made working directory "$3
 fi
 
-echo "SEDI: triggering GoQat camera for "$2", "$(date +"%H:%M:%S")
-cp $1 /home/my_watch
-cp $1 $(pwd)/$3/
-startTime=$(date +"%d.%H.%M.%S")
+echo "SEDI: triggering GoQat camera for "$2", "$(date +%H:%M:%S)
+cp ../$1 /home/my_watch
+cp ../$1 $(pwd)/$3/
+startTime=$(date +"%s.%N")
 
 while [ ! -f /root/GoQat/ccd_display.fit ];
 do
 	sleep 0.1
 done
 
-endTime=$(date +"%d.%H.%M.%S")
+endTime=$(date +"%s.%N")
 echo "SEDI: camera returned image, "$(date +"%H:%M:%S")
 
 #move .fit file into directory

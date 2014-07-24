@@ -1,6 +1,6 @@
 #!/bin/bash
 
-time=$(date +%d.%H.%M.%S)
+time=$(date +%s.%N)
 
 distributeCommand()
 {

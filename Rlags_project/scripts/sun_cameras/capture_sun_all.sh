@@ -4,7 +4,7 @@ cd /home/linaro/Rlags_project/scripts/sun_cameras/
 echo '1-2.1.2.1' | sudo tee /sys/bus/usb/drivers/usb/bind > /dev/null
 
 sleep 0.5
-time0=$(date +%d.%H.%M.%S)
+time0=$(date +%s.%N)
 #echo "sun0 cap"
 sudo ./get_sun0_image
 #echo "end"
@@ -17,7 +17,7 @@ echo '1-2.1.2.1' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null
 echo '1-2.1.2.2' | sudo tee /sys/bus/usb/drivers/usb/bind > /dev/null
 
 sleep 0.5
-time1=$(date +%d.%H.%M.%S)
+time1=$(date +%s.%N)
 #echo "sun1 cap"
 sudo ./get_sun1_image
 #echo "end"
@@ -30,7 +30,7 @@ echo '1-2.1.2.2' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null
 echo '1-2.1.2.3' | sudo tee /sys/bus/usb/drivers/usb/bind > /dev/null
 
 sleep 0.5
-time2=$(date +%d.%H.%M.%S)
+time2=$(date +%s.%N)
 #echo "sun2 cap"
 sudo ./get_sun2_image
 #echo "end"
@@ -44,12 +44,12 @@ echo '1-2.1.2.3' | sudo tee /sys/bus/usb/drivers/usb/unbind > /dev/null
 sudo cp sun_cam_*.jpg /home/linaro/latestData/
 (cd ~/Rlags_project/scripts; ./releaseDataLock.sh) #release mutex on latestData/
 
-sudo mv sun_cam_0.jpg sun_cam_0.$time0.jpg
-sudo mv sun_cam_1.jpg sun_cam_1.$time1.jpg
-sudo mv sun_cam_2.jpg sun_cam_2.$time2.jpg
+sudo mv sun_cam_0.jpg suncam_$time0.0.jpg
+sudo mv sun_cam_1.jpg suncam_$time1.1.jpg
+sudo mv sun_cam_2.jpg suncam_$time2.2.jpg
 
-sudo cp sun_cam_*.jpg /media/ssd_0/sun_cameras/
-sudo cp sun_cam_*.jpg /media/ssd_1/sun_cameras/
+sudo cp suncam_*.jpg /media/ssd_0/sun_cameras/
+sudo cp suncam_*.jpg /media/ssd_1/sun_cameras/
 
-sudo rm sun_cam_*.jpg
+sudo rm suncam_*.jpg
 

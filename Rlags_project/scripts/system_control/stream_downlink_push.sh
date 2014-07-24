@@ -1,27 +1,23 @@
 #!/bin/bash
 
-cd ~/control_scripts
-
 while true
 do
 	start=$(date +%s.%N)
-	echo "Comm: assembling data bundle, beginning transmission. "$(date)
+	echo "Comm: preparing for downlink transmission. "$(date)
 
 	cd ~/control_scripts
 	./assemble_housekeeping.sh
 
-	cd ~/Rlags_project/scripts/communication
-	./push.sh #transmits bundle.tar.bz2
-	#this is temporary! simulates transmit
-	sleep 30
+	cd ~/latestData
+	cat -en bundle.txt > /dev/ttyUSB2
 
-	echo "Comm: transmission completed. "$(date)
+	echo "Comm: transmission completed. Archiving."
 
-	waitTime=$(cat transmission_rate) #number of minutes between the beginning of each transmission
+	cp bundle.txt /media/ssd_0/link_sent/data_$start.txt
+	cp bundle.txt /media/ssd_1/link_sent/data_$start.txt
+
+	rm bundle.txt
+
 	end=$(date +%s.%N)
-
-	if [ $waitTime -gt 0 ] #if it's > 0
-	then
-		sleep $(echo "$waitTime * 60 - $end + $start" | bc) #question: what if $waitTime < end-start?
-	fi
+	sleep $(echo 60 - $end + $start - 0.009 | bc)
 done
