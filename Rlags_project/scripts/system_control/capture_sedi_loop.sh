@@ -63,8 +63,8 @@ function startCycle() {
 	# sleep 5 #leaves time to control-C if need be
 }
 
-#while true
-#do
+while true
+do
 	# run each calibration_lamp, calibration_nolamp, capture cycle
 	# each scientific capture is one of three possible watchfiles
 	# Landon wanted a consistent integration time for calibration, but 120/180/240 seconds for capture
@@ -72,4 +72,4 @@ function startCycle() {
 	startCycle 1
 	startCycle 2
 	startCycle 3
-#done
+done

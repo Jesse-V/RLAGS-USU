@@ -38,6 +38,10 @@ sudo stty -F /dev/ttyUSB1 1200
 echo "Sys init: setting baudrate for TX (ttyUSB2) downlink..."
 sudo stty -F /dev/ttyUSB2 115200
 
+echo "Sys init: initializing GPS stream reading..."
+cd ~/Rlags_project/scripts/gps
+./streamInGPS.sh & #begin transferring from ttyUSB0 to buffer file
+
 echo "Sys init: archiving IMU timestamp..."
 cd ~/Rlags_project/scripts/imu/build
 ./get_imu_data.sh

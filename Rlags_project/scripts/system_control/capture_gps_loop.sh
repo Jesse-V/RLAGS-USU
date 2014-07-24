@@ -3,13 +3,16 @@
 cd ~/Rlags_project/scripts/gps
 startup=$(date +%s.%N)
 
-./streamInGPS.sh & #begin transferring from ttyUSB0 to buffer file
-
 while true
 do
 	start=$(date +%s.%N)
 
-	tail -50 gpsStream.txt | grep -v '^$' | tail -15 > ~/latestData/gpsData.txt
+	#tail -50 gpsStream.txt | grep -v '^$' | tail -15 >> ~/tempGPS.txt
+	#cp gpsStream.txt gpsStream.temp.txt
+	#tail -50 gpsStream.temp.txt >> ~/tempGPS.txt
+	#mv ~/tempGPS.txt ~/gpsExp.txt
+
+	tail -50 gpsStream.txt | grep -v '^$' | tail -20 > ~/latestData/gpsData.txt
 
 	cp gpsStream.txt /media/ssd_0/gps/stream.$startup.txt
 	cp gpsStream.txt /media/ssd_1/gps/stream.$startup.txt
