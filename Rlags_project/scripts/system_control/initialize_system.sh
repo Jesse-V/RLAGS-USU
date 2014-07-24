@@ -41,6 +41,8 @@ sudo stty -F /dev/ttyUSB2 115200
 echo "Sys init: initializing GPS stream reading..."
 cd ~/Rlags_project/scripts/gps
 ./streamInGPS.sh & #begin transferring from ttyUSB0 to buffer file
+sleep 0.5
+tail -f gpsStream.txt | grep --line-buffered -E "GPRMC" | python parse.py &
 
 echo "Sys init: archiving IMU timestamp..."
 cd ~/Rlags_project/scripts/imu/build

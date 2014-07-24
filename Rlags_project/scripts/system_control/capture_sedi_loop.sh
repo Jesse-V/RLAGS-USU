@@ -21,16 +21,16 @@ function startCycle() {
 	echo 200 >> ~/Rlags_project/scripts/communication/build/serial_input
 
 	#calibration with lamp
-	sudo ./capture.sh calibration_watchfile calibration_lamp $dirName
+	sudo ./capture.sh calibration_watchfile $1_calibration_lamp $dirName
 
 	echo "SEDI: turning lamp off"
 	echo 201 >> ~/Rlags_project/scripts/communication/build/serial_input
 
 	#calibration with no lamp
-	sudo ./capture.sh calibration_watchfile calibration_nolamp $dirName
+	sudo ./capture.sh calibration_watchfile $1_calibration_nolamp $dirName
 
 	#scientific capture
-	sudo ./capture.sh exposure_watchfile$1 capture_trial$1 $dirName
+	sudo ./capture.sh $1_exposure_watchfile $1_capture $dirName
 
 	echo "SEDI: storing camera data"
 	cd workingDir
