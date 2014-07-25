@@ -24,6 +24,6 @@ do
 	echo "Sun/star cameras: capture ended "$(date +%s.%N)
 
 	end=$(date +%s.%N)
-	echo "Sun/star cameras: took "$($end - $start | bc)
+	echo "Sun/star cameras: took "$(echo "$end - $start" | bc)" seconds"
 	sleep $(echo 45 - $end + $start - 0.009 | bc)
 done

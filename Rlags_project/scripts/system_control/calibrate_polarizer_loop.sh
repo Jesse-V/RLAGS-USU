@@ -19,7 +19,7 @@ do
 	((counter++))
 
 	if [[ $((counter % 20)) -eq 0 ]]; then
-		echo "Polarizer: set to "$angle", "$(date)
+		echo "Polarizer: set to "$angle
 	fi
 
 	sleep 0.5
