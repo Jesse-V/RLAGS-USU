@@ -44,6 +44,11 @@ cd ~/Rlags_project/scripts/gps
 sleep 0.5
 tail -f gpsStream.txt | grep --line-buffered -E "GPRMC" | python parse.py &
 
+echo "Sys init: initializing uplink reading..."
+cd ~/Rlags_project/scripts/communication
+rm -f uplinkBuffer.txt
+hexdump -e '/1 "%02X"' < /dev/ttyUSB1 | perl -wlne 'print $1 if /(FAF3(E01F|E11E)10EF.*)/g' | cut -b 9-12 >> uplinkBuffer.txt &
+
 echo "Sys init: archiving IMU timestamp..."
 cd ~/Rlags_project/scripts/imu/build
 ./get_imu_data.sh
@@ -52,4 +57,3 @@ cat new_cc_data.txt >> /media/ssd_0/time/imu_cc_$now.txt
 cat new_d2_data.txt >> /media/ssd_0/time/imu_d2_$now.txt
 cat new_cc_data.txt >> /media/ssd_1/time/imu_cc_$now.txt
 cat new_d2_data.txt >> /media/ssd_1/time/imu_d2_$now.txt
-

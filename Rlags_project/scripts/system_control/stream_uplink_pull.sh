@@ -9,23 +9,15 @@ distributeCommand()
 		return
 	fi
 
-	if [ -z "$4" ]; then
-		echo "Link: not enough arguments, ignoring"
-		return
+	echo "Link: received command "$1
+
+	if [[ $1 == *10EF* ]]; then
+		sudo reboot -f
 	fi
 
-	echo "Link: received command "$1" "$2" "$3" "$4
-
-	cd ~/Rlags_project/scripts/sedi_camera
-	./update_watchfile $1 exposure_watchfile #changes integration time for capture
-	./update_watchfile $2 calibration_watchfile
-
-	if [ $3 -eq 911 ]
-	then
-		sudo reboot
+	if [[ $1 == *EF10* ]]; then
+                sudo reboot -f
 	fi
-
-	echo -n $4 > transmission_rate
 }
 
 waitForCommand()
@@ -41,7 +33,6 @@ waitForCommand()
 	done
 }
 
+
 cd ~/Rlags_project/scripts/communication
-rm -r uplink_in_stream
-touch uplink_in_stream
-tail -f uplink_in_stream | grep --line-buffered -E "*" | waitForCommand
+tail -f uplinkBuffer.txt | grep --line-buffered -E "*" | waitForCommand

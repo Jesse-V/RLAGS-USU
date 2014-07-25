@@ -58,6 +58,7 @@ echo "Startup: beginning scientific capture"
 ./capture_imu_loop.sh &>> ~/latestData/status.log &	  #IMU querying and archiving
 ./capture_gps_loop.sh &>> ~/latestData/status.log &	  #Periodically archive GPS data stream
 ./capture_thermal_loop.sh &>> ~/latestData/status.log &  #Timestamp and archive thermal data
+sleep 0.6
 ./calibrate_polarizer_loop.sh &>> ~/latestData/status.log & #keep the polarizer calibrated properly
 
 #wait until star/sun images come in, then we have something
@@ -66,7 +67,7 @@ do
         sleep 0.25
 done
 
-#./stream_uplink_pull.sh &>> ~/latestData/status.log &	  #handle incoming commands from uplink
+./stream_uplink_pull.sh &>> ~/latestData/status.log &	  #handle incoming commands from uplink
 ./stream_downlink_push.sh &>> ~/latestData/status.log &  #transmit data bundles to downlink
 
 echo "Startup: startup complete, all systems activated. "$(date)

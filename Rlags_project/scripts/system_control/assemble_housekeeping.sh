@@ -12,7 +12,7 @@ echo "****BEGIN****"		>> housekeeping/bundle.txt
 echo $(date) 			>> housekeeping/bundle.txt
 echo $(uptime) 			>> housekeeping/bundle.txt
 echo -e "\n****EVENTS***" 	>> housekeeping/bundle.txt
-tail -100 status.log		>> housekeeping/bundle.txt
+tail -150 status.log		>> housekeeping/bundle.txt
 echo -e "\n****GOQAT****" 	>> housekeeping/bundle.txt
 sudo tail -40 /root/GoQat/log.txt >> housekeeping/bundle.txt
 echo -e "\n****TEMPS****" 	>> housekeeping/bundle.txt
