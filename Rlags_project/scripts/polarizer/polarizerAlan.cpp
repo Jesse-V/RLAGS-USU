@@ -121,8 +121,8 @@ void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_
 
   // Converts the date to J (Julian Epoch - 2000, to within a minute or so)
   double julianDay = juliandate(day, gmt);
-
   // std::cout << juliandate << std::endl;
+//printf ("%f\n", julianDay);
 
   double dDay = (juliandate(day, gmt) - 2456894.0000);
   double RAsun = 153.263 + dDay*0.922;                           // unit of degrees
@@ -141,9 +141,9 @@ void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_
   sunE << sin(DECsun), -cos(DECsun)*sin(LST-RAsun), -cos(DECsun)*cos(LST-RAsun);
 
   Matrix_3x3d Meg;
-  Meg <<  cos(Lat),   0,  sin(Lat),
+  Meg <<  cos(Lat * (M_PI / 180)),   0,  sin(Lat * (M_PI / 180)),
           0,          1,  0,
-          -sin(Lat),  0,  cos(Lat);
+          -sin(Lat * (M_PI / 180)),  0,  cos(Lat * (M_PI / 180));
 
   Matrix_3x1d sunG = Meg * sunE;
 
@@ -175,16 +175,18 @@ void polarizer(Degree lat, Degree lon, /*double alt, */GMT gmt, Day day, Matrix_
   double phi = atan2(sunP[0],sunP[1])*180/M_PI;  //units of degrees
   double dPhi = fmod(167.5-phi,180);
 
+	std::cout << "PHI: " << phi << std::endl;
+	std::cout << "dPhi: " << dPhi << std::endl;
   // std::cout << dPhi << std::endl;
 
   double CODE = 0;
   if (dPhi < 92.5)
   {
-    CODE = std::max((dPhi-2.5), static_cast<double>(0));
+    CODE = dPhi - 2.5;
   }
   else
   {
-    CODE = std::min((dPhi*1.0588-7.939), static_cast<double>(180));
+    CODE = dPhi * 1.0588 - 7.939;
   }
   printf("%f", CODE);
 }
