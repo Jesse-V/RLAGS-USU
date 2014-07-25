@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#IMU SCRIPT MUST BE RUNNING FOR THIS TO WORK RIGHT
+
 echo "Polarizer: beginning continue polarizer adjustments"
 cd ~/Rlags_project/scripts/polarizer/build
 start=$(date +%s.%N)
@@ -13,15 +15,13 @@ do
 	cat ~/latestData/polarizerInfo.txt >> /media/ssd_0/polarizer/stream.$start.txt
 	cat ~/latestData/polarizerInfo.txt >> /media/ssd_1/polarizer/stream.$start.txt
 
-	cat ~/latestData/polarizerInfo.txt
+	angle=$(tail -1 ~/latestData/polarizerInfo.txt)
+	((counter++))
 
-#	angle=$(tail -1 ~/latestData/polarizerInfo.txt)
-#	((counter++))
+	if [[ $((counter % 20)) -eq 0 ]]; then
+		echo "Polarizer: set to "$angle", "$(date)
+	fi
 
-#	if [[ $((counter % 5)) -eq 0 ]]; then
-#		echo "Polarizer: set to "$angle", "$(date)
-#	fi
-
-	sleep 2.5
+	sleep 0.5
 done
 

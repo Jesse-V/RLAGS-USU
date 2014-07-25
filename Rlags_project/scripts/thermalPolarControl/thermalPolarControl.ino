@@ -315,7 +315,6 @@ void loop() {
           setServoAngle(servoAngle);
         }
         Serial.print(servoAngle);
-        servoAngle = 0;
         setServoAngle(servoAngle);
       }
     }

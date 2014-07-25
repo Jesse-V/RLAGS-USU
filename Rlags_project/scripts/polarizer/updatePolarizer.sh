@@ -3,7 +3,7 @@
 gps=$(cat ../../gps/latestGps)
 
 cd ../../imu/build/
-./get_imu_data.sh
+#./get_imu_data.sh
 imu=$(cat new_cc_data.txt | python parseCC.py)
 
 cd ../../polarizer/build/
@@ -16,8 +16,8 @@ min=$(date -u +'%M')
 sec=$(date -u +'%S')
 
 angle=$(./polarizer ${year} ${month} ${day} ${hour} ${min} ${sec} ${gps} ${imu})
-echo ${gps}
-echo ${imu}
+#echo ${gps}
+#echo ${imu}
 echo ${year} ${month} ${day} ${hour} ${min} ${sec} ${gps} ${imu}
 echo $angle", "$(date)
-#echo $angle >> ~/Rlags_project/scripts/communication/build/serial_input
+echo $angle >> ~/Rlags_project/scripts/communication/build/serial_input
