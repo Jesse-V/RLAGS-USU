@@ -29,7 +29,7 @@ int main()
 	setValue(CONTROL_EXPOSURE, exposureTime, autoExpose);
 	setValue(CONTROL_BRIGHTNESS, 5, false);
 	setValue(CONTROL_GAMMA, 50, false);
-	setValue(CONTROL_GAIN, 10, false);
+	setValue(CONTROL_GAIN, 50, false);
 
 	//int exposure_us = getValue(CONTROL_EXPOSURE, &autov);
 	//int gain = getValue(CONTROL_GAIN, &autov);
