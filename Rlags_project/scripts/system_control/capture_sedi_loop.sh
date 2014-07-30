@@ -5,7 +5,7 @@ commPID=$(./get_arduino_comm_pid.sh)
 echo "SEDI: Arduino communication PID is: "$commPID
 
 cd ~/Rlags_project/scripts/sedi_camera
-rm -rf workingDir
+sudo rm -rf workingDir
 mkdir workingDir
 
 echo "SEDI: capture loop started"

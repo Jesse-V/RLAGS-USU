@@ -13,6 +13,8 @@ echo $(date) 			>> housekeeping/bundle.txt
 echo $(uptime) 			>> housekeeping/bundle.txt
 echo -e "\n****EVENTS***" 	>> housekeeping/bundle.txt
 tail -150 status.log		>> housekeeping/bundle.txt
+echo -e "\n****SEDI*****"       >> housekeeping/bundle.txt
+grep -E "SEDI|UPTIME" status.log | tail -40 >> housekeeping/bundle.txt
 echo -e "\n****GOQAT****" 	>> housekeeping/bundle.txt
 sudo tail -40 /root/GoQat/log.txt >> housekeeping/bundle.txt
 echo -e "\n****TEMPS****" 	>> housekeeping/bundle.txt

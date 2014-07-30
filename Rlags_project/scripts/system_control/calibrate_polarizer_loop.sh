@@ -18,10 +18,10 @@ do
 	angle=$(tail -1 ~/latestData/polarizerInfo.txt)
 	((counter++))
 
-	if [[ $((counter % 20)) -eq 0 ]]; then
+	if [[ $((counter % 2)) -eq 0 ]]; then
 		echo "Polarizer: set to "$angle
 	fi
 
-	sleep 0.5
+	sleep 5
 done
 

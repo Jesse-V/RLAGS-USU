@@ -13,10 +13,22 @@ fi
 echo "SEDI: triggering GoQat camera for "$2", "$(date +%H:%M:%S)
 cp ../$1 /home/my_watch
 cp ../$1 $(pwd)/$3/
+
 startTime=$(date +"%s.%N")
+counter=0
 
 while [ ! -f /root/GoQat/ccd_display.fit ];
 do
+	((counter++))
+
+	if [[ $counter -gt 3600 ]]; then #if longer than 6 minutes (3600 ticks)
+		echo "SEDI: DETECTED HANG, RETRYING CAPTURE, "$(date)
+
+		cp ../$1 /home/my_watch
+		startTime=$(date +"%s.%N")
+		counter=0
+	fi
+
 	sleep 0.1
 done
 
