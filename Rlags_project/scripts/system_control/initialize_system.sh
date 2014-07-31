@@ -25,9 +25,10 @@ sudo chmod 666 ~/latestData/status.log
 
 echo "Sys init: initializing Odroid-Arduino communication..."
 cd ~/Rlags_project/scripts/communication/build
-rm -f serial_input ../serial_output
-touch serial_input ../serial_output
-tail -f serial_input | grep --line-buffered -E "*" | ./serial &> ../serial_output &
+rm -f rawSerialInput serialFeed serial_output
+touch rawSerialInput serialFeed serial_output
+./serial_queue.sh &
+tail -f serialFeed | grep --line-buffered -E "*" | ./serial &> ../serial_output &
 
 echo "Sys init: setting baudrate for GPS (ttyUSB0) link..."
 sudo stty -F /dev/ttyUSB0 600

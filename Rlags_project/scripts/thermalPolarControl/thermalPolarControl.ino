@@ -321,16 +321,16 @@ void loop() {
 
     else if(servoAngle == 200)
     {
-      //Serial.print("\t");
+      Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, HIGH);
-      //Serial.print("ON");
+      Serial.print("ON");
     }
 
     else if(servoAngle == 201)
     {
-      //Serial.print("\t");
+      Serial.print("\t");
       digitalWrite(CALIBR_ENABLE, LOW);
-      //Serial.print("OFF");
+      Serial.print("OFF");
     }
   }
 

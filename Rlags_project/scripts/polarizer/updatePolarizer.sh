@@ -20,4 +20,4 @@ angle=$(./polarizer ${year} ${month} ${day} ${hour} ${min} ${sec} ${gps} ${imu})
 #echo ${imu}
 echo ${year} ${month} ${day} ${hour} ${min} ${sec} ${gps} ${imu}
 echo $angle", "$(date)
-echo $angle >> ~/Rlags_project/scripts/communication/build/serial_input
+echo $angle >> ~/Rlags_project/scripts/communication/build/rawSerialInput
