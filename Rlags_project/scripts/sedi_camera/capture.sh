@@ -24,6 +24,8 @@ do
 	if [[ $counter -gt 3600 ]]; then #if longer than 6 minutes (3600 ticks)
 		echo "SEDI: DETECTED HANG, RETRYING CAPTURE, "$(date)
 
+		(cd ~/Rlags_project/scripts/sedi_camera; sudo ./initialize_goqat.sh) #restart SEDI
+		sleep 5
 		cp ../$1 /home/my_watch
 		startTime=$(date +"%s.%N")
 		counter=0

@@ -7,7 +7,7 @@ queueUp()
 		read line
 		echo $line >> serialFeed
 
-		sleep 4
+		sleep 6
 	done
 }
 
