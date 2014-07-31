@@ -19,14 +19,14 @@ function startCycle() {
 
 	echo "SEDI: turning lamp on"
 	echo 200 >> ~/Rlags_project/scripts/communication/build/rawSerialInput
-	sleep 7
+	sleep 4
 
 	#calibration with lamp
 	sudo ./capture.sh calibration_watchfile $1_calibration_lamp $dirName
 
 	echo "SEDI: turning lamp off"
 	echo 201 >> ~/Rlags_project/scripts/communication/build/rawSerialInput
-	sleep 7
+	sleep 4
 
 	#calibration with no lamp
 	sudo ./capture.sh calibration_watchfile $1_calibration_nolamp $dirName

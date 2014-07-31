@@ -22,6 +22,6 @@ do
 		echo "Polarizer: set to "$angle
 	fi
 
-	sleep 10
+	sleep 5
 done
 
